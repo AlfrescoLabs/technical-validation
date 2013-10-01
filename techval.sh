@@ -1,7 +1,23 @@
 #!/bin/sh
+#
+# Copyright © 2013 Peter Monks (pmonks@alfresco.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# This file is part of an unsupported extension to Alfresco.
 
 # Operating environment tunables - modify as needed to fit your system
-DEPENDS_DIR=/Users/pmonks/Development/Alfresco/certification/tools/depends
+DEPENDS_DIR=~/Development/Alfresco/certification/tools/depends
 NEO4J_URL=http://localhost:7474/db/data/
 NEO4J_DB_DIR=/usr/local/Cellar/neo4j/community-1.9.3-unix/libexec/data/
 
@@ -18,15 +34,15 @@ fi
 
 # Parse & validate script arguments
 BINARIES=
-OUTPUT_FILE=technicalValidationReport.txt
+OUTPUT_FILE=./technicalValidationReport.txt
 SOURCE_DIR=.
 
-while getopts "b:o:s:h?" flag; do
+while getopts "b:r:s:h?" flag; do
   if [ "$flag" == "b" ]; then
     BINARIES=$OPTARG
   fi
 
-  if [ "$flag" == "o" ]; then
+  if [ "$flag" == "r" ]; then
     OUTPUT_FILE=$OPTARG
   fi
 
@@ -35,24 +51,27 @@ while getopts "b:o:s:h?" flag; do
   fi
 
   if [ "$flag" == "h" ]; then
-  echo "Usage:"
-  echo "techval [-?h] [-s sourceDirectory] -b locationOfBinaries"
-  echo "If not provided, sourceDirectory defaults to ."
+    echo "Usage:"
+    echo "techval [-?h] [-s sourceDirectory] [-r reportFile] -b locationOfBinaries"
+    echo "If not provided, sourceDirectory defaults to ."
+    echo "If not provided, reportFile defaults to ./technicalValidationReport.txt"
     exit 0
   fi
 
   if [ "$flag" == "?" ]; then
-  echo "Usage:"
-  echo "techval [-?h] [-s sourceDirectory] -b locationOfBinaries"
-  echo "If not provided, sourceDirectory defaults to ."
+    echo "Usage:"
+    echo "techval [-?h] [-s sourceDirectory] [-r reportFile] -b locationOfBinaries"
+    echo "If not provided, sourceDirectory defaults to ."
+    echo "If not provided, reportFile defaults to ./technicalValidationReport.txt"
     exit 0
   fi
 done
 
 if [ -z "$BINARIES" ]; then
   echo "Usage:"
-  echo "techval [-?h] [-s sourceDirectory] -b locationOfBinaries"
+  echo "techval [-?h] [-s sourceDirectory] [-r reportFile] -b locationOfBinaries"
   echo "If not provided, sourceDirectory defaults to ."
+  echo "If not provided, reportFile defaults to ./technicalValidationReport.txt"
   exit -1
 fi
 
@@ -62,7 +81,7 @@ echo "-------------------------------------------"
 echo "Report date:      $(date)"
 echo "Source directory: ${SOURCE_DIR}"
 echo "Binaries:         ${BINARIES}"
-echo "Report:           ${OUTPUT_FILE}"
+echo "Report file:      ${OUTPUT_FILE}"
 
 echo "+----------------------------------------------------------------------+" > ${OUTPUT_FILE}
 echo "| Alfresco Technical Validation Report                                 |" >> ${OUTPUT_FILE}
