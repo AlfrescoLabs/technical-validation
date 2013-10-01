@@ -34,7 +34,7 @@ fi
 
 # Parse & validate script arguments
 BINARIES=
-OUTPUT_FILE=./technicalValidationReport.txt
+REPORT_FILE=./technicalValidationReport.txt
 SOURCE_DIR=.
 
 while getopts "b:r:s:h?" flag; do
@@ -43,7 +43,7 @@ while getopts "b:r:s:h?" flag; do
   fi
 
   if [ "$flag" == "r" ]; then
-    OUTPUT_FILE=$OPTARG
+    REPORT_FILE=$OPTARG
   fi
 
   if [ "$flag" == "s" ]; then
@@ -81,14 +81,14 @@ echo "-------------------------------------------"
 echo "Report date:      $(date)"
 echo "Source directory: ${SOURCE_DIR}"
 echo "Binaries:         ${BINARIES}"
-echo "Report file:      ${OUTPUT_FILE}"
+echo "Report file:      ${REPORT_FILE}"
 
-echo "+----------------------------------------------------------------------+" > ${OUTPUT_FILE}
-echo "| Alfresco Technical Validation Report                                 |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "Report date:      $(date)" >> ${OUTPUT_FILE}
-echo "Source directory: ${SOURCE_DIR}" >> ${OUTPUT_FILE}
-echo "Binaries:         ${BINARIES}" >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" > ${REPORT_FILE}
+echo "| Alfresco Technical Validation Report                                 |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "Report date:      $(date)" >> ${REPORT_FILE}
+echo "Source directory: ${SOURCE_DIR}" >> ${REPORT_FILE}
+echo "Binaries:         ${BINARIES}" >> ${REPORT_FILE}
 
 # Stop, clean and restart Neo4J
 echo "Reticulating splines..."
@@ -104,38 +104,38 @@ lein run -- -n ${NEO4J_URL} ${BINARIES}
 popd > /dev/null
 
 echo "Summarising source code..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Source Code Stats                                                    |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${OUTPUT_FILE}
-echo "Freemarker files:    `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${OUTPUT_FILE}
-echo "Freemarker LoC:      `find ${SOURCE_DIR} -name \*.ftl -exec wc -l {} \; | awk '{ sum += $1 } END { print sum }'`" >> ${OUTPUT_FILE}
-echo "Content models:      `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.alfresco.org/model/dictionary/1.0 {} \; | wc -l`" >> ${OUTPUT_FILE}
-echo "Spring app contexts: $((`find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/dtd/spring-beans.dtd {} \; | wc -l` + `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/schema/beans {} \; | wc -l`))" >> ${OUTPUT_FILE}
-echo "Web Scripts:         `find ${SOURCE_DIR} -name \*.desc.xml | wc -l`" >> ${OUTPUT_FILE}
-echo "Actions:             `find ${SOURCE_DIR} -name \*.java -exec grep -l ActionExecutor {} \; | wc -l`" >> ${OUTPUT_FILE}
-echo "Behaviours:          `find ${SOURCE_DIR} -name \*.java -exec grep -l bindClassBehaviour {} \; | wc -l`" >> ${OUTPUT_FILE}
-echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.quartz.Job {} \; | wc -l`" >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Source Code Stats                                                    |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${REPORT_FILE}
+echo "Freemarker files:    `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${REPORT_FILE}
+echo "Freemarker LoC:      `find ${SOURCE_DIR} -name \*.ftl -exec wc -l {} \; | awk '{ sum += $1 } END { print sum }'`" >> ${REPORT_FILE}
+echo "Content models:      `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.alfresco.org/model/dictionary/1.0 {} \; | wc -l`" >> ${REPORT_FILE}
+echo "Spring app contexts: $((`find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/dtd/spring-beans.dtd {} \; | wc -l` + `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/schema/beans {} \; | wc -l`))" >> ${REPORT_FILE}
+echo "Web Scripts:         `find ${SOURCE_DIR} -name \*.desc.xml | wc -l`" >> ${REPORT_FILE}
+echo "Actions:             `find ${SOURCE_DIR} -name \*.java -exec grep -l ActionExecutor {} \; | wc -l`" >> ${REPORT_FILE}
+echo "Behaviours:          `find ${SOURCE_DIR} -name \*.java -exec grep -l bindClassBehaviour {} \; | wc -l`" >> ${REPORT_FILE}
+echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.quartz.Job {} \; | wc -l`" >> ${REPORT_FILE}
 
-[[ -n `find . -name pom.xml -print -quit` ]] && echo "Build tool:                Maven" >> ${OUTPUT_FILE}
-[[ -n `find . -name build.xml -print -quit` ]] && echo "Build tool:                Ant" >> ${OUTPUT_FILE}
+[[ -n `find . -name pom.xml -print -quit` ]] && echo "Build tool:                Maven" >> ${REPORT_FILE}
+[[ -n `find . -name build.xml -print -quit` ]] && echo "Build tool:                Ant" >> ${REPORT_FILE}
 
 echo "Checking for use of eval() in JavaScript..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Use of eval() in Javascript                                          |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of eval() in Javascript                                          |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
 
 echo "Checking for use of synchronisation..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Use of synchronised in Java                                          |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-find ${SOURCE_DIR} -name \*.java -exec grep -Hn synchronized {} \; | cut -d":" -f1-2 >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of synchronised in Java                                          |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.java -exec grep -Hn synchronized {} \; | cut -d":" -f1-2 >> ${REPORT_FILE}
 
 echo "Checking class version..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Java Class Versions                                                  |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Java Class Versions                                                  |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
  START n=node(*)
  WHERE has(n.name)
@@ -143,12 +143,12 @@ neo4j-shell -readonly -c "cypher 1.9
    AND n.\`class-version\` < 50
 RETURN n.name as Class, n.\`class-version-str\` as Class_Version
  ORDER BY n.name;
-" >> ${OUTPUT_FILE}
+" >> ${REPORT_FILE}
 
 echo "Checking for use of blacklisted JDK APIs..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Blacklisted JDK API usage                                            |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Blacklisted JDK API usage                                            |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
  START n=node(*)
  MATCH (n)-->(m)
@@ -181,12 +181,12 @@ neo4j-shell -readonly -c "cypher 1.9
                              ]))
 RETURN n.name as Class, collect(distinct m.name) as Blacklisted_JDK_APIs_Used
  ORDER BY n.name;
-" >> ${OUTPUT_FILE}
+" >> ${REPORT_FILE}
 
 echo "Checking for use of blacklisted Alfresco APIs..."
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| Blacklisted Alfresco API usage                                       |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Blacklisted Alfresco API usage                                       |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
 START n=node(*)
 MATCH (n)-->(m)
@@ -385,12 +385,15 @@ WHERE has(n.name)
                     ])
 RETURN n.name as Class, collect(distinct m.name) as Blacklisted_Alfresco_APIs_Used
  ORDER BY n.name;
-" >> ${OUTPUT_FILE}
+" >> ${REPORT_FILE}
 
 # Stop neo4j once we're done
 neo4j stop > /dev/null
 
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "| End of Technical Validation Report                                   |" >> ${OUTPUT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${OUTPUT_FILE}
-echo "Script complete - report has been written to ${OUTPUT_FILE}."
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| End of Technical Validation Report                                   |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "Script complete - report has been written to ${REPORT_FILE}."
+
+# Note: I believe this next line s Mac OSX specific
+open ${REPORT_FILE}
