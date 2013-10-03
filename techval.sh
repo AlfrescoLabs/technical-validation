@@ -76,9 +76,9 @@ if [ -z "$BINARIES" ]; then
 fi
 
 # Reporting logic
-echo "Alfresco Technical Validation Report Script"
-echo "-------------------------------------------"
-echo "Report date:      $(date)"
+echo "\n                  Alfresco Technical Validation Report Script"
+echo "                  -------------------------------------------"
+echo "\nReport date:      $(date)"
 echo "Source directory: ${SOURCE_DIR}"
 echo "Binaries:         ${BINARIES}"
 echo "Report file:      ${REPORT_FILE}"
@@ -91,7 +91,7 @@ echo "Source directory: ${SOURCE_DIR}" >> ${REPORT_FILE}
 echo "Binaries:         ${BINARIES}" >> ${REPORT_FILE}
 
 # Stop, clean and restart Neo4J
-echo "Reticulating splines..."
+echo "\nReticulating splines..."
 neo4j stop > /dev/null
 rm -rf ${NEO4J_DB_DIR}/graph.db
 rm -f  ${NEO4J_DB_DIR}/keystore
@@ -104,7 +104,7 @@ lein run -- -n ${NEO4J_URL} ${BINARIES}
 popd > /dev/null
 
 echo "Summarising source code..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Source Code Stats                                                    |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${REPORT_FILE}
@@ -121,19 +121,19 @@ echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.q
 [[ -n `find . -name build.xml -print -quit` ]] && echo "Build tool:                Ant" >> ${REPORT_FILE}
 
 echo "Checking for use of eval() in JavaScript..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Use of eval() in Javascript                                          |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
 
 echo "Checking for use of synchronisation..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Use of synchronised in Java                                          |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.java -exec grep -Hn synchronized {} \; | cut -d":" -f1-2 >> ${REPORT_FILE}
 
 echo "Checking class version..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Java Class Versions                                                  |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
@@ -146,7 +146,7 @@ RETURN n.name as Class, n.\`class-version-str\` as Class_Version
 " >> ${REPORT_FILE}
 
 echo "Checking for use of blacklisted JDK APIs..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Blacklisted JDK API usage                                            |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
@@ -184,7 +184,7 @@ RETURN n.name as Class, collect(distinct m.name) as Blacklisted_JDK_APIs_Used
 " >> ${REPORT_FILE}
 
 echo "Checking for use of blacklisted Alfresco APIs..."
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Blacklisted Alfresco API usage                                       |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
@@ -390,7 +390,7 @@ RETURN n.name as Class, collect(distinct m.name) as Blacklisted_Alfresco_APIs_Us
 # Stop neo4j once we're done
 neo4j stop > /dev/null
 
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| End of Technical Validation Report                                   |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "Script complete - report has been written to ${REPORT_FILE}."
