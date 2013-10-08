@@ -19,7 +19,7 @@
 # Operating environment tunables - modify as needed to fit your system
 DEPENDS_DIR=~/Development/Alfresco/certification/tools/depends
 NEO4J_URL=http://localhost:7474/db/data/
-NEO4J_DB_DIR=/usr/local/Cellar/neo4j/community-1.9.3-unix/libexec/data/
+NEO4J_DB_DIR=/usr/local/Cellar/neo4j/community-1.9.4-unix/libexec/data/
 
 # Validate operating environment
 if [ ! -d "${DEPENDS_DIR}" ]; then
@@ -105,7 +105,7 @@ popd > /dev/null
 
 echo "Summarising source code..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Source Code Stats                                                    |" >> ${REPORT_FILE}
+echo "| Source Code Stats (Summary)                                          |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${REPORT_FILE}
 echo "Freemarker files:    `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${REPORT_FILE}
@@ -120,72 +120,9 @@ echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.q
 [[ -n `find . -name pom.xml -print -quit` ]] && echo "Build tool:                Maven" >> ${REPORT_FILE}
 [[ -n `find . -name build.xml -print -quit` ]] && echo "Build tool:                Ant" >> ${REPORT_FILE}
 
-echo "Checking for use of eval() in JavaScript..."
-echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Use of eval() in Javascript                                          |" >> ${REPORT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
-
-echo "Checking for use of synchronisation..."
-echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Use of synchronised in Java                                          |" >> ${REPORT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name \*.java -exec grep -Hn synchronized {} \; | cut -d":" -f1-2 >> ${REPORT_FILE}
-
-echo "Checking class version..."
-echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Java Class Versions                                                  |" >> ${REPORT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-neo4j-shell -readonly -c "cypher 1.9
- START n=node(*)
- WHERE has(n.name)
-   AND has(n.\`class-version\`)
-   AND n.\`class-version\` < 50
-RETURN n.name as Class, n.\`class-version-str\` as Class_Version
- ORDER BY n.name;
-" >> ${REPORT_FILE}
-
-echo "Checking for use of blacklisted JDK APIs..."
-echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Blacklisted JDK API usage                                            |" >> ${REPORT_FILE}
-echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-neo4j-shell -readonly -c "cypher 1.9
- START n=node(*)
- MATCH (n)-->(m)
- WHERE has(n.name)
-   AND has(m.name)
-   AND (   m.name IN [
-                      'java.lang.Throwable',
-                      'java.lang.System',
-                      'java.lang.Thread',
-                      'java.lang.ThreadGroup',
-                      'java.lang.ThreadLocal',
-                      'java.lang.Runnable',
-                      'java.lang.Process',
-                      'java.lang.ProcessBuilder',
-                      'java.lang.ClassLoader',
-                      'java.security.SecureClassLoader'
-                     ]
-        OR (    has(m.package)
-            AND m.package IN [
-                               'java.sql',
-                               'javax.sql',
-                               'org.springframework.jdbc',
-                               'com.ibatis',
-                               'org.hibernate',
-                               'java.util.concurrent',
-                               'javax.servlet',
-                               'javax.servlet.http',
-                               'javax.transaction',
-                               'javax.transaction.xa'
-                             ]))
-RETURN n.name as Class, collect(distinct m.name) as Blacklisted_JDK_APIs_Used
- ORDER BY n.name;
-" >> ${REPORT_FILE}
-
 echo "Checking for use of blacklisted Alfresco APIs..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Blacklisted Alfresco API usage                                       |" >> ${REPORT_FILE}
+echo "| Blacklisted Alfresco API usage (API01,STB06,UP01)                    |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
 START n=node(*)
@@ -386,6 +323,101 @@ WHERE has(n.name)
 RETURN n.name as Class, collect(distinct m.name) as Blacklisted_Alfresco_APIs_Used
  ORDER BY n.name;
 " >> ${REPORT_FILE}
+
+echo "Checking for use of synchronisation..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of synchronised in Java (STB08,STB09)                            |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.java -exec grep -Hn synchronized {} \; | cut -d":" -f1-2 >> ${REPORT_FILE}
+
+echo "Checking class version..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Java Class Versions (COM06)                                          |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+neo4j-shell -readonly -c "cypher 1.9
+ START n=node(*)
+ WHERE has(n.name)
+   AND has(n.\`class-version\`)
+   AND n.\`class-version\` < 50
+RETURN n.name as Class, n.\`class-version-str\` as Class_Version
+ ORDER BY n.name;
+" >> ${REPORT_FILE}
+
+echo "Checking for use of blacklisted JDK APIs..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Blacklisted JDK API usage (SEC04,STB03,STB04,STB10,STB12)            |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+neo4j-shell -readonly -c "cypher 1.9
+ START n=node(*)
+ MATCH (n)-->(m)
+ WHERE has(n.name)
+   AND has(m.name)
+   AND (   m.name IN [
+                      'java.lang.Throwable',
+                      'java.lang.Error',
+                      'java.lang.System',
+                      'java.lang.Thread',
+                      'java.lang.ThreadGroup',
+                      'java.lang.ThreadLocal',
+                      'java.lang.Runnable',
+                      'java.lang.Process',
+                      'java.lang.ProcessBuilder',
+                      'java.lang.ClassLoader',
+                      'java.security.SecureClassLoader'
+                     ]
+        OR (    has(m.package)
+            AND m.package IN [
+                               'java.sql',
+                               'javax.sql',
+                               'org.springframework.jdbc',
+                               'com.ibatis',
+                               'org.hibernate',
+                               'java.util.concurrent',
+                               'javax.servlet',
+                               'javax.servlet.http',
+                               'javax.transaction',
+                               'javax.transaction.xa'
+                             ]))
+RETURN n.name as Class, collect(distinct m.name) as Blacklisted_JDK_APIs_Used
+ ORDER BY n.name;
+" >> ${REPORT_FILE}
+
+echo "Checking for use of SearchService / ResultSet (manual followup required)..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of SearchService/ResultSet (STB07,UX01) - MANUAL FOLLOWUP        |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+neo4j-shell -readonly -c "cypher 1.9
+ START n=node(*)
+ MATCH (n)-->(m)
+ WHERE has(n.name)
+   AND has(m.name)
+   AND m.name IN [
+                   'org.alfresco.service.cmr.search.SearchService',
+                   'org.alfresco.service.cmr.search.ResultSet'
+                 ]
+RETURN n.name as Class, collect(distinct m.name) as SearchService_ResultSet
+ ORDER BY n.name;
+" >> ${REPORT_FILE}
+
+echo "Checking for use of AuthenticationUtil (manual followup required)..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of AuthenticationUtil (SEC02) - MANUAL FOLLOWUP                  |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+neo4j-shell -readonly -c "cypher 1.9
+ START n=node(*)
+ MATCH (n)-->(m)
+ WHERE has(n.name)
+   AND has(m.name)
+   AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil'
+RETURN n.name as Class, m.name as AuthenticationUtil
+ ORDER BY n.name;
+" >> ${REPORT_FILE}
+
+echo "Checking for use of eval() in JavaScript..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use of eval() in Javascript (SEC05)                                  |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
 
 # Stop neo4j once we're done
 neo4j stop > /dev/null
