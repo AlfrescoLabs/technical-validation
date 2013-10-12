@@ -3,8 +3,9 @@
 Tool(s) for the technical validation of custom code that extends or integrates with Alfresco.
 
 ## Dependencies
- 1. [depends](https://github.com/pmonks/depends)
- 2. [neo4j](http://www.neo4j.org/)
+ 1. [cloc](http://cloc.sourceforge.net/)
+ 2. [depends](https://github.com/pmonks/depends)
+ 3. [neo4j](http://www.neo4j.org/)
 
 ## Installation
 
