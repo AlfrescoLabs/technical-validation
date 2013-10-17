@@ -108,11 +108,11 @@ echo "\n+----------------------------------------------------------------------+
 echo "| Source Code Stats (Summary)                                          |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${REPORT_FILE}
-echo "Freemarker files:    `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${REPORT_FILE}
-echo "Freemarker LoC:      `find ${SOURCE_DIR} -name \*.ftl -exec wc -l {} \; | awk '{ sum += $1 } END { print sum }'`" >> ${REPORT_FILE}
+echo "Freemarker files:     `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${REPORT_FILE}
+echo "Freemarker LoC:             `find ${SOURCE_DIR} -name \*.ftl -exec wc -l {} \; | awk '{ sum += $1 } END { print sum }'`" >> ${REPORT_FILE}
 echo "Content models:      `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.alfresco.org/model/dictionary/1.0 {} \; | wc -l`" >> ${REPORT_FILE}
-echo "Spring app contexts: $((`find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/dtd/spring-beans.dtd {} \; | wc -l` + `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/schema/beans {} \; | wc -l`))" >> ${REPORT_FILE}
-echo "Web Scripts:         `find ${SOURCE_DIR} -name \*.desc.xml | wc -l`" >> ${REPORT_FILE}
+echo "Spring app contexts:        $((`find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/dtd/spring-beans.dtd {} \; | wc -l` + `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.springframework.org/schema/beans {} \; | wc -l`))" >> ${REPORT_FILE}
+echo "Web Scripts:          `find ${SOURCE_DIR} -name \*.desc.xml | wc -l`" >> ${REPORT_FILE}
 echo "Actions:             `find ${SOURCE_DIR} -name \*.java -exec grep -l ActionExecutor {} \; | wc -l`" >> ${REPORT_FILE}
 echo "Behaviours:          `find ${SOURCE_DIR} -name \*.java -exec grep -l bindClassBehaviour {} \; | wc -l`" >> ${REPORT_FILE}
 echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.quartz.Job {} \; | wc -l`" >> ${REPORT_FILE}
@@ -122,6 +122,7 @@ echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.q
 [[ -n `find ${SOURCE_DIR} -name build.gradle -print -quit` ]] && echo "Build tool:                 Gradle" >> ${REPORT_FILE}
 [[ -n `find ${SOURCE_DIR} -name project.clj -print -quit` ]] && echo "Build tool:                 Leiningen" >> ${REPORT_FILE}
 [[ -n `find ${SOURCE_DIR} -name build.sbt -print -quit` ]] && echo "Build tool:                 sbt" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name makefile -print -quit` ]] && echo "Build tool:                 Make" >> ${REPORT_FILE}
 
 
 echo "Checking for use of blacklisted Alfresco APIs..."
@@ -423,11 +424,38 @@ RETURN n.name as Class, m.name as AuthenticationUtil
  ORDER BY n.name;
 " >> ${REPORT_FILE}
 
+echo "Checking for authentication=none Web Scripts..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Avoid 'none' authentication in Web Scripts (SEC03)                   |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.desc.xml -exec grep -H "<authentication>none</authentication>" {} \; >> ${REPORT_FILE}
+
 echo "Checking for use of eval() in JavaScript..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Use of eval() in Javascript (SEC05)                                  |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
+
+echo "Checking for use of RetryingTransactionHelper..."
+echo "Checking for transaction setting in Web Scripts..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Prefer Alfresco-managed transactions (STB18)                         |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+neo4j-shell -readonly -c "cypher 1.9
+ START n=node(*)
+ MATCH (n)-->(m)
+ WHERE has(n.name)
+   AND has(m.name)
+   AND m.name = 'org.alfresco.repo.transaction.RetryingTransactionHelper'
+RETURN n.name as Class, m.name as AuthenticationUtil
+ ORDER BY n.name;
+" >> ${REPORT_FILE}
+
+echo "Checking for transaction setting in Web Scripts..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Avoid transaction setting in Web Scripts (STB19,STB20) - MANUAL FOLLOWUP |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.desc.xml -exec grep -H "<transaction>" {} \; >> ${REPORT_FILE}
 
 # Stop neo4j once we're done
 neo4j stop > /dev/null
