@@ -117,8 +117,12 @@ echo "Actions:             `find ${SOURCE_DIR} -name \*.java -exec grep -l Actio
 echo "Behaviours:          `find ${SOURCE_DIR} -name \*.java -exec grep -l bindClassBehaviour {} \; | wc -l`" >> ${REPORT_FILE}
 echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.quartz.Job {} \; | wc -l`" >> ${REPORT_FILE}
 
-[[ -n `find . -name pom.xml -print -quit` ]] && echo "Build tool:                Maven" >> ${REPORT_FILE}
-[[ -n `find . -name build.xml -print -quit` ]] && echo "Build tool:                Ant" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name pom.xml -print -quit` ]] && echo "Build tool:                 Maven" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name build.xml -print -quit` ]] && echo "Build tool:                 Ant" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name build.gradle -print -quit` ]] && echo "Build tool:                 Gradle" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name project.clj -print -quit` ]] && echo "Build tool:                 Leiningen" >> ${REPORT_FILE}
+[[ -n `find ${SOURCE_DIR} -name build.sbt -print -quit` ]] && echo "Build tool:                 sbt" >> ${REPORT_FILE}
+
 
 echo "Checking for use of blacklisted Alfresco APIs..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
@@ -138,6 +142,7 @@ WHERE has(n.name)
                       'org.alfresco.query.PagingRequest',
                       'org.alfresco.query.PagingResults',
                       'org.alfresco.repo.cache.SimpleCache',
+                      'org.alfresco.repo.module.ModuleComponent',
                       'org.alfresco.repo.node.NodeServicePolicies',
                       'org.alfresco.repo.node.NodeServicePolicies$BeforeAddAspectPolicy',
                       'org.alfresco.repo.node.NodeServicePolicies$BeforeArchiveNodePolicy',
@@ -241,6 +246,10 @@ WHERE has(n.name)
                       'org.alfresco.service.cmr.model.FileInfo',
                       'org.alfresco.service.cmr.model.FileNotFoundException',
                       'org.alfresco.service.cmr.model.SubFolderFilter',
+                      'org.alfresco.service.cmr.module.ModuleDependency',
+                      'org.alfresco.service.cmr.module.ModuleDetails',
+                      'org.alfresco.service.cmr.module.ModuleService',
+                      'org.alfresco.service.cmr.moduleModuleInstallState',
                       'org.alfresco.service.cmr.repository.AbstractStoreException',
                       'org.alfresco.service.cmr.repository.AspectMissingException',
                       'org.alfresco.service.cmr.repository.AssociationExistsException',
@@ -318,7 +327,8 @@ WHERE has(n.name)
                       'org.alfresco.util.FileNameValidator',
                       'org.alfresco.util.GUID',
                       'org.alfresco.util.ISO9075',
-                      'org.alfresco.util.Pair'
+                      'org.alfresco.util.Pair',
+                      'org.alfresco.util.VersionNumber'
                     ])
 RETURN n.name as Class, collect(distinct m.name) as Blacklisted_Alfresco_APIs_Used
  ORDER BY n.name;
