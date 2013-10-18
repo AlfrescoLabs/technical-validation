@@ -331,8 +331,8 @@ WHERE has(n.name)
                       'org.alfresco.util.Pair',
                       'org.alfresco.util.VersionNumber'
                     ])
-RETURN n.name as Class, collect(distinct m.name) as Blacklisted_Alfresco_APIs_Used
- ORDER BY n.name;
+RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
+ ORDER BY m.name;
 " >> ${REPORT_FILE}
 
 echo "Checking for use of synchronisation..."
@@ -389,8 +389,8 @@ neo4j-shell -readonly -c "cypher 1.9
                                'javax.transaction',
                                'javax.transaction.xa'
                              ]))
-RETURN n.name as Class, collect(distinct m.name) as Blacklisted_JDK_APIs_Used
- ORDER BY n.name;
+RETURN m.name as Blacklisted_JDK_API, collect(distinct n.name) as Used_By
+ ORDER BY m.name;
 " >> ${REPORT_FILE}
 
 echo "Checking for use of SearchService / ResultSet (manual followup required)..."
@@ -406,7 +406,7 @@ neo4j-shell -readonly -c "cypher 1.9
                    'org.alfresco.service.cmr.search.SearchService',
                    'org.alfresco.service.cmr.search.ResultSet'
                  ]
-RETURN n.name as Class, collect(distinct m.name) as SearchService_ResultSet
+RETURN n.name as Class, collect(distinct m.name) as Search_Class
  ORDER BY n.name;
 " >> ${REPORT_FILE}
 
@@ -436,8 +436,7 @@ echo "| Use of eval() in Javascript (SEC05)                                  |" 
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
 
-echo "Checking for use of RetryingTransactionHelper..."
-echo "Checking for transaction setting in Web Scripts..."
+echo "Checking for manual transaction demarcation..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Prefer Alfresco-managed transactions (STB18)                         |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
@@ -446,8 +445,11 @@ neo4j-shell -readonly -c "cypher 1.9
  MATCH (n)-->(m)
  WHERE has(n.name)
    AND has(m.name)
-   AND m.name = 'org.alfresco.repo.transaction.RetryingTransactionHelper'
-RETURN n.name as Class, m.name as AuthenticationUtil
+   AND m.name IN [
+                  'org.alfresco.repo.transaction.RetryingTransactionHelper',
+                  'org.alfresco.service.transaction.TransactionService'
+                 ]
+RETURN n.name as Class, collect(distinct m.name) as Transaction_Class
  ORDER BY n.name;
 " >> ${REPORT_FILE}
 
