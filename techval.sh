@@ -125,6 +125,12 @@ echo "Quartz jobs:         `find ${SOURCE_DIR} -name \*.java -exec grep -l org.q
 [[ -n `find ${SOURCE_DIR} -name makefile -print -quit` ]] && echo "Build tool:                 Make" >> ${REPORT_FILE}
 
 
+echo "Checking module version information..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Module version information (summary,UP04)                            |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name module.properties -exec grep -H version {} \; >> ${REPORT_FILE}
+
 echo "Checking for use of blacklisted Alfresco APIs..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Blacklisted Alfresco API usage (API01,STB06,UP01)                    |" >> ${REPORT_FILE}
