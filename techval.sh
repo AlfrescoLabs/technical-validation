@@ -396,6 +396,12 @@ RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
  ORDER BY m.name;
 " >> ${REPORT_FILE}
 
+echo "Checking for bean injection..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Bean injection (API05)                                               |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*-context.xml -exec grep -Hn ref= {} \; >> ${REPORT_FILE}
+
 echo "Checking for use of synchronisation..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Use of synchronised in Java (STB08,STB09)                            |" >> ${REPORT_FILE}
