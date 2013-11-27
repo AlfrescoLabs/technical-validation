@@ -551,9 +551,6 @@ echo "| Don't parse NodeRefs, StoreRefs, etc. (UP02)                         |" 
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name web-client-config-custom.xml >> ${REPORT_FILE}
 
-NodeRef.getId
-NodeRef.getStoreRef
-
 # Stop neo4j once we're done
 neo4j stop > /dev/null
 
