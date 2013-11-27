@@ -421,6 +421,18 @@ RETURN n.name as Class, n.\`class-version-str\` as Class_Version
  ORDER BY n.name;
 " >> ${REPORT_FILE}
 
+echo "Checking for indexed content model properties..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Judicious use of indexed properties in content models (PERF02)       |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<index enabled=" {} \; >> ${REPORT_FILE}
+
+echo "Checking for stored content model properties..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Don't store content model properties in the indexes (PERF03)         |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<stored>true</stored>" {} \; >> ${REPORT_FILE}
+
 echo "Checking for use of blacklisted JDK APIs..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Blacklisted JDK API usage (SEC04,STB03,STB04,STB10,STB12)            |" >> ${REPORT_FILE}
@@ -505,6 +517,7 @@ find ${SOURCE_DIR} -name \*.js -exec grep -Hn "eval(" {} \; >> ${REPORT_FILE}
 
 echo "Checking for manual transaction demarcation..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Use RetryingTransactionHelper for manual transactions (STB06)        |" >> ${REPORT_FILE}
 echo "| Prefer Alfresco-managed transactions (STB18)                         |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 neo4j-shell -readonly -c "cypher 1.9
@@ -526,17 +539,20 @@ echo "| Avoid transaction setting in Web Scripts (STB19,STB20) - MANUAL FOLLOWUP
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.desc.xml -exec grep -Hn "<transaction>" {} \; >> ${REPORT_FILE}
 
-echo "Checking for indexed content model properties..."
+echo "Checking for extension of Explorer UI..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Judicious use of indexed properties in content models (PERF02)       |" >> ${REPORT_FILE}
+echo "| Don't extend the legacy Explorer UI (UP01) - MANUAL FOLLOWUP         |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<index enabled=" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name web-client-config-custom.xml >> ${REPORT_FILE}
 
-echo "Checking for stored content model properties..."
+echo "Checking for parsing of NodeRefs..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-echo "| Don't store content model properties in the indexes (PERF03)         |" >> ${REPORT_FILE}
+echo "| Don't parse NodeRefs, StoreRefs, etc. (UP02)                         |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<stored>true</stored>" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name web-client-config-custom.xml >> ${REPORT_FILE}
+
+NodeRef.getId
+NodeRef.getStoreRef
 
 # Stop neo4j once we're done
 neo4j stop > /dev/null
