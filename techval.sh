@@ -526,6 +526,18 @@ echo "| Avoid transaction setting in Web Scripts (STB19,STB20) - MANUAL FOLLOWUP
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 find ${SOURCE_DIR} -name \*.desc.xml -exec grep -H "<transaction>" {} \; >> ${REPORT_FILE}
 
+echo "Checking for indexed content model properties..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Judicious use of indexed properties in content models (PERF02)       |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -H "<index enabled=" {} \; >> ${REPORT_FILE}
+
+echo "Checking for stored content model properties..."
+echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+echo "| Don't store content model properties in the indexes (PERF03)         |" >> ${REPORT_FILE}
+echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -H "<stored>true</stored>" {} \; >> ${REPORT_FILE}
+
 # Stop neo4j once we're done
 neo4j stop > /dev/null
 
