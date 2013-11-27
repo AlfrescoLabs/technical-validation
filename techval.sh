@@ -129,7 +129,7 @@ echo "Checking module version information..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Module version information (summary,UP04)                            |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name module.properties -exec grep -H version {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name module.properties -exec grep -Hn version {} \; >> ${REPORT_FILE}
 
 # For now this list is maintained by engineering at https://my.alfresco.com/share/alfresco.com/page/site/alfresco-certified-technology/document-details?nodeRef=workspace://SpacesStore/76f73e72-2279-4f4b-bd8b-af25fb84684d
 echo "Checking for use of blacklisted Alfresco APIs..."
@@ -495,13 +495,13 @@ echo "Checking for authentication=none Web Scripts..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Avoid 'none' authentication in Web Scripts (SEC03)                   |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name \*.desc.xml -exec grep -H "<authentication>none</authentication>" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.desc.xml -exec grep -Hn "<authentication>none</authentication>" {} \; >> ${REPORT_FILE}
 
 echo "Checking for use of eval() in JavaScript..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Use of eval() in Javascript (SEC05)                                  |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name \*.js -exec grep -H "eval(" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.js -exec grep -Hn "eval(" {} \; >> ${REPORT_FILE}
 
 echo "Checking for manual transaction demarcation..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
@@ -524,19 +524,19 @@ echo "Checking for transaction setting in Web Scripts..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Avoid transaction setting in Web Scripts (STB19,STB20) - MANUAL FOLLOWUP |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -name \*.desc.xml -exec grep -H "<transaction>" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -name \*.desc.xml -exec grep -Hn "<transaction>" {} \; >> ${REPORT_FILE}
 
 echo "Checking for indexed content model properties..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Judicious use of indexed properties in content models (PERF02)       |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -H "<index enabled=" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<index enabled=" {} \; >> ${REPORT_FILE}
 
 echo "Checking for stored content model properties..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Don't store content model properties in the indexes (PERF03)         |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -H "<stored>true</stored>" {} \; >> ${REPORT_FILE}
+find ${SOURCE_DIR} -iname \*model\*.xml -exec grep -Hn "<stored>true</stored>" {} \; >> ${REPORT_FILE}
 
 # Stop neo4j once we're done
 neo4j stop > /dev/null
