@@ -19,7 +19,7 @@
 # Operating environment tunables - modify as needed to fit your system
 DEPENDS_DIR=~/Development/Alfresco/certification/tools/depends
 NEO4J_URL=http://localhost:7474/db/data/
-NEO4J_DB_DIR=/usr/local/Cellar/neo4j/1.9.5/libexec/data/
+NEO4J_DB_DIR=/usr/local/Cellar/neo4j/2.0.0/libexec/data/
 
 # Validate operating environment
 if [ ! -d "${DEPENDS_DIR}" ]; then
@@ -72,6 +72,16 @@ if [ -z "$BINARIES" ]; then
   echo "techval [-?h] [-s sourceDirectory] [-r reportFile] -b locationOfBinaries"
   echo "If not provided, sourceDirectory defaults to ."
   echo "If not provided, reportFile defaults to ./technicalValidationReport.txt"
+  exit -1
+fi
+
+if [ ! -e "${BINARIES}" ]; then
+  echo "Unable to find binaries at ${BINARIES}."
+  exit -1
+fi
+
+if [ ! -d "${SOURCE_DIR}" ]; then
+  echo "Unable to find source directory at ${SOURCE_DIR}."
   exit -1
 fi
 
