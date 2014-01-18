@@ -16,7 +16,7 @@
 (def ^:private ^String api-list-close-tag "</pre>")
 
 (defn public-java-api
-  ([] public-java-api api-page-url)
+  ([] (public-java-api api-page-url))
   ([url]
    (log/debug "Retrieving Alfresco Public Java API list from" url "...")
    (let [api-page-html ^String (slurp url)]

@@ -8,10 +8,12 @@
 ;
 
 (ns alfresco-technical-validation.validation
-  (:require [clojure.string        :as s]
-            [clojure.tools.logging :as log]
-            [depends.reader        :as dr]
-            [depends.neo4jwriter   :as dn]
+  (:require [clojure.string                                    :as s]
+            [clojure.tools.logging                             :as log]
+            [clojurewerkz.neocons.rest                         :as nr]
+            [clojurewerkz.neocons.rest.cypher                  :as cy]
+            [depends.reader                                    :as dr]
+            [depends.neo4jwriter                               :as dn]
             [bookmark-writer.core                              :as bw]
             [alfresco-technical-validation.alfresco-public-api :as alf-api]
             ))
@@ -22,16 +24,35 @@
   [source]
   (comment "####TODO!!!!"))
 
+(defn- validate-alfresco-api-usage
+  []
+  (let [alfresco-public-java-api (alf-api/public-java-api)
+        res                      (cy/tquery "START n=node(*)
+MATCH (n)-->(m)
+WHERE has(n.name)
+  AND has(m.name)
+  AND has(m.package)
+  AND m.package =~ 'org.alfresco..*'
+  AND NOT(m.package =~ 'org.alfresco.extension..*')
+  AND NOT(m.name IN [
+                      {public-apis}
+                    ])
+RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
+ ORDER BY m.name;
+  " {:public-apis alfresco-public-java-api})]
+    println res))  ;####TEST
+
 (defn- validate-criteria
   [neo4j-url
    source-index]
-  (comment "####TODO!!!!"))
+  (nr/connect! neo4j-url)
+  (validate-alfresco-api-usage))
+
 
 (defn validate
   "Validates the given source and binaries, using the Neo4J server available at the given URL."
   [source binaries neo4j-url report-filename]
   (let [dependencies             (dr/classes-info binaries)
-        alfresco-public-java-api (alf-api/public-java-api)
         source-index             (index-source source)]
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
