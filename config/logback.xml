@@ -9,17 +9,15 @@
     </encoder>
   </appender>
 
-<!--
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%date %-5level [%thread] [%logger] %msg%n</pattern>
     </encoder>
   </appender>
--->
-  <logger name="depends" level="DEBUG"/>
-  <logger name="bookmark_writer" level="DEBUG"/>
+
+  <logger name="depends" level="WARN"/>
+  <logger name="bookmark_writer" level="WARN"/>
   <logger name="alfresco_technical_validation" level="DEBUG"/>
-  <logger name="net.java.truecommons" level="WARN"/>
 
   <root level="WARN">
 <!--    <appender-ref ref="STDOUT" /> -->
