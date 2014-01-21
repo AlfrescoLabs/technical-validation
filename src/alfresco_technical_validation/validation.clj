@@ -27,7 +27,9 @@
 (defn- validate-alfresco-api-usage
   []
   (let [alfresco-public-java-api (alf-api/public-java-api)
-        res                      (cy/tquery "START n=node(*)
+        _                        (println "alfresco-public-java-api=" alfresco-public-java-api)
+        res                      (cy/tquery "
+START n=node(*)
 MATCH (n)-->(m)
 WHERE has(n.name)
   AND has(m.name)
@@ -39,8 +41,8 @@ WHERE has(n.name)
                     ])
 RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
  ORDER BY m.name;
-  " {:public-apis alfresco-public-java-api})]
-    println res))  ;####TEST
+                                            " {:public-apis alfresco-public-java-api})]
+    (println "res=" res)))  ;####TEST
 
 (defn- validate-criteria
   [neo4j-url
