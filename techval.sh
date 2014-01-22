@@ -117,7 +117,7 @@ echo "Summarising source code..."
 echo "\n+----------------------------------------------------------------------+" >> ${REPORT_FILE}
 echo "| Source Code Stats (Summary)                                          |" >> ${REPORT_FILE}
 echo "+----------------------------------------------------------------------+" >> ${REPORT_FILE}
-cloc --quiet --progress-rate=0 ${SOURCE_DIR} >> ${REPORT_FILE}
+ohcount --summary ${SOURCE_DIR} >> ${REPORT_FILE}
 echo "Freemarker files:     `find ${SOURCE_DIR} -name \*.ftl | wc -l`" >> ${REPORT_FILE}
 echo "Freemarker LoC:             `find ${SOURCE_DIR} -name \*.ftl -exec wc -l {} \; | awk '{ sum += $1 } END { print sum }'`" >> ${REPORT_FILE}
 echo "Content models:      `find ${SOURCE_DIR} -name \*.xml -exec grep -l http://www.alfresco.org/model/dictionary/1.0 {} \; | wc -l`" >> ${REPORT_FILE}
