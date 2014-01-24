@@ -20,15 +20,46 @@
 
 (def ^:private report-template (clojure.java.io/resource "alfresco-technical-validation-template.docx"))
 
+; List of special characters is from http://lucene.apache.org/core/3_6_2/queryparsersyntax.html#Escaping Special Characters
+; (neo4j v2.0.0 uses Lucene 3.6.2)
+(def ^:private cypher-value-escapes {\+ "\\+"
+                                     \- "\\-"
+                                     \& "\\&"
+                                     \| "\\|"
+                                     \! "\\!"
+                                     \( "\\("
+                                     \) "\\)"
+                                     \{ "\\{"
+                                     \} "\\}"
+                                     \[ "\\["
+                                     \] "\\]"
+                                     \^ "\\^"
+                                     \" "\\\""
+                                     \~ "\\~"
+                                     \* "\\*"
+                                     \? "\\?"
+                                     \: "\\:"
+                                     \\ "\\\\" })   ; ####TODO: does \$ need to be added too??
+
 (defn- index-source
   [source]
   (comment "####TODO!!!!"))
 
+(defn- sanitised-api-list
+  []
+  (map #(s/escape % cypher-value-escapes) (alf-api/public-java-api)))
+
+; To workaround the limitation described in the comments of this page: http://docs.neo4j.org/chunked/stable/cypher-parameters.html
+(defn- populate-in-clause
+  [query in-values]
+  (let [values-1 (s/join (map #(str "'" % "',") in-values))
+        values-2 (.substring values-1 0 (- (.length values-1) 1))]
+    (s/replace query "{in-clause-values}" values-2)))
+
 (defn- validate-alfresco-api-usage
   []
-  (let [alfresco-public-java-api (alf-api/public-java-api)
-        _                        (println "alfresco-public-java-api=" alfresco-public-java-api)
-        res                      (cy/tquery "
+  (let [alfresco-public-java-api (sanitised-api-list)
+        cypher-query             (populate-in-clause "
 START n=node(*)
 MATCH (n)-->(m)
 WHERE has(n.name)
@@ -37,12 +68,12 @@ WHERE has(n.name)
   AND m.package =~ 'org.alfresco..*'
   AND NOT(m.package =~ 'org.alfresco.extension..*')
   AND NOT(m.name IN [
-                      {public-apis}
+                      {in-clause-values}
                     ])
 RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
- ORDER BY m.name;
-                                            " {:public-apis alfresco-public-java-api})]
-    (println "res=" res)))  ;####TEST
+ ORDER BY m.name;", alfresco-public-java-api)
+        res                      (cy/tquery cypher-query)]
+    (println "res =" res)))  ;####TEST
 
 (defn- validate-criteria
   [neo4j-url
