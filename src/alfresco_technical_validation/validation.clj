@@ -16,6 +16,7 @@
             [depends.neo4jwriter                               :as dn]
             [bookmark-writer.core                              :as bw]
             [alfresco-technical-validation.alfresco-public-api :as alf-api]
+            [alfresco-technical-validation.source-indexer      :as src-idx]
             ))
 
 (def ^:private report-template (clojure.java.io/resource "alfresco-technical-validation-template.docx"))
@@ -40,10 +41,6 @@
                                      \? "\\?"
                                      \: "\\:"
                                      \\ "\\\\" })   ; ####TODO: does \$ need to be added too??
-
-(defn- index-source
-  [source]
-  (comment "####TODO!!!!"))
 
 (defn- cypher-escaped-alfresco-api
   []
@@ -188,7 +185,7 @@ RETURN n.name AS Class, COLLECT(DISTINCT m.name) AS TransactionClass
   "Validates the given source and binaries, using the Neo4J server available at the given URL."
   [source binaries neo4j-url report-filename]
   (let [dependencies             (dr/classes-info binaries)
-        source-index             (index-source source)]
+        source-index             (src-idx/index-source source)]
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
       (comment
