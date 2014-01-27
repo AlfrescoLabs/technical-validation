@@ -60,26 +60,80 @@
   []
   (let [alfresco-public-java-api (sanitised-api-list)
         cypher-query             (populate-in-clause "
-START n=node(*)
-MATCH (n)-->(m)
-WHERE has(n.name)
-  AND has(m.name)
-  AND has(m.package)
-  AND m.package =~ 'org.alfresco..*'
-  AND NOT(m.package =~ 'org.alfresco.extension..*')
-  AND NOT(m.name IN [
-                      {in-clause-values}
-                    ])
-RETURN m.name as Blacklisted_Alfresco_API, collect(distinct n.name) as Used_By
- ORDER BY m.name;", alfresco-public-java-api)
+                                                       START n=NODE(*)
+                                                       MATCH (n)-->(m)
+                                                       WHERE HAS(n.name)
+                                                         AND HAS(m.name)
+                                                         AND HAS(m.package)
+                                                         AND m.package =~ 'org.alfresco..*'
+                                                         AND NOT(m.package =~ 'org.alfresco.extension..*')
+                                                         AND NOT(m.name IN [
+                                                                             {in-clause-values}
+                                                                           ])
+                                                      RETURN m.name AS BlacklistedAlfrescoAPI, COLLECT(DISTINCT n.name) AS UsedBy
+                                                       ORDER BY m.name
+                                                     ", alfresco-public-java-api)
         res                      (cy/tquery cypher-query)]
     (println "res =" res)))  ;####TEST
+
+(defn- validate-java-version
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         WHERE HAS(n.name)
+                           AND HAS(n.`class-version`)
+                           AND n.`class-version` < 50
+                        RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
+                         ORDER BY n.name
+                       ")]
+    (println "res =" res)))    ;####TEST
+
+(defn- validate-java-api-usage
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND (   m.name IN [
+                                              'java.lang.Throwable',
+                                              'java.lang.Error',
+                                              'java.lang.System',
+                                              'java.lang.Thread',
+                                              'java.lang.ThreadGroup',
+                                              'java.lang.ThreadLocal',
+                                              'java.lang.Runnable',
+                                              'java.lang.Process',
+                                              'java.lang.ProcessBuilder',
+                                              'java.lang.ClassLoader',
+                                              'java.security.SecureClassLoader'
+                                             ]
+                            OR (    HAS(m.package)
+                           AND m.package IN [
+                                              'java.sql',
+                                              'javax.sql',
+                                              'org.springframework.jdbc',
+                                              'com.ibatis',
+                                              'org.hibernate',
+                                              'java.util.concurrent',
+                                              'javax.servlet',
+                                              'javax.servlet.http',
+                                              'javax.transaction',
+                                              'javax.transaction.xa'
+                                            ]))
+                        RETURN m.name AS BlacklistedJavaAPI, COLLECT(DISTINCT n.name) AS UsedBy
+                         ORDER BY m.name
+                       ")]
+    (println "res =" res)))    ;####TEST
 
 (defn- validate-criteria
   [neo4j-url
    source-index]
   (nr/connect! neo4j-url)
-  (validate-alfresco-api-usage))
+  (validate-alfresco-api-usage)
+  (validate-java-version)
+  (validate-java-api-usage)
+  )
 
 
 (defn validate
