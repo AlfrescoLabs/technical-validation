@@ -67,11 +67,30 @@
                                                          AND NOT(m.name IN [
                                                                              {in-clause-values}
                                                                            ])
-                                                      RETURN m.name AS BlacklistedAlfrescoAPI, COLLECT(DISTINCT n.name) AS UsedBy
-                                                       ORDER BY m.name
+                                                      RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedAlfrescoAPIs
+                                                       ORDER BY n.name
                                                      ", alfresco-public-java-api)
-        res                      (cy/tquery cypher-query)]
-    (println "res =" res)))  ;####TEST
+        res                      (cy/tquery cypher-query)
+        message                  (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedAlfrescoAPIs"))) res)))]
+    (println "API01 =" message)  ;####TEST!
+    { "API01" message }))
+
+(defn- api06-service-locator
+  []
+  (let [alfresco-public-java-api (cypher-escaped-alfresco-api)
+        res                      (cy/tquery "
+                                              START n=NODE(*)
+                                              MATCH (n)-->(m)
+                                              WHERE HAS(n.name)
+                                                AND HAS(m.name)
+                                                AND m.name IN [
+                                                                'org.springframework.context.ApplicationContextAware',
+                                                                'org.springframework.context.ApplicationContext'
+                                                              ]
+                                             RETURN m.name AS BlacklistedSpringAPI, COLLECT(DISTINCT n.name) AS UsedBy
+                                              ORDER BY m.name
+                                            ")]
+    (println "API06 =" res)))  ;####TEST
 
 (defn- com06-compiled-jvm-version
   []
@@ -83,7 +102,7 @@
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
                        ")]
-    (println "res =" res)))    ;####TEST
+    (println "COM06 =" res)))    ;####TEST
 
 (defn- sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis
   []
@@ -121,7 +140,7 @@
                         RETURN m.name AS BlacklistedJavaAPI, COLLECT(DISTINCT n.name) AS UsedBy
                          ORDER BY m.name
                        ")]
-    (println "res =" res)))    ;####TEST
+    (println "SEC04/STB03/STB04/STB05/STB06/STB10/STB12 =" res)))    ;####TEST
 
 (defn- stb07-stb14-search-apis
   []
@@ -137,7 +156,7 @@
                         RETURN m.name AS SearchAPI, COLLECT(DISTINCT n.name) AS UsedBy
                          ORDER BY m.name
                        ")]
-    (println "res =" res)))    ;####TEST
+    (println "STB07/STB14 =" res)))    ;####TEST
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -150,7 +169,7 @@
                         RETURN n.name AS Class, m.name AS AuthenticationUtil
                          ORDER BY n.name
                        ")]
-    (println "res =" res)))    ;####TEST
+    (println "SEC02 =" res)))    ;####TEST
 
 (defn- stb06-stb18-manual-transactions
   []
@@ -166,20 +185,22 @@
 RETURN n.name AS Class, COLLECT(DISTINCT m.name) AS TransactionClass
  ORDER BY n.name
                        ")]
-    (println "res =" res)))    ;####TEST
+    (println "STB06/STB18 =" res)))    ;####TEST
 
 
 (defn- validate-criteria
   [neo4j-url
    source-index]
   (nr/connect! neo4j-url)
-  (api01-public-alfresco-java-api)
-  (com06-compiled-jvm-version)
-  (sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis)
-  (stb07-stb14-search-apis)
-  (sec02-minimise-manual-authentication)
-  (stb06-stb18-manual-transactions)
-  )
+  (merge
+    (api01-public-alfresco-java-api)
+    (api06-service-locator)
+    (com06-compiled-jvm-version)
+    (sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis)
+    (stb07-stb14-search-apis)
+    (sec02-minimise-manual-authentication)
+    (stb06-stb18-manual-transactions)
+  ))
 
 (defn validate
   "Validates the given source and binaries, using the Neo4J server available at the given URL."
@@ -188,6 +209,7 @@ RETURN n.name AS Class, COLLECT(DISTINCT m.name) AS TransactionClass
         source-index             (src-idx/index-source source)]
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
+      (println "bookmarks =" bookmarks)   ; ####TEST!!!!
       (comment
       (bw/populate-bookmarks! report-template report-filename bookmarks))))
       )
