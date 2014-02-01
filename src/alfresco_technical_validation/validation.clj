@@ -72,7 +72,6 @@
                                                      ", alfresco-public-java-api)
         res                      (cy/tquery cypher-query)
         message                  (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedAlfrescoAPIs"))) res)))]
-    (println "API01 =" message)  ;####TEST!
     { "API01" message }))
 
 (defn- api06-service-locator
@@ -87,10 +86,11 @@
                                                                 'org.springframework.context.ApplicationContextAware',
                                                                 'org.springframework.context.ApplicationContext'
                                                               ]
-                                             RETURN m.name AS BlacklistedSpringAPI, COLLECT(DISTINCT n.name) AS UsedBy
-                                              ORDER BY m.name
-                                            ")]
-    (println "API06 =" res)))  ;####TEST
+                                             RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedSpringAPIs
+                                              ORDER BY n.name
+                                            ")
+        message                  (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedSpringAPIs"))) res)))]
+    { "API06" message }))
 
 (defn- com06-compiled-jvm-version
   []
@@ -101,8 +101,9 @@
                            AND n.`class-version` < 50
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
-                       ")]
-    (println "COM06 =" res)))    ;####TEST
+                       ")
+        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "ClassName") " is compiled for JVM version " (get % "ClassVersion"))) res))]
+    { "COM06" message }))
 
 (defn- sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis
   []
@@ -137,10 +138,19 @@
                                               'javax.transaction',
                                               'javax.transaction.xa'
                                             ]))
-                        RETURN m.name AS BlacklistedJavaAPI, COLLECT(DISTINCT n.name) AS UsedBy
-                         ORDER BY m.name
-                       ")]
-    (println "SEC04/STB03/STB04/STB05/STB06/STB10/STB12 =" res)))    ;####TEST
+                        RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedJavaAPIs
+                         ORDER BY n.name
+                       ")
+        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedJavaAPIs"))) res)))]
+    {
+      "SEC04" message
+      "STB03" message
+      "STB04" message
+      "STB05" message
+      "STB06" message
+      "STB10" message
+      "STB12" message
+     }))
 
 (defn- stb07-stb14-search-apis
   []
@@ -153,10 +163,14 @@
                                            'org.alfresco.service.cmr.search.SearchService',
                                            'org.alfresco.service.cmr.search.ResultSet'
                                          ]
-                        RETURN m.name AS SearchAPI, COLLECT(DISTINCT n.name) AS UsedBy
-                         ORDER BY m.name
-                       ")]
-    (println "STB07/STB14 =" res)))    ;####TEST
+                        RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS SearchAPIs
+                         ORDER BY n.name
+                       ")
+        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "SearchAPIs"))) res)))]
+    {
+      "STB07" message
+      "STB14" message
+    }))
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -166,27 +180,31 @@
                          WHERE HAS(n.name)
                            AND HAS(m.name)
                            AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil'
-                        RETURN n.name AS Class, m.name AS AuthenticationUtil
+                        RETURN n.name AS UsedBy, m.name AS AuthenticationUtilAPI
                          ORDER BY n.name
-                       ")]
-    (println "SEC02 =" res)))    ;####TEST
+                       ")
+        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (get % "AuthenticationUtilAPI")) res)))]
+    { "SEC02" message }))
 
 (defn- stb06-stb18-manual-transactions
   []
   (let [res (cy/tquery "
- START n=NODE(*)
- MATCH (n)-->(m)
- WHERE HAS(n.name)
-   AND HAS(m.name)
-   AND m.name IN [
-                  'org.alfresco.repo.transaction.RetryingTransactionHelper',
-                  'org.alfresco.service.transaction.TransactionService'
-                 ]
-RETURN n.name AS Class, COLLECT(DISTINCT m.name) AS TransactionClass
- ORDER BY n.name
-                       ")]
-    (println "STB06/STB18 =" res)))    ;####TEST
-
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                          'org.alfresco.repo.transaction.RetryingTransactionHelper',
+                                          'org.alfresco.service.transaction.TransactionService'
+                                         ]
+                        RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS TransactionAPIs
+                         ORDER BY n.name
+                       ")
+        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "TransactionAPIs"))) res)))]
+    {
+      "STB06" message
+      "STB18" message
+    }))
 
 (defn- validate-criteria
   [neo4j-url
@@ -210,6 +228,4 @@ RETURN n.name AS Class, COLLECT(DISTINCT m.name) AS TransactionClass
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
       (println "bookmarks =" bookmarks)   ; ####TEST!!!!
-      (comment
       (bw/populate-bookmarks! report-template report-filename bookmarks))))
-      )
