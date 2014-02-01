@@ -228,4 +228,4 @@
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
       (println "bookmarks =" bookmarks)   ; ####TEST!!!!
-      (bw/populate-bookmarks! report-template report-filename bookmarks))))
+      (bw/populate-bookmarks! (clojure.java.io/input-stream report-template) report-filename bookmarks))))
