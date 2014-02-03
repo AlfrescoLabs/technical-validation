@@ -52,6 +52,16 @@
   (let [comma-delimited-string-quoted-in-values (s/join "," (map #(str "'" % "'") in-values))]
     (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
 
+(defn- build-bookmark-map
+  [criteria-id message]
+  (if message
+    { (str criteria-id "_Evidence")    message
+      (str criteria-id "_Meets")       ""
+      (str criteria-id "_NoRemedy")    "" }
+    { (str criteria-id "_Evidence")    ""
+      (str criteria-id "_DoesNotMeet") ""
+      (str criteria-id "_Remedy")      "" } ))
+
 (defn- api01-public-alfresco-java-api
   []
   (let [alfresco-public-java-api (cypher-escaped-alfresco-api)
@@ -77,7 +87,7 @@
                                                       " uses "
                                                       (s/join ", " (get % "BlacklistedAlfrescoAPIs")))
                                                 res)))]
-    { "API01" message }))
+    (build-bookmark-map "API01" message)))
 
 (defn- api06-service-locator
   []
@@ -101,7 +111,7 @@
                                                       " uses "
                                                       (s/join ", " (get % "BlacklistedSpringAPIs")))
                                                 res)))]
-    { "API06" message }))
+    (build-bookmark-map "API06" message)))
 
 (defn- com06-compiled-jvm-version
   []
@@ -120,7 +130,8 @@
                                             " is compiled for JVM version "
                                             (get % "ClassVersion")))
                                       res))]
-    { "COM06" message }))
+    (build-bookmark-map "COM06" message)))
+
 
 (defn- sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis
   []
@@ -165,15 +176,13 @@
                                             " uses "
                                             (s/join ", " (get % "BlacklistedJavaAPIs")))
                                       res)))]
-    {
-      "SEC04" message
-      "STB03" message
-      "STB04" message
-      "STB05" message
-      "STB06" message
-      "STB10" message
-      "STB12" message
-     }))
+    (merge
+      (build-bookmark-map "SEC04" message)
+      (build-bookmark-map "STB03" message)
+      (build-bookmark-map "STB04" message)
+      (build-bookmark-map "STB05" message)
+      (build-bookmark-map "STB10" message)
+      (build-bookmark-map "STB12" message))))
 
 (defn- stb07-stb14-search-apis
   []
@@ -196,10 +205,9 @@
                                             " uses "
                                             (s/join ", " (get % "SearchAPIs")))
                                       res)))]
-    {
-      "STB07" message
-      "STB14" message
-    }))
+    (merge
+      (build-bookmark-map "STB07" message)
+      (build-bookmark-map "STB14" message))))
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -219,7 +227,7 @@
                                               " uses "
                                               (get % "AuthenticationUtilAPI"))
                                         res)))]
-    { "SEC02" message }))
+    (build-bookmark-map "SEC02" message)))
 
 (defn- stb06-stb18-manual-transactions
   []
@@ -242,10 +250,9 @@
                                             " uses "
                                             (s/join ", " (get % "TransactionAPIs")))
                                       res)))]
-    {
-      "STB06" message
-      "STB18" message
-    }))
+    (merge
+      (build-bookmark-map "STB06" message)
+      (build-bookmark-map "STB18" message))))
 
 (defn- validate-criteria
   [neo4j-url
@@ -268,5 +275,4 @@
         source-index             (src-idx/index-source source)]
     (dn/write-dependencies! neo4j-url dependencies)
     (let [bookmarks (validate-criteria neo4j-url source-index)]
-      (println "bookmarks =" bookmarks)   ; ####TEST!!!!
       (bw/populate-bookmarks! (clojure.java.io/input-stream report-template) report-filename bookmarks))))
