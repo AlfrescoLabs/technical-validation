@@ -49,9 +49,8 @@
 ; To workaround the limitation described in the comments of this page: http://docs.neo4j.org/chunked/stable/cypher-parameters.html
 (defn- populate-in-clause
   [query in-values]
-  (let [values-1 (s/join (map #(str "'" % "',") in-values))
-        values-2 (.substring values-1 0 (- (.length values-1) 1))]
-    (s/replace query "{in-clause-values}" values-2)))
+  (let [comma-delimited-string-quoted-in-values (s/join "," (map #(str "'" % "'") in-values))]
+    (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
 
 (defn- api01-public-alfresco-java-api
   []
@@ -71,7 +70,13 @@
                                                        ORDER BY n.name
                                                      ", alfresco-public-java-api)
         res                      (cy/tquery cypher-query)
-        message                  (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedAlfrescoAPIs"))) res)))]
+        message                  (if (empty? res)
+                                   ""
+                                   (s/join "\n"
+                                           (map #(str (get % "UsedBy")
+                                                      " uses "
+                                                      (s/join ", " (get % "BlacklistedAlfrescoAPIs")))
+                                                res)))]
     { "API01" message }))
 
 (defn- api06-service-locator
@@ -89,7 +94,13 @@
                                              RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedSpringAPIs
                                               ORDER BY n.name
                                             ")
-        message                  (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedSpringAPIs"))) res)))]
+        message                  (if (empty? res)
+                                   ""
+                                   (s/join "\n"
+                                           (map #(str (get % "UsedBy")
+                                                      " uses "
+                                                      (s/join ", " (get % "BlacklistedSpringAPIs")))
+                                                res)))]
     { "API06" message }))
 
 (defn- com06-compiled-jvm-version
@@ -102,7 +113,13 @@
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
                        ")
-        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "ClassName") " is compiled for JVM version " (get % "ClassVersion"))) res))]
+        message        (if (empty? res)
+                         ""
+                         (s/join "\n"
+                                 (map #(str (get % "ClassName")
+                                            " is compiled for JVM version "
+                                            (get % "ClassVersion")))
+                                      res))]
     { "COM06" message }))
 
 (defn- sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis
@@ -141,7 +158,13 @@
                         RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedJavaAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "BlacklistedJavaAPIs"))) res)))]
+        message        (if (empty? res)
+                         ""
+                         (s/join "\n"
+                                 (map #(str (get % "UsedBy")
+                                            " uses "
+                                            (s/join ", " (get % "BlacklistedJavaAPIs")))
+                                      res)))]
     {
       "SEC04" message
       "STB03" message
@@ -166,7 +189,13 @@
                         RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS SearchAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "SearchAPIs"))) res)))]
+        message        (if (empty? res)
+                         ""
+                         (s/join "\n"
+                                 (map #(str (get % "UsedBy")
+                                            " uses "
+                                            (s/join ", " (get % "SearchAPIs")))
+                                      res)))]
     {
       "STB07" message
       "STB14" message
@@ -183,7 +212,13 @@
                         RETURN n.name AS UsedBy, m.name AS AuthenticationUtilAPI
                          ORDER BY n.name
                        ")
-        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (get % "AuthenticationUtilAPI")) res)))]
+        message        (if (empty? res)
+                         ""
+                         (s/join "\n"
+                                   (map #(str (get % "UsedBy")
+                                              " uses "
+                                              (get % "AuthenticationUtilAPI"))
+                                        res)))]
     { "SEC02" message }))
 
 (defn- stb06-stb18-manual-transactions
@@ -200,7 +235,13 @@
                         RETURN n.name as UsedBy, COLLECT(DISTINCT m.name) AS TransactionAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res) "" (s/join "\n" (map #(str (get % "UsedBy") " uses " (s/join ", " (get % "TransactionAPIs"))) res)))]
+        message        (if (empty? res)
+                         ""
+                         (s/join "\n"
+                                 (map #(str (get % "UsedBy")
+                                            " uses "
+                                            (s/join ", " (get % "TransactionAPIs")))
+                                      res)))]
     {
       "STB06" message
       "STB18" message
