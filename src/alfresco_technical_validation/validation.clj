@@ -259,6 +259,7 @@
    source-index]
   (nr/connect! neo4j-url)
   (merge
+    { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
     (api01-public-alfresco-java-api)
     (api06-service-locator)
     (com06-compiled-jvm-version)
