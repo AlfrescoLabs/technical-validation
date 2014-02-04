@@ -53,14 +53,15 @@
     (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
 
 (defn- build-bookmark-map
-  [criteria-id message]
-  (if message
-    { (str criteria-id "_Evidence")    message
-      (str criteria-id "_Meets")       ""
-      (str criteria-id "_NoRemedy")    "" }
-    { (str criteria-id "_Evidence")    ""
-      (str criteria-id "_DoesNotMeet") ""
-      (str criteria-id "_Remedy")      "" } ))
+  ([criteria-id evidence] (build-bookmark-map criteria-id evidence ""))
+  ([criteria-id evidence non-evidence]
+   (if (and evidence (not (empty? (s/trim evidence))))
+     { (str criteria-id "_Evidence")    evidence
+       (str criteria-id "_Meets")       ""
+       (str criteria-id "_NoRemedy")    "" }
+     { (str criteria-id "_Evidence")    non-evidence
+       (str criteria-id "_DoesNotMeet") ""
+       (str criteria-id "_Remedy")      "" } )))
 
 (defn- api01-public-alfresco-java-api
   []
@@ -87,7 +88,7 @@
                                                       " uses "
                                                       (s/join ", " (get % "BlacklistedAlfrescoAPIs")))
                                                 res)))]
-    (build-bookmark-map "API01" message)))
+    (build-bookmark-map "API01" message "The technology only uses Alfresco's Public Java APIs.")))
 
 (defn- api06-service-locator
   []
@@ -111,7 +112,7 @@
                                                       " uses "
                                                       (s/join ", " (get % "BlacklistedSpringAPIs")))
                                                 res)))]
-    (build-bookmark-map "API06" message)))
+    (build-bookmark-map "API06" message "The technology does not use the service locator pattern.")))
 
 (defn- com06-compiled-jvm-version
   []
@@ -130,7 +131,7 @@
                                             " is compiled for JVM version "
                                             (get % "ClassVersion")))
                                       res))]
-    (build-bookmark-map "COM06" message)))
+    (build-bookmark-map "COM06" message "The code has been compiled for JVM 1.6 or greater.")))
 
 
 (defn- sec04-stb03-stb04-stb05-stb06-stb10-stb12-java-apis
@@ -177,12 +178,12 @@
                                             (s/join ", " (get % "BlacklistedJavaAPIs")))
                                       res)))]
     (merge
-      (build-bookmark-map "SEC04" message)
-      (build-bookmark-map "STB03" message)
-      (build-bookmark-map "STB04" message)
-      (build-bookmark-map "STB05" message)
-      (build-bookmark-map "STB10" message)
-      (build-bookmark-map "STB12" message))))
+      (build-bookmark-map "SEC04" message "The technology does not use blacklisted Java APIs.")
+      (build-bookmark-map "STB03" message "The technology does not use blacklisted Java APIs.")
+      (build-bookmark-map "STB04" message "The technology does not use blacklisted Java APIs.")
+      (build-bookmark-map "STB05" message "The technology does not use blacklisted Java APIs.")
+      (build-bookmark-map "STB10" message "The technology does not use blacklisted Java APIs.")
+      (build-bookmark-map "STB12" message "The technology does not use blacklisted Java APIs."))))
 
 (defn- stb07-stb14-search-apis
   []
@@ -206,8 +207,8 @@
                                             (s/join ", " (get % "SearchAPIs")))
                                       res)))]
     (merge
-      (build-bookmark-map "STB07" message)
-      (build-bookmark-map "STB14" message))))
+      (build-bookmark-map "STB07" message "The technology does not use the Search APIs.")
+      (build-bookmark-map "STB14" message "The technology does not use the Search APIs."))))
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -227,7 +228,7 @@
                                               " uses "
                                               (get % "AuthenticationUtilAPI"))
                                         res)))]
-    (build-bookmark-map "SEC02" message)))
+    (build-bookmark-map "SEC02" message "The technology does not manually control the authenticated session.")))
 
 (defn- stb06-stb18-manual-transactions
   []
@@ -251,8 +252,8 @@
                                             (s/join ", " (get % "TransactionAPIs")))
                                       res)))]
     (merge
-      (build-bookmark-map "STB06" message)
-      (build-bookmark-map "STB18" message))))
+      (build-bookmark-map "STB06" message "The technology does not manually demarcate transactions.")
+      (build-bookmark-map "STB18" message "The technology does not manually demarcate transactions."))))
 
 (defn- validate-criteria
   [neo4j-url
