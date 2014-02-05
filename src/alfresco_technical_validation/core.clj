@@ -36,10 +36,9 @@
   ([] (infini-spinner 100))
   ([delay-in-ms]
     (try
-      (loop [characters "▁▃▄▅▆▇█▇▆▅▄▃"  ;characters "▉▊▋▌▍▎▏▎▍▌▋▊▉"  ;characters "⋮⋰⋯⋱"  ;characters "┤┘┴└├┌┬┐"  ;characters "|/-\\"
+      (loop [characters "▁▃▄▅▆▇█▇▆▅▄▃"  ;characters " ░▒▓█▓▒░"  ;characters "▉▊▋▌▍▎▏▎▍▌▋▊▉"  ;characters "⋮⋰⋯⋱"  ;characters "┤┘┴└├┌┬┐"  ;characters "|/-\\"
              i          0]
-        (print "\033[D")
-        (print (ava/yellow (nth characters i)))
+        (print (str "\033[2D" (ava/blue (nth characters i)) " "))
         (flush)
         (Thread/sleep delay-in-ms)
         (recur characters (mod (inc i) (.length characters))))
@@ -74,12 +73,12 @@
         (if (or help (nil? binaries) (nil? source) (nil? report-filename))
           (println (str "Usage:\n" summary))
           (do
-            (print "Reticulating splines...  ")
+            (print "Reticulating splines...   ")
             (flush)
             (let [spinner (start-spinner)]
               (atv/validate source binaries neo4j-url report-filename)
               (.interrupt ^Thread spinner))
-            (println (str "\033[25D" (ava/green "✔") " " report-filename))
+            (println (str "\033[26D" (ava/green "✔") " " report-filename))
             (flush))))
       nil)
     (catch Exception e
