@@ -10,9 +10,12 @@
 (ns alfresco-technical-validation.source-indexer
   (:require [clojure.string        :as s]
             [clojure.tools.logging :as log]
+            [clojure.java.io       :as io]
             ))
 
 (defn index-source
   "Indexes the source code in the given location."
   [source]
-  (comment "####TODO!!!!"))
+  (let [files (file-seq (io/file source))]
+    (comment "####TODO: implement me!")
+    ))

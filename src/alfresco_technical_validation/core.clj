@@ -8,10 +8,11 @@
 ;
 
 (ns alfresco-technical-validation.core
-  (:require [clojure.string        :as s]
-            [clojure.tools.logging :as log]
-            [clojure.tools.cli     :refer [parse-opts]]
-            [io.aviso.exception                       :as aviso]
+  (:require [clojure.string                           :as s]
+            [clojure.tools.logging                    :as log]
+            [clojure.tools.cli                        :refer [parse-opts]]
+            [io.aviso.exception                       :as ave]
+            [io.aviso.ansi                            :as ava]
             [alfresco-technical-validation.validation :as atv]
             )
   (:use [clojure.tools.cli :only [cli]]
@@ -30,6 +31,27 @@
    ["-r" "--report-file REPORT_FILE" "The filename of the output report"
     :validate [#(not (.exists (clojure.java.io/file %))) "Report file must not exist"]]
    ["-h" "--help"]])
+
+(defn- infini-spinner
+  ([] (infini-spinner 100))
+  ([delay-in-ms]
+    (try
+      (loop [characters "▁▃▄▅▆▇█▇▆▅▄▃"  ;characters "▉▊▋▌▍▎▏▎▍▌▋▊▉"  ;characters "⋮⋰⋯⋱"  ;characters "┤┘┴└├┌┬┐"  ;characters "|/-\\"
+             i          0]
+        (print "\033[D")
+        (print (ava/yellow (nth characters i)))
+        (flush)
+        (Thread/sleep delay-in-ms)
+        (recur characters (mod (inc i) (.length characters))))
+      (catch InterruptedException ie
+        (comment "Swallow exception and terminate.")))))
+
+(defn- start-spinner
+  []
+  (doto 
+    (Thread. ^Runnable infini-spinner)
+    (.setDaemon true)
+    (.start)))
 
 (defn -main
   "Command line access for Alfresco Technical Validation."
@@ -51,8 +73,17 @@
         (println errors)
         (if (or help (nil? binaries) (nil? source) (nil? report-filename))
           (println (str "Usage:\n" summary))
-          (atv/validate source binaries neo4j-url report-filename)))
+          (do
+            (print "Reticulating splines...  ")
+            (flush)
+            (let [spinner (start-spinner)]
+              (atv/validate source binaries neo4j-url report-filename)
+              (.interrupt ^Thread spinner))
+            (println (str "\033[25D" (ava/green "✔") " " report-filename))
+            (flush))))
       nil)
     (catch Exception e
       (log/error e)
-      (println (aviso/format-exception e)))))
+      (println (ave/format-exception e)))
+    (finally
+      (shutdown-agents))))
