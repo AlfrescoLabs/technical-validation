@@ -92,26 +92,28 @@
 
 (defn- api06-service-locator
   []
-  (let [alfresco-public-java-api (cypher-escaped-alfresco-api)
-        res                      (cy/tquery "
-                                              START n=NODE(*)
-                                              MATCH (n)-->(m)
-                                              WHERE HAS(n.name)
-                                                AND HAS(m.name)
-                                                AND m.name IN [
-                                                                'org.springframework.context.ApplicationContextAware',
-                                                                'org.springframework.context.ApplicationContext'
-                                                              ]
-                                             RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedSpringAPIs
-                                              ORDER BY n.name
-                                            ")
-        message                  (if (empty? res)
-                                   nil
-                                   (s/join "\n"
-                                           (map #(str (get % "UsedBy")
-                                                      " uses "
-                                                      (s/join ", " (get % "BlacklistedSpringAPIs")))
-                                                res)))]
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'org.springframework.context.ApplicationContextAware',
+                                           'org.springframework.context.ApplicationContext'
+                                         ]
+                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedSpringAPIs
+                         ORDER BY n.name
+                       ")
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "BlacklistedSpringAPIs")))
+                               res)))]
     (build-bookmark-map "API06" (empty? res) message "The technology does not use the service locator pattern.")))
 
 (defn- com06-compiled-jvm-version
@@ -119,18 +121,21 @@
   (let [res (cy/tquery "
                          START n=NODE(*)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND HAS(n.`class-version`)
                            AND n.`class-version` < 50
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "ClassName")
-                                            " is compiled for JVM version "
-                                            (get % "ClassVersion"))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "ClassName")
+                                     " is compiled for JVM version "
+                                     (get % "ClassVersion"))
+                               res)))]
     (build-bookmark-map "COM06" (empty? res) message "The code has been compiled for JVM 1.6 or greater.")))
 
 (defn- com09-stb07-stb14-search-apis
@@ -195,6 +200,9 @@
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
                            AND HAS(m.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND m.name IN [
                                            'java.lang.Process',
                                            'java.lang.ProcessBuilder'
@@ -202,13 +210,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ProcessAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "ProcessAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "ProcessAPIs")))
+                               res)))]
     (build-bookmark-map "SEC04" (empty? res) message "The technology does not use Process.exec() or ProcessBuilder.")))
 
 (defn- stb03-servlets-servlet-filters
@@ -217,6 +225,9 @@
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND HAS(m.package)
                            AND m.package IN [
                                               'javax.servlet',
@@ -225,13 +236,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ServletAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "ServletAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "ServletAPIs")))
+                               res)))]
     (build-bookmark-map "STB03" (empty? res) message "The technology does not use servlets or servlet filters.")))
 
 (defn- stb04-database-access
@@ -240,6 +251,9 @@
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND HAS(m.name)
                            AND HAS(m.package)
                            AND m.package IN [
@@ -252,13 +266,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS DatabaseAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "DatabaseAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "DatabaseAPIs")))
+                               res)))]
     (build-bookmark-map "STB04" (empty? res) message "The technology does not access the database directly.")))
 
 (defn- stb06-stb18-manual-transactions
@@ -275,13 +289,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS TransactionAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "TransactionAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "TransactionAPIs")))
+                               res)))]
     (merge
       (build-bookmark-map "STB06" (empty? res) message "The technology does not manually demarcate transactions.")
       (build-bookmark-map "STB18" (empty? res) message "The technology does not manually demarcate transactions."))))
@@ -292,6 +306,9 @@
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND (   (    HAS(m.name)
                                     AND m.name IN [
                                                     'java.lang.Thread',
@@ -304,13 +321,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ThreadAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "ThreadAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "ThreadAPIs")))
+                               res)))]
     (build-bookmark-map "STB10" (empty? res) message "The technology does not use threading APIs.")))
 
 (defn- stb12-logging
@@ -319,6 +336,9 @@
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'java.lang.Throwable',
@@ -328,13 +348,13 @@
                         RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS LoggingAPIs
                          ORDER BY n.name
                        ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "LoggingAPIs")))
-                                      res)))]
+        message (if (empty? res)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "UsedBy")
+                                     " uses "
+                                     (s/join ", " (get % "LoggingAPIs")))
+                               res)))]
     (build-bookmark-map "STB12"
                         (empty? res)
                         (str message "\n#### Manual followup required to check the use of these APIs. ####")
