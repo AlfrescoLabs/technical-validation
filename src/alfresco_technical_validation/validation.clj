@@ -99,6 +99,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'org.springframework.context.ApplicationContextAware',
@@ -124,6 +125,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND HAS(n.`class-version`)
                            AND n.`class-version` < 50
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
@@ -203,6 +205,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND m.name IN [
                                            'java.lang.Process',
                                            'java.lang.ProcessBuilder'
@@ -228,6 +231,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND HAS(m.package)
                            AND m.package IN [
                                               'javax.servlet',
@@ -254,6 +258,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND HAS(m.name)
                            AND HAS(m.package)
                            AND m.package IN [
@@ -309,6 +314,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND (   (    HAS(m.name)
                                     AND m.name IN [
                                                     'java.lang.Thread',
@@ -339,6 +345,7 @@
                            AND HAS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'java.lang.Throwable',
