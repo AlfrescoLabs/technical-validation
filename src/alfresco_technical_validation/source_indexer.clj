@@ -31,16 +31,16 @@
 
 (defn- build-file-type-index
   [files file-regex k]
-  { k (filter #(re-matches file-regex %) files) })
+  { k (filter #(re-matches file-regex (.getName %)) files) })
 
 (defn- build-file-types-index
   [files]
-  (merge (map #(build-file-type-index files % (val %)) file-types-of-interest)))
+  (into {} (map #(build-file-type-index files (key %) (val %)) file-types-of-interest)))
 
 (defn index-source
   "Indexes the source code in the given location."
   [source]
-  (let [files (file-seq (io/file source))
-        ]
+  (let [files      (file-seq (io/file source))
+        file-index (build-file-types-index files)]
     (comment "####TODO: implement me!")
     ))
