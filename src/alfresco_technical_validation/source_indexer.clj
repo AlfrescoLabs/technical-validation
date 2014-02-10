@@ -31,7 +31,7 @@
 
 (defn- build-file-type-index
   [files file-regex k]
-  { k (filter #(re-matches file-regex (.getName %)) files) })
+  { k (filter #(re-matches file-regex (.getName ^java.io.File %)) files) })
 
 (defn- build-file-types-index
   [files]

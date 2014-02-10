@@ -32,12 +32,22 @@
     :validate [#(not (.exists (clojure.java.io/file %))) "Report file must not exist"]]
    ["-h" "--help"]])
 
+(def ^:private spinner-styles
+  {
+    :spinner         "|/-\\"
+    :unicode-spinner "⋮⋰⋯⋱"
+    :up-and-down     "▁▃▄▅▆▇█▇▆▅▄▃"
+    :fade-in-and-out " ░▒▓█▓▒░"
+    :side-to-side    "▉▊▋▌▍▎▏▎▍▌▋▊▉"
+    :quadrants       "┤┘┴└├┌┬┐"
+  })
+
 (defn- infini-spinner
-  ([] (infini-spinner 100))
-  ([delay-in-ms]
+  ([] (infini-spinner 100 :up-and-down))
+  ([delay-in-ms spinner-style]
     (try
-      (loop [characters "▁▃▄▅▆▇█▇▆▅▄▃"  ;characters " ░▒▓█▓▒░"  ;characters "▉▊▋▌▍▎▏▎▍▌▋▊▉"  ;characters "⋮⋰⋯⋱"  ;characters "┤┘┴└├┌┬┐"  ;characters "|/-\\"
-             i          0]
+      (loop [characters ^String (spinner-style spinner-styles)
+             i                  0]
         (print (str "\033[2D" (ava/blue (nth characters i)) " "))
         (flush)
         (Thread/sleep delay-in-ms)
