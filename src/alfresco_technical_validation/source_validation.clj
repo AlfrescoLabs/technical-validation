@@ -8,9 +8,10 @@
 ;
 
 (ns alfresco-technical-validation.source-validation
-  (:require [clojure.string        :as s]
-            [clojure.tools.logging :as log]
-            [clojure.java.io       :as io]
+  (:require [clojure.string                     :as s]
+            [clojure.tools.logging              :as log]
+            [clojure.java.io                    :as io]
+            [alfresco-technical-validation.util :refer :all]
             ))
 
 (def ^:private file-types-of-interest {

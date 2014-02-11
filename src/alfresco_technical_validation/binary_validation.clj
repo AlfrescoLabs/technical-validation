@@ -15,6 +15,7 @@
             [depends.reader                                    :as dr]
             [depends.neo4jwriter                               :as dn]
             [alfresco-technical-validation.alfresco-public-api :as alf-api]
+            [alfresco-technical-validation.util                :refer :all]
             ))
 
 ; List of special characters is from http://lucene.apache.org/core/3_6_2/queryparsersyntax.html#Escaping Special Characters
@@ -47,17 +48,6 @@
   [query in-values]
   (let [comma-delimited-string-quoted-in-values (s/join "," (map #(str "'" % "'") in-values))]
     (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
-
-(defn- build-bookmark-map
-  ([criteria-id meets evidence] (build-bookmark-map criteria-id meets evidence ""))
-  ([criteria-id meets evidence non-evidence]
-   (if meets
-     { (str criteria-id "_Evidence")    non-evidence
-       (str criteria-id "_DoesNotMeet") ""
-       (str criteria-id "_Remedy")      "" }
-     { (str criteria-id "_Evidence")    evidence
-       (str criteria-id "_Meets")       ""
-       (str criteria-id "_NoRemedy")    "" } )))
 
 (defn- api01-public-alfresco-java-api
   []
