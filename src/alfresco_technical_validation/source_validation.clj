@@ -7,7 +7,7 @@
 ; Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 ;
 
-(ns alfresco-technical-validation.source-indexer
+(ns alfresco-technical-validation.source-validation
   (:require [clojure.string        :as s]
             [clojure.tools.logging :as log]
             [clojure.java.io       :as io]
@@ -37,8 +37,8 @@
   [files]
   (into {} (map #(build-file-type-index files (key %) (val %)) file-types-of-interest)))
 
-(defn index-source
-  "Indexes the source code in the given location."
+(defn validate
+  "Runs all source-based validations."
   [source]
   (let [files      (file-seq (io/file source))
         file-index (build-file-types-index files)]

@@ -20,7 +20,7 @@
                   [org.clojure/tools.trace         "0.7.6"]
                   [org.clojure/tools.logging       "0.2.6"]
                   [clojurewerkz/neocons            "2.0.1"]
-                  [ch.qos.logback/logback-classic  "1.1.0"]
+                  [ch.qos.logback/logback-classic  "1.1.1"]
                   [io.aviso/pretty                 "0.1.8"]
                   [depends                         "0.1.0-SNAPSHOT"]
                   [bookmark-writer                 "0.1.0-SNAPSHOT"]
