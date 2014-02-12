@@ -22,7 +22,11 @@
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
   [source binaries neo4j-url report-filename]
-  (let [bookmarks (merge { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
-                         (src/validate source)
-                         (bin/validate neo4j-url binaries))]
-    (bw/populate-bookmarks! (io/input-stream report-template) report-filename bookmarks)))
+  (let [global-bookmarks { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
+        source-bookmarks (src/validate source)
+        binary-bookmarks (bin/validate neo4j-url binaries)
+        all-bookmarks    (merge global-bookmarks source-bookmarks binary-bookmarks)]
+    (clojure.pprint/pprint source-bookmarks)
+    (comment
+    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)))
+    )
