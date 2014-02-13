@@ -26,7 +26,7 @@
                   [bookmark-writer                 "0.1.0-SNAPSHOT"]
                 ]
   :profiles {:dev {:dependencies [
-                                   [midje "1.6.0"]
+                                   [midje "1.6.2"]
                                    [clj-ns-browser "1.3.1"]
                                  ]}}
   :resource-paths ["config"]

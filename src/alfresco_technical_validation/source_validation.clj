@@ -14,21 +14,23 @@
             [alfresco-technical-validation.util :refer :all]
             ))
 
-(def ^:private file-types-of-interest {
-  :module-properties      #"module\.properties"
-  :java                   #".*\.java"
-  :javascript             #".*\.js"
-  :freemarker             #".*\.ftl"
-  :xml                    #".*\.xml"
-  :web-script-descriptors #".*\.desc\.xml"
-  :spring-app-context     #".*-context\.xml"
-  :ant                    #"build\.xml"
-  :maven                  #"pom\.xml"
-  :gradle                 #"build\.gradle"
-  :leiningen              #"project\.clj"
-  :sbt                    #"build\.sbt"
-  :make                   #"[mM]akefile"
-  :pants                  #"BUILD"
+(def ^:private file-types
+  "The file types we're interested in, with symbolic names and filename regex to identify them."
+  {
+    :module-properties      #"module\.properties"
+    :java                   #".*\.java"
+    :javascript             #".*\.js"
+    :freemarker             #".*\.ftl"
+    :xml                    #".*\.xml"
+    :web-script-descriptors #".*\.desc\.xml"
+    :spring-app-context     #".*-context\.xml"
+    :ant                    #"build\.xml"
+    :maven                  #"pom\.xml"
+    :gradle                 #"build\.gradle"
+    :leiningen              #"project\.clj"
+    :sbt                    #"build\.sbt"
+    :make                   #"[mM]akefile"
+    :pants                  #"BUILD"
   })
 
 (defn- build-file-type-index
@@ -37,25 +39,30 @@
 
 (defn- build-file-types-index
   [files]
-  (into {} (map #(build-file-type-index files (key %) (val %)) file-types-of-interest)))
+  (into {} (map #(build-file-type-index files (key %) (val %)) file-types)))
 
-(defn- grep-file
-  "Returns a sequence of {:line-number x :re-seq y} maps for all lines in file that match the given regex."
-  [regex file]
-  (with-open [reader (io/reader file)]
-    (let [lines (line-seq reader)]
-      (doall
-        (map-indexed #(let [matches (re-seq regex %2)]
-                        (if (not-empty matches)
-                          { :line-number %1 :re-seq matches } ))
-                     lines)))))
+(def ^:private content-regexes-by-file-type {
+    :module-properties [ [:module-id      #"module\.id=(.*)\z"]
+                         [:module-version #"module\.version=(.*)\z"]
+                         [:repo-min       #"module\.repo\.version\.min=(.*)\z"]
+                         [:repo-max       #"module\.repo\.version\.max=(.*)\z"]
+                         [:alf-edition    #"module\.edition=(.*)\z"]
+                       ]
+    :ant               [ [:ivy            #"antlib:org\.apache\.ivy\.ant"] ]
+  })
 
-(defn- grep-files
-  "Returns a sequence of [file-name, [{:line-number x :re-seq y}]] pairs that match the regex."
-  [regex files]
-  (filter #(empty? (second %))
-          (map #(vector % (grep-file regex %))
-               files)))
+(defn- build-content-index-for-file-type
+  [file-type file-index]
+  (let [relevant-files   (file-type file-index)
+        relevant-regexes (file-type content-regexes-by-file-type)
+        raw-grep-result  (multi-grep-files relevant-regexes relevant-files)]
+;    (clojure.pprint/pprint raw-grep-result)  ;####TEST!!!!
+    (comment "####TODO: PERFORM SOME TRANSMOGRIFICATION MAGIC HERE!!!!")
+  ))
+
+(defn- build-content-index
+  [file-index]
+  (map #(build-content-index-for-file-type % file-index) (keys content-regexes-by-file-type)))
 
 (defn- detect-build-tools
   [file-index]
@@ -72,11 +79,19 @@
                                             (if (not-empty (:pants     file-index)) "Pants"))))]
     { "BuildTools" (if (empty? build-tools) "Unknown" build-tools) }))
 
+(defn- alfresco-version
+  [file-index]
+  (let [module-properties (:module-properties file-index)
+        ]
+
+    ))
+
 (defn validate
   "Runs all source-based validations."
   [source]
-  (let [files      (file-seq (io/file source))
-        file-index (build-file-types-index files)]
+  (let [files         (file-seq (io/file source))
+        file-index    (build-file-types-index files)
+        content-index (doall (build-content-index file-index))]  ;####TODO: remove doall once debugged
     (merge
       (detect-build-tools file-index))))
   
