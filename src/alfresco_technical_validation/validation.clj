@@ -26,7 +26,4 @@
         source-bookmarks (src/validate source)
         binary-bookmarks (bin/validate neo4j-url binaries)
         all-bookmarks    (merge global-bookmarks source-bookmarks binary-bookmarks)]
-    (clojure.pprint/pprint source-bookmarks)
-    (comment
     (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)))
-    )

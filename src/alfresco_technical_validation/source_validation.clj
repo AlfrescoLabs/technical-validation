@@ -11,6 +11,7 @@
   (:require [clojure.string                     :as s]
             [clojure.tools.logging              :as log]
             [clojure.java.io                    :as io]
+            [clojure.set                        :as set]
             [alfresco-technical-validation.util :refer :all]
             ))
 
@@ -41,28 +42,30 @@
   [files]
   (into {} (map #(build-file-type-index files (key %) (val %)) file-types)))
 
-(def ^:private content-regexes-by-file-type {
-    :module-properties [ [:module-id      #"module\.id=(.*)\z"]
-                         [:module-version #"module\.version=(.*)\z"]
-                         [:repo-min       #"module\.repo\.version\.min=(.*)\z"]
-                         [:repo-max       #"module\.repo\.version\.max=(.*)\z"]
-                         [:alf-edition    #"module\.edition=(.*)\z"]
-                       ]
-    :ant               [ [:ivy            #"antlib:org\.apache\.ivy\.ant"] ]
+(def ^:private content-regexes-by-file-type
+  "Regexes we want to run over the files, by file-type."
+  {
+    :module-properties {
+                         :module-id      #"module\.id=(.*)\z"
+                         :module-version #"module\.version=(.*)\z"
+                         :repo-min       #"module\.repo\.version\.min=(.*)\z"
+                         :repo-max       #"module\.repo\.version\.max=(.*)\z"
+                         :alf-edition    #"module\.edition=(.*)\z"
+                       }
+    :ant               { :ivy #"antlib:org\.apache\.ivy\.ant" }
   })
 
 (defn- build-content-index-for-file-type
   [file-type file-index]
   (let [relevant-files   (file-type file-index)
-        relevant-regexes (file-type content-regexes-by-file-type)
+        relevant-regexes (vals (file-type content-regexes-by-file-type))
+        regex-id-lookup  (set/map-invert (file-type content-regexes-by-file-type))
         raw-grep-result  (multi-grep-files relevant-regexes relevant-files)]
-;    (clojure.pprint/pprint raw-grep-result)  ;####TEST!!!!
-    (comment "####TODO: PERFORM SOME TRANSMOGRIFICATION MAGIC HERE!!!!")
-  ))
+    (flatten (map #(assoc % :regex-id (get regex-id-lookup (:regex %))) raw-grep-result))))
 
 (defn- build-content-index
   [file-index]
-  (map #(build-content-index-for-file-type % file-index) (keys content-regexes-by-file-type)))
+  (flatten (map #(build-content-index-for-file-type % file-index) (keys content-regexes-by-file-type))))
 
 (defn- detect-build-tools
   [file-index]
@@ -79,19 +82,39 @@
                                             (if (not-empty (:pants     file-index)) "Pants"))))]
     { "BuildTools" (if (empty? build-tools) "Unknown" build-tools) }))
 
-(defn- alfresco-version
-  [file-index]
-  (let [module-properties (:module-properties file-index)
-        ]
+(defn- module-versions
+  [content-index]
+  (let [module-versions    (distinct (map #(second (first (:re-seq %))) (filter #(= :module-version (:regex-id %)) content-index)))
+        module-version-str (s/join "," module-versions)]
+    { "ModuleVersion" (if (empty? module-version-str) "Not specified" module-version-str) }))
 
-    ))
+(defn- alfresco-min-versions
+  [content-index]
+  (let [alfresco-min-versions     (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-min (:regex-id %)) content-index)))
+        alfresco-min-versions-str (s/join "," alfresco-min-versions)]
+    { "AlfrescoVersionMin" (if (empty? alfresco-min-versions-str) "Not specified" alfresco-min-versions-str) }))
+
+(defn- alfresco-max-versions
+  [content-index]
+  (let [alfresco-max-versions     (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-max (:regex-id %)) content-index)))
+        alfresco-max-versions-str (s/join "," alfresco-max-versions)]
+    { "AlfrescoVersionMax" (if (empty? alfresco-max-versions-str) "Not specified" alfresco-max-versions-str) }))
+
+(defn- alfresco-versions
+  [content-index]
+  (merge
+    (alfresco-min-versions content-index)
+    (alfresco-max-versions content-index)))
 
 (defn validate
   "Runs all source-based validations."
   [source]
   (let [files         (file-seq (io/file source))
         file-index    (build-file-types-index files)
-        content-index (doall (build-content-index file-index))]  ;####TODO: remove doall once debugged
+        content-index (build-content-index file-index)]
     (merge
-      (detect-build-tools file-index))))
+      (detect-build-tools file-index)
+      (module-versions    content-index)
+      (alfresco-versions  content-index)
+    )))
   
