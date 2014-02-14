@@ -17,9 +17,13 @@ Note: these dependencies should be installed via your OS package manager, where 
 
 ## Installation
 
-Checkout the source from [GitHub](https://github.com/AlfrescoLabs/technical-validation).
+...is a huge pain right now as it requires building [depends](https://github.com/pmonks/depends), [bookmark-writer](https://github.com/pmonks/bookmark-writer) and the [validation tool](https://github.com/AlfrescoLabs/technical-validation) from source, and deploying the first 2 into a local Maven repository.
+
+I'm working on getting an uberjar functional, at which point this'll involve downloading a single behemoth JAR file and running it directly.
 
 ## Running / usage
+
+Assuming you get the source built and installed properly, you can...
 
 ```shell
  $ lein run -- -h
