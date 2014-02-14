@@ -54,7 +54,7 @@
                        }
     :ant               { :ivy #"antlib:org\.apache\.ivy\.ant" }
     :java              {
-                         :synchronized #"\ssynchronized\s"
+                         :synchronized #"(^|\s)synchronized(\s|$)"
                        }
   })
 
@@ -104,9 +104,12 @@
     { "AlfrescoVersionMax" (if (empty? message) "Not specified" message) }))
 
 (defn- stb08-stb09-use-of-synchronized
-  [content-index]
+  [source content-index]
   (let [uses-of-synchronized (filter #(= :synchronized (:regex-id %)) content-index)
-        message              (str "Uses of synchronized:\n" (s/join "\n" (map #(str (:file %) " line " (:line-number %)) uses-of-synchronized)))]
+        message              (str "Uses of synchronized:\n"
+                                  (s/join "\n"
+                                          (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %))
+                                               uses-of-synchronized)))]
     (merge
       (build-bookmark-map "STB08"
                           (empty? uses-of-synchronized)
@@ -128,6 +131,6 @@
       (module-versions                 content-index)
       (alfresco-min-versions           content-index)
       (alfresco-max-versions           content-index)
-      (stb08-stb09-use-of-synchronized content-index)
+      (stb08-stb09-use-of-synchronized source content-index)
     )))
   
