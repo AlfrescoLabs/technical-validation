@@ -60,6 +60,7 @@
         :sec05          #"(?:^|\s)eval\("
       }
     :web-script-descriptor {
+        :stb19-stb20    #"<transaction>"
         :sec03          #"<authentication>\s*none\s*</authentication>"
       }
     :spring-app-context {
@@ -143,20 +144,39 @@
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
-  (let [matches (filter #(= :stb08-stb09 (:regex-id %)) content-index)
-        message (str "Uses of synchronized:\n"
-                     (s/join "\n"
-                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %))
-                                  matches)))]
-    (merge
-      (build-bookmark-map "STB08"
-                          (empty? matches)
-                          (str message "\n#### Manual followup required. ####")
-                          "The technology does not synchronize.")
-      (build-bookmark-map "STB09"
-                          (empty? matches)
-                          (str message "\n#### Manual followup required. ####")
-                          "The technology does not synchronize."))))
+  (merge
+    (standard-validation source
+                         content-index
+                         :stb08-stb09
+                         "STB08"
+                         "Uses of synchronized"
+                         true
+                         "The technology does not synchronized.")
+    (standard-validation source
+                         content-index
+                         :stb08-stb09
+                         "STB09"
+                         "Uses of synchronized"
+                         true
+                         "The technology does not synchronized.")))
+
+(defn- stb19-stb20-web-script-transaction-setting
+  [source content-index]
+  (merge
+    (standard-validation source
+                         content-index
+                         :stb19-stb20
+                         "STB19"
+                         "Uses of <transaction> setting"
+                         false
+                         "The technology does not use the <transaction> setting.")
+    (standard-validation source
+                         content-index
+                         :stb19-stb20
+                         "STB20"
+                         "Uses of <transaction> setting"
+                         false
+                         "The technology does not use the <transaction> setting.")))
 
 (defn- perf02-judicious-use-of-indexed-properties
   [source content-index]
@@ -209,8 +229,9 @@
       (module-versions                            content-index)
       (alfresco-min-versions                      content-index)
       (alfresco-max-versions                      content-index)
-      (stb08-stb09-use-of-synchronized            source content-index)
       (api05-inject-serviceregistry-not-services  source content-index)
+      (stb08-stb09-use-of-synchronized            source content-index)
+      (stb19-stb20-web-script-transaction-setting source content-index)
       (perf02-judicious-use-of-indexed-properties source content-index)
       (perf03-dont-store-property-values          source content-index)
       (sec03-none-authentication-in-web-scripts   source content-index)
