@@ -3,9 +3,11 @@
 Tool(s) for the technical validation of custom code that extends or integrates with Alfresco.
 
 ## Dependencies
- 1. [cloc](http://cloc.sourceforge.net/)
+ 1. [Ohcount](https://github.com/blackducksw/ohcount)
  2. [depends](https://github.com/pmonks/depends)
  3. [neo4j](http://www.neo4j.org/)
+
+Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX, I strongly recommend [Homebrew](http://brew.sh/).
 
 ## Installation
 
