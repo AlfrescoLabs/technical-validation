@@ -26,6 +26,7 @@
     :web-script-descriptor #".*\.desc\.xml"
     :spring-app-context    #".*-context\.xml"
     :content-model         #".*model.*\.xml"
+    :explorer-config       #"web-client-config-custom\.xml"
     :ant                   #"build\.xml"
     :maven                 #"pom\.xml"
     :gradle                #"build\.gradle"
@@ -67,7 +68,7 @@
         :api05          #"(?:^|\s)ref="
       }
     :content-model {
-        :perf02         #"<index enabled\s*=\s*\"true"
+        :perf02         #"<index enabled\s*=\s*\"true"   ; This regex makes Sublime Text go crazy!
         :perf03         #"<stored>\s*true\s*</stored>"
       }
     :ant {
@@ -218,6 +219,18 @@
                        false
                        "The technology does not use eval in Javascript."))
 
+(defn- up01-explorer-ui-extension
+  [source file-index]
+  (let [matches (:explorer-config file-index)
+        message (str "Explorer UI extension files:\n"
+                     (s/join "\n"
+                             (map #(subs (str %) (.length ^String source))
+                                  matches)))]
+    (build-bookmark-map "UP01"
+                        (empty? matches)
+                        message
+                        "The technology does not extend the Explorer UI.")))
+
 (defn validate
   "Runs all source-based validations."
   [source]
@@ -236,5 +249,6 @@
       (perf03-dont-store-property-values          source content-index)
       (sec03-none-authentication-in-web-scripts   source content-index)
       (sec05-use-of-eval                          source content-index)
+      (up01-explorer-ui-extension                 source file-index)
     )))
   
