@@ -150,15 +150,15 @@
     (merge
       (build-bookmark-map "COM09"
                           (empty? res)
-                          (str message "\n#### Manual followup required to check which search \"language\" is in use. ####")
+                          (str message "\n#### Manual followup required. ####")
                           "The technology does not use the Search APIs.")
       (build-bookmark-map "STB07"
                           (empty? res)
-                          (str message "\n#### Manual followup required to confirm ResultSets are closed. ####")
+                          (str message "\n#### Manual followup required. ####")
                           "The technology does not use the Search APIs.")
       (build-bookmark-map "STB14"
                           (empty? res)
-                          (str message "\n#### Manual followup required to confirm usage isn't done during bootstrap. ####")
+                          (str message "\n#### Manual followup required. ####")
                           "The technology does not use the Search APIs."))))
 
 (defn- sec02-minimise-manual-authentication
@@ -350,7 +350,7 @@
                                res)))]
     (build-bookmark-map "STB12"
                         (empty? res)
-                        (str message "\n#### Manual followup required to check the use of these APIs. ####")
+                        (str message "\n#### Manual followup required. ####")
                         "The technology does not use improper logging techniques.")))
 
 (defn- up01-explorer-ui

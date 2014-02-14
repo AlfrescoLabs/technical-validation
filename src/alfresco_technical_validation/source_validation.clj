@@ -43,19 +43,22 @@
   (into {} (map #(build-file-type-index files (key %) (val %)) file-types)))
 
 (def ^:private content-regexes-by-file-type
-  "Regexes we want to run over the files, by file-type."
+  "Regexes we want to run over each file type."
   {
-    :module-properties {
-                         :module-id      #"module\.id=(.*)\z"
-                         :module-version #"module\.version=(.*)\z"
-                         :repo-min       #"module\.repo\.version\.min=(.*)\z"
-                         :repo-max       #"module\.repo\.version\.max=(.*)\z"
-                         :alf-edition    #"module\.edition=(.*)\z"
-                       }
-    :ant               { :ivy #"antlib:org\.apache\.ivy\.ant" }
-    :java              {
-                         :synchronized #"(^|\s)synchronized(\s|$)"
-                       }
+    :module-properties  {
+                          :module-id      #"module\.id=(.*)\z"
+                          :module-version #"module\.version=(.*)\z"
+                          :repo-min       #"module\.repo\.version\.min=(.*)\z"
+                          :repo-max       #"module\.repo\.version\.max=(.*)\z"
+                          :alf-edition    #"module\.edition=(.*)\z"
+                        }
+    :ant                { :ivy            #"antlib:org\.apache\.ivy\.ant" }
+    :java               {
+                          :stb08-stb09    #"(^|\s)synchronized(\s|$)"
+                        }
+    :spring-app-context {
+                          :api05          #"(^|\s)ref="
+                        }
   })
 
 (defn- build-content-index-for-file-type
@@ -103,21 +106,33 @@
         message (s/join "," matches)]
     { "AlfrescoVersionMax" (if (empty? message) "Not specified" message) }))
 
+(defn- api05-inject-serviceregistry-not-services
+  [source content-index]
+  (let [matches (filter #(= :api05 (:regex-id %)) content-index)
+        message (str "Bean injections:\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                  matches)))]
+      (build-bookmark-map "API05"
+                          (empty? matches)
+                          (str message "\n#### Manual followup required. ####")
+                          "The technology does not perform bean injection.")))
+
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
-  (let [uses-of-synchronized (filter #(= :synchronized (:regex-id %)) content-index)
-        message              (str "Uses of synchronized:\n"
-                                  (s/join "\n"
-                                          (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %))
-                                               uses-of-synchronized)))]
+  (let [matches (filter #(= :stb08-stb09 (:regex-id %)) content-index)
+        message (str "Uses of synchronized:\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %))
+                                  matches)))]
     (merge
       (build-bookmark-map "STB08"
-                          (empty? uses-of-synchronized)
-                          (str message "\n#### Manual followup required to check these uses of synchronized. ####")
+                          (empty? matches)
+                          (str message "\n#### Manual followup required. ####")
                           "The technology does not synchronize.")
       (build-bookmark-map "STB09"
-                          (empty? uses-of-synchronized)
-                          (str message "\n#### Manual followup required to check these uses of synchronized. ####")
+                          (empty? matches)
+                          (str message "\n#### Manual followup required. ####")
                           "The technology does not synchronize."))))
 
 (defn validate
@@ -127,10 +142,11 @@
         file-index    (build-file-types-index files)
         content-index (build-content-index file-index)]
     (merge
-      (detect-build-tools              file-index)
-      (module-versions                 content-index)
-      (alfresco-min-versions           content-index)
-      (alfresco-max-versions           content-index)
-      (stb08-stb09-use-of-synchronized source content-index)
+      (detect-build-tools                        file-index)
+      (module-versions                           content-index)
+      (alfresco-min-versions                     content-index)
+      (alfresco-max-versions                     content-index)
+      (stb08-stb09-use-of-synchronized           source content-index)
+      (api05-inject-serviceregistry-not-services source content-index)
     )))
   
