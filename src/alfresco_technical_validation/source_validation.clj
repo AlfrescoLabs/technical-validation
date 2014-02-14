@@ -61,7 +61,8 @@
                           :api05          #"(?:^|\s)ref="
                         }
     :content-model      {
-                          :perf02         #"(?:^|\s)<index enabled\s*=\s*\"true"
+                          :perf02         #"<index enabled\s*=\s*\"true"
+                          :perf03         #"<stored>\s*true\s*</stored>"
                         }
   })
 
@@ -151,6 +152,18 @@
                           (str message "\n#### Manual followup required. ####")
                           "The technology does not index any content model properties.")))
 
+(defn- perf03-dont-store-property-values
+  [source content-index]
+  (let [matches (filter #(= :perf03 (:regex-id %)) content-index)
+        message (str "Stored content model properties:\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                  matches)))]
+      (build-bookmark-map "PERF03"
+                          (empty? matches)
+                          message
+                          "The technology does not store any content model properties in the search engine indexes.")))
+
 (defn validate
   "Runs all source-based validations."
   [source]
@@ -165,5 +178,6 @@
       (stb08-stb09-use-of-synchronized            source content-index)
       (api05-inject-serviceregistry-not-services  source content-index)
       (perf02-judicious-use-of-indexed-properties source content-index)
+      (perf03-dont-store-property-values          source content-index)
     )))
   
