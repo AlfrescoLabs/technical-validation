@@ -3,28 +3,36 @@
 Tool(s) for the technical validation of custom code that extends or integrates with Alfresco.
 
 ## Dependencies
+ 1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+ 2. [neo4j 2.0+](http://www.neo4j.org/)
+ 3. [leiningen](http://leiningen.org/)
+ 4. [depends](https://github.com/pmonks/depends)
+ 5. [bookmark-writer](https://github.com/pmonks/bookmark-writer)
+
+The following tool is also useful, though not used directly by the tool:
+
  1. [Ohcount](https://github.com/blackducksw/ohcount)
- 2. [depends](https://github.com/pmonks/depends)
- 3. [neo4j](http://www.neo4j.org/)
 
 Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX, I strongly recommend [Homebrew](http://brew.sh/).
 
 ## Installation
 
 Checkout the source from [GitHub](https://github.com/AlfrescoLabs/technical-validation).
-Open techval.sh and modify the tunables (at the top of the file) as needed to match your operating environment.
 
 ## Running / usage
 
 ```shell
- ./techval.sh [args]
+ ./lein run -- [args]
 ```
-    Switch                 Default                          Description
-    ------                 -------                          -----------
-    -s [directory]         .                                Directory containing source of the solution to be validated.
-    -b [file or directory] n/a                              Binary file or directory containing the binaries (AMP files, typically) of the solution to be validated.
-    -r [file]              ./technicalValidationReport.txt  Name of the file to write the report to.
-    -h, -?                 n/a                              Show help.
+ -------------------------------+-------------------------------+----------------------------------
+  Parameter                     | Default Value                 | Description
+ -------------------------------+-------------------------------+----------------------------------
+  -s, --source SOURCE                                            Source folder
+  -b, --binaries BINARIES                                        Binary folder or archive
+  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use
+  -r, --report-file REPORT_FILE                                  The filename of the output report
+  -h, --help
+ -------------------------------+-------------------------------+----------------------------------
 
 ## Developer Information
 
@@ -34,7 +42,7 @@ Open techval.sh and modify the tunables (at the top of the file) as needed to ma
 
 ## License
 
-Copyright © 2013 Peter Monks (pmonks@alfresco.com)
+Copyright © 2013,2014 Peter Monks (pmonks@alfresco.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
