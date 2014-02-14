@@ -28,7 +28,8 @@
   :profiles {:dev {:dependencies [
                                    [midje "1.6.2"]
                                    [clj-ns-browser "1.3.1"]
-                                 ]}}
+                                 ]}
+             :uberjar {:aot :all}}
   :resource-paths ["config"]
   :jvm-opts ^:replace []  ; Stop Leiningen from turning off JVM optimisations - makes it slower to start but ensures code runs as fast as possible
   :main alfresco-technical-validation.core)
