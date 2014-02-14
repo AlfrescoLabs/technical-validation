@@ -81,7 +81,11 @@
       (if errors
         (println errors)
         (if (or help (nil? binaries) (nil? source) (nil? report-filename))
-          (println (str "Usage:\n" summary))
+          (println (str " -------------------------------+-------------------------------+----------------------------------\n"
+                        "  Parameter                     | Default Value                 | Description\n"
+                        " -------------------------------+-------------------------------+----------------------------------\n"
+                        summary
+                        "\n -------------------------------+-------------------------------+----------------------------------"))
           (do
             (print "Reticulating splines...   ")
             (flush)
