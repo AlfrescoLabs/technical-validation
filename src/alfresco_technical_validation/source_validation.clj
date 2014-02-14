@@ -25,6 +25,7 @@
     :xml                    #".*\.xml"
     :web-script-descriptors #".*\.desc\.xml"
     :spring-app-context     #".*-context\.xml"
+    :content-model          #".*model.*\.xml"
     :ant                    #"build\.xml"
     :maven                  #"pom\.xml"
     :gradle                 #"build\.gradle"
@@ -54,10 +55,13 @@
                         }
     :ant                { :ivy            #"antlib:org\.apache\.ivy\.ant" }
     :java               {
-                          :stb08-stb09    #"(^|\s)synchronized(\s|$)"
+                          :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
                         }
     :spring-app-context {
-                          :api05          #"(^|\s)ref="
+                          :api05          #"(?:^|\s)ref="
+                        }
+    :content-model      {
+                          :perf02         #"(?:^|\s)<index enabled\s*=\s*\"true"
                         }
   })
 
@@ -135,6 +139,18 @@
                           (str message "\n#### Manual followup required. ####")
                           "The technology does not synchronize."))))
 
+(defn- perf02-judicious-use-of-indexed-properties
+  [source content-index]
+  (let [matches (filter #(= :perf02 (:regex-id %)) content-index)
+        message (str "Indexed content model properties:\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                  matches)))]
+      (build-bookmark-map "PERF02"
+                          (empty? matches)
+                          (str message "\n#### Manual followup required. ####")
+                          "The technology does not index any content model properties.")))
+
 (defn validate
   "Runs all source-based validations."
   [source]
@@ -142,11 +158,12 @@
         file-index    (build-file-types-index files)
         content-index (build-content-index file-index)]
     (merge
-      (detect-build-tools                        file-index)
-      (module-versions                           content-index)
-      (alfresco-min-versions                     content-index)
-      (alfresco-max-versions                     content-index)
-      (stb08-stb09-use-of-synchronized           source content-index)
-      (api05-inject-serviceregistry-not-services source content-index)
+      (detect-build-tools                         file-index)
+      (module-versions                            content-index)
+      (alfresco-min-versions                      content-index)
+      (alfresco-max-versions                      content-index)
+      (stb08-stb09-use-of-synchronized            source content-index)
+      (api05-inject-serviceregistry-not-services  source content-index)
+      (perf02-judicious-use-of-indexed-properties source content-index)
     )))
   
