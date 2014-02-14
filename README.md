@@ -1,6 +1,6 @@
 # technical-validation
 
-Tool(s) for the technical validation of custom code that extends or integrates with Alfresco.
+Tool(s) for the technical validation of custom code that extends the [Alfresco](http://www.alfresco.com) open source document management system.
 
 ## Dependencies
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
