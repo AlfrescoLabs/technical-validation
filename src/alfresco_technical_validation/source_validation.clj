@@ -53,6 +53,9 @@
                          :alf-edition    #"module\.edition=(.*)\z"
                        }
     :ant               { :ivy #"antlib:org\.apache\.ivy\.ant" }
+    :java              {
+                         :synchronized #"\ssynchronized\s"
+                       }
   })
 
 (defn- build-content-index-for-file-type
@@ -84,27 +87,35 @@
 
 (defn- module-versions
   [content-index]
-  (let [module-versions    (distinct (map #(second (first (:re-seq %))) (filter #(= :module-version (:regex-id %)) content-index)))
-        module-version-str (s/join "," module-versions)]
-    { "ModuleVersion" (if (empty? module-version-str) "Not specified" module-version-str) }))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :module-version (:regex-id %)) content-index)))
+        message (s/join "," matches)]
+    { "ModuleVersion" (if (empty? message) "Not specified" message) }))
 
 (defn- alfresco-min-versions
   [content-index]
-  (let [alfresco-min-versions     (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-min (:regex-id %)) content-index)))
-        alfresco-min-versions-str (s/join "," alfresco-min-versions)]
-    { "AlfrescoVersionMin" (if (empty? alfresco-min-versions-str) "Not specified" alfresco-min-versions-str) }))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-min (:regex-id %)) content-index)))
+        message (s/join "," matches)]
+    { "AlfrescoVersionMin" (if (empty? message) "Not specified" message) }))
 
 (defn- alfresco-max-versions
   [content-index]
-  (let [alfresco-max-versions     (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-max (:regex-id %)) content-index)))
-        alfresco-max-versions-str (s/join "," alfresco-max-versions)]
-    { "AlfrescoVersionMax" (if (empty? alfresco-max-versions-str) "Not specified" alfresco-max-versions-str) }))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-max (:regex-id %)) content-index)))
+        message (s/join "," matches)]
+    { "AlfrescoVersionMax" (if (empty? message) "Not specified" message) }))
 
-(defn- alfresco-versions
+(defn- stb08-stb09-use-of-synchronized
   [content-index]
-  (merge
-    (alfresco-min-versions content-index)
-    (alfresco-max-versions content-index)))
+  (let [uses-of-synchronized (filter #(= :synchronized (:regex-id %)) content-index)
+        message              (str "Uses of synchronized:\n" (s/join "\n" (map #(str (:file %) " line " (:line-number %)) uses-of-synchronized)))]
+    (merge
+      (build-bookmark-map "STB08"
+                          (empty? uses-of-synchronized)
+                          (str message "\n#### Manual followup required to check these uses of synchronized. ####")
+                          "The technology does not synchronize.")
+      (build-bookmark-map "STB09"
+                          (empty? uses-of-synchronized)
+                          (str message "\n#### Manual followup required to check these uses of synchronized. ####")
+                          "The technology does not synchronize."))))
 
 (defn validate
   "Runs all source-based validations."
@@ -113,8 +124,10 @@
         file-index    (build-file-types-index files)
         content-index (build-content-index file-index)]
     (merge
-      (detect-build-tools file-index)
-      (module-versions    content-index)
-      (alfresco-versions  content-index)
+      (detect-build-tools              file-index)
+      (module-versions                 content-index)
+      (alfresco-min-versions           content-index)
+      (alfresco-max-versions           content-index)
+      (stb08-stb09-use-of-synchronized content-index)
     )))
   
