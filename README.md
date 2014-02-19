@@ -14,9 +14,9 @@ Note: these dependencies should be installed via your OS package manager, where 
 
 ## Installation
 
-...is a huge pain right now as it requires using [leiningen](http://leiningen.org/) to build [depends](https://github.com/pmonks/depends), [bookmark-writer](https://github.com/pmonks/bookmark-writer), and [validation tool](https://github.com/AlfrescoLabs/technical-validation) from source, and deploying the first 2 into a local Maven repository.
+...is a huge pain right now as it requires using [leiningen](http://leiningen.org/) to build [depends](https://github.com/pmonks/depends), [bookmark-writer](https://github.com/pmonks/bookmark-writer), and the [validation tool](https://github.com/AlfrescoLabs/technical-validation) from source, and installing the first 2 into a local Maven repository.
 
-I'm working on getting a few more tests implemented, and will then prepare an uberjar-base release.
+I'm working on getting a few more tests implemented, and will then prepare an uberjar-based release.
 
 ## Running / usage
 
