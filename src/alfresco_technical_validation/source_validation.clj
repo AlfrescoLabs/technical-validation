@@ -57,11 +57,11 @@
   "Regexes we want to run over each file type."
   {
     :module-properties {
-        :module-id      #"module\.id=(.*)\z"
         :module-version #"module\.version=(.*)\z"
         :repo-min       #"module\.repo\.version\.min=(.*)\z"
         :repo-max       #"module\.repo\.version\.max=(.*)\z"
         :alf-edition    #"module\.edition=(.*)\z"
+        :com03          #"module\.id=(.*)\z"
       }
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
@@ -77,7 +77,7 @@
         :api05          #"(?:^|\s)ref="
       }
     :content-model {
-        :perf02         #"<index enabled\s*=\s*\"true"   ; This regex makes Sublime Text go crazy!
+        :perf02         #"<index enabled\s*=\s*\"true"   ; This regex makes Sublime Text syntax highlighting go crazy!
         :perf03         #"<stored>\s*true\s*</stored>"
       }
     :ant {
@@ -130,6 +130,12 @@
         message (s/join "," matches)]
     { "AlfrescoVersionMax" (if (empty? message) "Not specified" message) }))
 
+(defn- alfresco-editions
+  [content-index]
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :alf-edition (:regex-id %)) content-index)))
+        message (s/join "," matches)]
+    { "AlfrescoEditions" (if (empty? message) "Not specified" message) }))
+
 (defn- standard-validation
   [source content-index regex-id criteria-id message-header manual-followup-required success-message]
   (let [matches (filter #(= regex-id (:regex-id %)) content-index)
@@ -151,6 +157,18 @@
                        "Bean injections"
                        true
                        "The technology does not perform bean injection."))
+
+(defn- com03-unique-module-identifier
+  [source content-index]
+  (let [matches (filter #(= :com03 (:regex-id %)) content-index)
+        message (str "Module identifier(s):\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                  matches)))]
+      (build-bookmark-map "COM03"
+                          (not-empty matches)
+                          "No module identifier provided."
+                          (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####"))))
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
@@ -251,7 +269,9 @@
       (module-versions                            content-index)
       (alfresco-min-versions                      content-index)
       (alfresco-max-versions                      content-index)
+      (alfresco-editions                          content-index)
       (api05-inject-serviceregistry-not-services  source content-index)
+      (com03-unique-module-identifier             source content-index)
       (stb08-stb09-use-of-synchronized            source content-index)
       (stb19-stb20-web-script-transaction-setting source content-index)
       (perf02-judicious-use-of-indexed-properties source content-index)
