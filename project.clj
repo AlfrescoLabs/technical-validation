@@ -39,6 +39,7 @@
                                    [clj-ns-browser "1.3.1"]
                                  ]}
              :uberjar {:aot :all}}
+  :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Merge Java ServiceLocator descriptors during uberjar construction
   :resource-paths ["config"]
   :jvm-opts ^:replace []  ; Stop Leiningen from turning off JVM optimisations - makes it slower to start but ensures code runs as fast as possible
   :main alfresco-technical-validation.core)
