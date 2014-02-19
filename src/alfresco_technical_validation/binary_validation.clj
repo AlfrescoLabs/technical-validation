@@ -316,19 +316,6 @@
                        ")]
     (standard-validation "STB12" res true "The technology does not use improper logging techniques.")))
 
-(defn- up01-explorer-ui
-  []
-  (let [res (cy/tquery "
-                         START n=NODE(*)
-                         MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.package)
-                           AND m.package =~ 'org.alfresco.web..*'
-                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
-                         ORDER BY n.name
-                       ")]
-    (standard-validation "UP01" res true "The technology does not extend the Explorer UI.")))
-
 (defn validate
   "Runs all binary-based validations."
   [neo4j-url binaries]
@@ -347,5 +334,4 @@
     (stb06-stb18-manual-transactions)
     (stb10-threading)
     (stb12-logging)
-    (up01-explorer-ui)
   ))
