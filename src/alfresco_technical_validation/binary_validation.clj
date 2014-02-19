@@ -134,6 +134,32 @@
                        ")]
     (standard-validation "DEV02" res false "The technology does not contain any Java-backed Web Scripts.")))
 
+(defn- com01-unique-java-package
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'java..*')
+                           AND NOT(n.package =~ 'sun..*')
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'org.alfresco..*')
+                           AND NOT(n.package =~ 'org.json.*')
+                           AND NOT(n.package =~ 'org.springframework..*')
+                        RETURN DISTINCT n.package AS PackageName
+                         ORDER BY PackageName
+                       ")
+        message (if (empty? res)
+                  nil
+                  (str "The following Java packages are used:\n"
+                       (s/join "\n" (map #(str (get % "PackageName")) res))))]
+    (build-bookmark-map "COM01"
+                        (not-empty res)
+                        "The code does not have any Java packages.\n#### Manual followup required - validate whether there's any Java in the solution at all. ####"
+                        (str message "\n#### Manual followup required - ensure reasonable uniqueness of these package names. ####"))))
+
 (defn- com06-compiled-jvm-version
   []
   (let [res (cy/tquery "
@@ -325,6 +351,7 @@
     (api01-public-alfresco-java-api)
     (api06-service-locator)
     (dev02-prefer-javascript-web-scripts)
+    (com01-unique-java-package)
     (com06-compiled-jvm-version)
     (com09-stb07-stb14-search-apis)
     (sec02-minimise-manual-authentication)

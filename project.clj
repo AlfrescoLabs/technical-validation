@@ -24,18 +24,18 @@
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
   :javac-target "1.7"
   :dependencies [
-                  [org.clojure/clojure             "1.5.1"]
-                  [org.clojure/tools.cli           "0.3.1"]
-                  [org.clojure/tools.trace         "0.7.6"]
-                  [org.clojure/tools.logging       "0.2.6"]
-                  [clojurewerkz/neocons            "2.0.1"]
-                  [ch.qos.logback/logback-classic  "1.1.1"]
-                  [io.aviso/pretty                 "0.1.8"]
-                  [depends                         "0.1.0-SNAPSHOT"]
-                  [bookmark-writer                 "0.1.0-SNAPSHOT"]
+                  [org.clojure/clojure            "1.5.1"]
+                  [org.clojure/tools.cli          "0.3.1"]
+                  [org.clojure/tools.trace        "0.7.6"]
+                  [org.clojure/tools.logging      "0.2.6"]
+                  [clojurewerkz/neocons           "2.0.1"]
+                  [ch.qos.logback/logback-classic "1.1.1"]
+                  [io.aviso/pretty                "0.1.8"]
+                  [depends                        "0.1.0-SNAPSHOT"]
+                  [bookmark-writer                "0.1.0-SNAPSHOT"]
                 ]
   :profiles {:dev {:dependencies [
-                                   [midje "1.6.2"]
+                                   [midje          "1.6.2"]
                                    [clj-ns-browser "1.3.1"]
                                  ]}
              :uberjar {:aot :all}}
