@@ -58,6 +58,20 @@
   (let [comma-delimited-string-quoted-in-values (s/join "," (map #(str "'" % "'") in-values))]
     (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
 
+(defn- standard-validation
+  [criteria-id query-result manual-followup-required success-message]
+  (let [message (if (empty? query-result)
+                  nil
+                  (s/join "\n"
+                          (map #(str (get % "ClassName")
+                                     " uses "
+                                     (s/join ", " (get % "APIs")))
+                               query-result)))]
+    (build-bookmark-map criteria-id
+                        (empty? query-result)
+                        (if manual-followup-required (str message "\n#### Manual followup required. ####") message)
+                        success-message)))
+
 (defn- api01-public-alfresco-java-api
   []
   (let [alfresco-public-java-api (cypher-escaped-alfresco-api)
@@ -72,18 +86,11 @@
                                                          AND NOT(m.name IN [
                                                                              {in-clause-values}
                                                                            ])
-                                                      RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedAlfrescoAPIs
+                                                      RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                                                        ORDER BY n.name
                                                      ", alfresco-public-java-api)
-        res                      (cy/tquery cypher-query)
-        message                  (if (empty? res)
-                                   nil
-                                   (s/join "\n"
-                                           (map #(str (get % "UsedBy")
-                                                      " uses "
-                                                      (s/join ", " (get % "BlacklistedAlfrescoAPIs")))
-                                                res)))]
-    (build-bookmark-map "API01" (empty? res) message "The technology only uses Alfresco's Public Java APIs.")))
+        res                      (cy/tquery cypher-query)]
+    (standard-validation "API01" res false "The technology only uses Alfresco's Public Java APIs.")))
 
 (defn- api06-service-locator
   []
@@ -100,17 +107,32 @@
                                            'org.springframework.context.ApplicationContextAware',
                                            'org.springframework.context.ApplicationContext'
                                          ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS BlacklistedSpringAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "BlacklistedSpringAPIs")))
-                               res)))]
-    (build-bookmark-map "API06" (empty? res) message "The technology does not use the service locator pattern.")))
+                       ")]
+    (standard-validation "API06" res false "The technology does not use the service locator pattern.")))
+
+(defn- dev02-prefer-javascript-web-scripts
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'org.springframework.extensions.webscripts.WebScript',
+                                           'org.springframework.extensions.webscripts.AbstractWebScript',
+                                           'org.springframework.extensions.webscripts.DeclarativeWebScript',
+                                           'org.springframework.extensions.webscripts.atom.AtomWebScript'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "DEV02" res false "The technology does not contain any Java-backed Web Scripts.")))
 
 (defn- com06-compiled-jvm-version
   []
@@ -146,29 +168,13 @@
                                            'org.alfresco.service.cmr.search.SearchService',
                                            'org.alfresco.service.cmr.search.ResultSet'
                                          ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS SearchAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "SearchAPIs")))
-                                      res)))]
+                       ")]
     (merge
-      (build-bookmark-map "COM09"
-                          (empty? res)
-                          (str message "\n#### Manual followup required. ####")
-                          "The technology does not use the Search APIs.")
-      (build-bookmark-map "STB07"
-                          (empty? res)
-                          (str message "\n#### Manual followup required. ####")
-                          "The technology does not use the Search APIs.")
-      (build-bookmark-map "STB14"
-                          (empty? res)
-                          (str message "\n#### Manual followup required. ####")
-                          "The technology does not use the Search APIs."))))
+      (standard-validation "COM09" res true "The technology does not use the Search APIs.")
+      (standard-validation "STB07" res true "The technology does not use the Search APIs.")
+      (standard-validation "STB14" res true "The technology does not use the Search APIs."))))
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -178,17 +184,10 @@
                          WHERE HAS(n.name)
                            AND HAS(m.name)
                            AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil'
-                        RETURN n.name AS UsedBy, m.name AS AuthenticationUtilAPI
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                   (map #(str (get % "UsedBy")
-                                              " uses "
-                                              (get % "AuthenticationUtilAPI"))
-                                        res)))]
-    (build-bookmark-map "SEC02" (empty? res) message "The technology does not manually control the authenticated session.")))
+                       ")]
+    (standard-validation "SEC02" res false "The technology does not manually control the authenticated session.")))
 
 (defn- sec04-process-exec-builder
   []
@@ -205,17 +204,10 @@
                                            'java.lang.Process',
                                            'java.lang.ProcessBuilder'
                                          ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ProcessAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "ProcessAPIs")))
-                               res)))]
-    (build-bookmark-map "SEC04" (empty? res) message "The technology does not use Process.exec() or ProcessBuilder.")))
+                       ")]
+    (standard-validation "SEC04" res false "The technology does not use Process.exec() or ProcessBuilder.")))
 
 (defn- stb03-servlets-servlet-filters
   []
@@ -232,17 +224,10 @@
                                               'javax.servlet',
                                               'javax.servlet.http'
                                             ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ServletAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "ServletAPIs")))
-                               res)))]
-    (build-bookmark-map "STB03" (empty? res) message "The technology does not use servlets or servlet filters.")))
+                       ")]
+    (standard-validation "STB03" res false "The technology does not use servlets or servlet filters.")))
 
 (defn- stb04-database-access
   []
@@ -263,17 +248,10 @@
                                               'com.ibatis',
                                               'org.hibernate'
                                             ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS DatabaseAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "DatabaseAPIs")))
-                               res)))]
-    (build-bookmark-map "STB04" (empty? res) message "The technology does not access the database directly.")))
+                       ")]
+    (standard-validation "STB04" res false "The technology does not access the database directly.")))
 
 (defn- stb06-stb18-manual-transactions
   []
@@ -286,19 +264,12 @@
                                           'org.alfresco.repo.transaction.RetryingTransactionHelper',
                                           'org.alfresco.service.transaction.TransactionService'
                                          ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS TransactionAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "TransactionAPIs")))
-                               res)))]
+                       ")]
     (merge
-      (build-bookmark-map "STB06" (empty? res) message "The technology does not manually demarcate transactions.")
-      (build-bookmark-map "STB18" (empty? res) message "The technology does not manually demarcate transactions."))))
+      (standard-validation "STB06" res false "The technology does not manually demarcate transactions.")
+      (standard-validation "STB18" res false "The technology does not manually demarcate transactions."))))
 
 (defn- stb10-threading
   []
@@ -319,17 +290,10 @@
                                                   ])
                                 OR (    HAS(m.package)
                                     AND m.package  = 'java.util.concurrent'))
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ThreadAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "ThreadAPIs")))
-                               res)))]
-    (build-bookmark-map "STB10" (empty? res) message "The technology does not use threading APIs.")))
+                       ")]
+    (standard-validation "STB10" res false "The technology does not use threading APIs.")))
 
 (defn- stb12-logging
   []
@@ -347,20 +311,10 @@
                                            'java.lang.Error',
                                            'java.lang.System'
                                          ]
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS LoggingAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "UsedBy")
-                                     " uses "
-                                     (s/join ", " (get % "LoggingAPIs")))
-                               res)))]
-    (build-bookmark-map "STB12"
-                        (empty? res)
-                        (str message "\n#### Manual followup required. ####")
-                        "The technology does not use improper logging techniques.")))
+                       ")]
+    (standard-validation "STB12" res true "The technology does not use improper logging techniques.")))
 
 (defn- up01-explorer-ui
   []
@@ -370,17 +324,10 @@
                          WHERE HAS(n.name)
                            AND HAS(m.package)
                            AND m.package =~ 'org.alfresco.web..*'
-                        RETURN n.name AS UsedBy, COLLECT(DISTINCT m.name) AS ExplorerUIAPIs
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")
-        message        (if (empty? res)
-                         nil
-                         (s/join "\n"
-                                 (map #(str (get % "UsedBy")
-                                            " uses "
-                                            (s/join ", " (get % "ExplorerUIAPIs")))
-                                      res)))]
-    (build-bookmark-map "UP01" (empty? res) message "The technology does not extend the Explorer UI.")))
+                       ")]
+    (standard-validation "UP01" res true "The technology does not extend the Explorer UI.")))
 
 (defn validate
   "Runs all binary-based validations."
@@ -390,6 +337,7 @@
   (merge
     (api01-public-alfresco-java-api)
     (api06-service-locator)
+    (dev02-prefer-javascript-web-scripts)
     (com06-compiled-jvm-version)
     (com09-stb07-stb14-search-apis)
     (sec02-minimise-manual-authentication)

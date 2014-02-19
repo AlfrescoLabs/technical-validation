@@ -46,16 +46,15 @@
   (with-open [reader (io/reader file)]
     (let [lines (line-seq reader)]
       (doall
-        (filter #(not (nil? %))
-                (map-indexed #(let [matches (re-seq regex %2)]
-                               (if (not-empty matches)
-                                 {
-                                   :file        file
-                                   :line        %2
-                                   :line-number %1
-                                   :re-seq      matches
-                                 }))
-                             lines))))))
+        (remove nil? (map-indexed #(let [matches (re-seq regex %2)]
+                                     (if (not-empty matches)
+                                       {
+                                         :file        file
+                                         :line        %2
+                                         :line-number %1
+                                         :re-seq      matches
+                                       }))
+                                   lines))))))
 
 (defn grep-files
   "Returns a sequence of maps representing the matching lines for the given regex in the given files.
@@ -67,21 +66,20 @@
      :re-seq       ; the output from re-seq for this line and this regex
    }"
   [regex files]
-  (flatten (map #(grep-file regex %) files)))
+  (set (flatten (map #(grep-file regex %) files))))
 
 (defn- multi-grep-line
   [file regexes line-number line]
-  (filter #(not (nil? %))
-          (map #(let [matches (re-seq % line)]
-                  (if (not-empty matches)
-                    {
-                      :file        file
-                      :line        line
-                      :line-number line-number
-                      :regex       %
-                      :re-seq      matches
-                    }))
-               regexes)))
+  (remove nil? (map #(let [matches (re-seq % line)]
+                       (if (not-empty matches)
+                         {
+                           :file        file
+                           :line        line
+                           :line-number line-number
+                           :regex       %
+                           :re-seq      matches
+                         }))
+                    regexes)))
 
 (defn multi-grep-file
   "Returns a sequence of maps representing the matching lines for the given regexes in the given file.
