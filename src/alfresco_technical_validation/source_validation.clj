@@ -34,7 +34,7 @@
     :xml                   #".*\.xml"
     :web-script-descriptor #".*\.desc\.xml"
     :spring-app-context    #".*-context\.xml"
-    :content-model         #".*model.*\.xml"
+    :content-model         #".*[mM]odel.*\.xml"
     :explorer-config       #"web-client-config-custom\.xml"
     :ant                   #"build\.xml"
     :maven                 #"pom\.xml"
@@ -57,11 +57,11 @@
   "Regexes we want to run over each file type."
   {
     :module-properties {
-        :module-version #"module\.version=(.*)\z"
-        :repo-min       #"module\.repo\.version\.min=(.*)\z"
-        :repo-max       #"module\.repo\.version\.max=(.*)\z"
-        :alf-edition    #"module\.edition=(.*)\z"
-        :com03          #"module\.id=(.*)\z"
+        :module-version #"module\.version\s*=(.*)\z"
+        :repo-min       #"module\.repo\.version\.min\s*=(.*)\z"
+        :repo-max       #"module\.repo\.version\.max\s*=(.*)\z"
+        :alf-edition    #"module\.edition\s*=(.*)\z"
+        :com03          #"module\.id\s*=(.*)\z"
       }
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
@@ -77,8 +77,9 @@
         :api05          #"(?:^|\s)ref="
       }
     :content-model {
-        :perf02         #"<index enabled\s*=\s*\"true"   ; This regex makes Sublime Text syntax highlighting go crazy!
+        :perf02         #"<index\s+enabled\s*=\s*\"true"
         :perf03         #"<stored>\s*true\s*</stored>"
+        :com08          #"<namespace\s+uri\s*=\s*\".*\"\s+prefix\s*=\s*\"(.*)\"\s*/>"
       }
     :ant {
         :ivy            #"antlib:org\.apache\.ivy\.ant"
@@ -171,6 +172,16 @@
       (build-bookmark-map "COM03"
                           (not-empty matches)
                           (if (empty? matches) "No module identifier provided." (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####")))))
+
+(defn- com08-unique-namespace-prefixes
+  [source content-index]
+  (standard-validation source
+                       content-index
+                       :com08
+                       "COM08"
+                       "Namespace declarations"
+                       true
+                       "The technology does not define content model namespaces."))
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
@@ -273,6 +284,7 @@
       (alfresco-editions                          content-index)
       (api05-inject-serviceregistry-not-services  source content-index)
       (com03-unique-module-identifier             source content-index)
+      (com08-unique-namespace-prefixes            source content-index)
       (stb08-stb09-use-of-synchronized            source content-index)
       (stb19-stb20-web-script-transaction-setting source content-index)
       (perf02-judicious-use-of-indexed-properties source content-index)
