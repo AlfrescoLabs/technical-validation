@@ -22,16 +22,15 @@
             ))
 
 (defn build-bookmark-map
-  "Builds the map of bookmarks for a single validation criteria."
-  ([criteria-id meets evidence] (build-bookmark-map criteria-id meets evidence ""))
-  ([criteria-id meets evidence non-evidence]
-   (if meets
-     { (str criteria-id "_Evidence")    non-evidence
-       (str criteria-id "_DoesNotMeet") ""
-       (str criteria-id "_Remedy")      "" }
-     { (str criteria-id "_Evidence")    evidence
-       (str criteria-id "_Meets")       ""
-       (str criteria-id "_NoRemedy")    "" } )))
+  "Builds a bookmark map for a single validation criteria."
+  [criteria-id meets evidence]
+  (if meets
+    { (str criteria-id "_Evidence")    evidence
+      (str criteria-id "_DoesNotMeet") ""
+      (str criteria-id "_Remedy")      "" }
+    { (str criteria-id "_Evidence")    evidence
+      (str criteria-id "_Meets")       ""
+      (str criteria-id "_NoRemedy")    "" } ))
 
 (defn grep-file
   "Returns a sequence of maps representing the matching lines for the given regex in the given file.
@@ -51,7 +50,7 @@
                                        {
                                          :file        file
                                          :line        %2
-                                         :line-number %1
+                                         :line-number (inc %1)
                                          :re-seq      matches
                                        }))
                                    lines))))))
@@ -94,7 +93,7 @@
   [regexes file]
   (with-open [reader (io/reader file)]
     (let [lines   (line-seq reader)]
-      (doall (flatten (map-indexed #(multi-grep-line file regexes %1 %2) lines))))))
+      (doall (flatten (map-indexed #(multi-grep-line file regexes (inc %1) %2) lines))))))
 
 (defn multi-grep-files
   "Returns a sequence of maps representing the matching lines for the given regexes in the given files.

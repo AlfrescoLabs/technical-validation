@@ -59,18 +59,18 @@
     (s/replace query "{in-clause-values}" comma-delimited-string-quoted-in-values)))
 
 (defn- standard-validation
-  [criteria-id query-result manual-followup-required success-message]
-  (let [message (if (empty? query-result)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "ClassName")
-                                     " uses "
-                                     (s/join ", " (get % "APIs")))
-                               query-result)))]
-    (build-bookmark-map criteria-id
-                        (empty? query-result)
-                        (if manual-followup-required (str message "\n#### Manual followup required. ####") message)
-                        success-message)))
+  ([criteria-id query-result manual-followup-required success-message]
+   (standard-validation criteria-id query-result manual-followup-required success-message empty?))
+  ([criteria-id query-result manual-followup-required success-message comparison-fn]
+   (let [query-result-as-string (s/join "\n"
+                                        (map #(str (get % "ClassName")
+                                                   " uses "
+                                                   (s/join ", " (get % "APIs")))
+                                             query-result))
+         message                (if (empty? query-result-as-string) success-message query-result-as-string)]
+     (build-bookmark-map criteria-id
+                         (comparison-fn query-result)
+                         (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
 
 (defn- api01-public-alfresco-java-api
   []
@@ -147,18 +147,35 @@
                            AND NOT(n.package =~ 'com.sap..*')
                            AND NOT(n.package =~ 'org.alfresco..*')
                            AND NOT(n.package =~ 'org.json.*')
+                           AND NOT(n.package =~ 'org.xml.*')
                            AND NOT(n.package =~ 'org.springframework..*')
                         RETURN DISTINCT n.package AS PackageName
                          ORDER BY PackageName
                        ")
-        message (if (empty? res)
-                  nil
-                  (str "The following Java packages are used:\n"
-                       (s/join "\n" (map #(str (get % "PackageName")) res))))]
+        res-as-string (str "The following Java packages are used:\n"
+                        (s/join "\n" (map #(str (get % "PackageName")) res)))
+        message       (if (empty? res)
+                        "The code does not have any Java packages.\n#### Manual followup required - validate whether there's any Java in the solution. ####"
+                        (str res-as-string "\n#### Manual followup required - ensure reasonable uniqueness of these package names. ####"))]
     (build-bookmark-map "COM01"
                         (not-empty res)
-                        "The code does not have any Java packages.\n#### Manual followup required - validate whether there's any Java in the solution at all. ####"
-                        (str message "\n#### Manual followup required - ensure reasonable uniqueness of these package names. ####"))))
+                        message)))
+
+(defn- com04-prefer-repository-actions
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'org.alfresco.repo.action.executer.ActionExecuter',
+                                           'org.alfresco.repo.action.executer.ActionExecuterAbstractBase'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "COM04" res false "The technology does not provide any repository actions." not-empty)))
 
 (defn- com06-compiled-jvm-version
   []
@@ -174,14 +191,14 @@
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
                        ")
-        message (if (empty? res)
-                  nil
-                  (s/join "\n"
-                          (map #(str (get % "ClassName")
-                                     " is compiled for JVM version "
-                                     (get % "ClassVersion"))
-                               res)))]
-    (build-bookmark-map "COM06" (empty? res) message "The code has been compiled for JVM 1.6 or greater.")))
+        message (s/join "\n"
+                        (map #(str (get % "ClassName")
+                                   " is compiled for JVM version "
+                                   (get % "ClassVersion"))
+                             res))]
+    (build-bookmark-map "COM06"
+                        (empty? res)
+                        (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
 
 (defn- com09-stb07-stb14-search-apis
   []
@@ -352,6 +369,7 @@
     (api06-service-locator)
     (dev02-prefer-javascript-web-scripts)
     (com01-unique-java-package)
+    (com04-prefer-repository-actions)
     (com06-compiled-jvm-version)
     (com09-stb07-stb14-search-apis)
     (sec02-minimise-manual-authentication)

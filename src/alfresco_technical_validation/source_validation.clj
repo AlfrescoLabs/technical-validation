@@ -137,16 +137,19 @@
     { "AlfrescoEditions" (if (empty? message) "Not specified" message) }))
 
 (defn- standard-validation
-  [source content-index regex-id criteria-id message-header manual-followup-required success-message]
-  (let [matches (filter #(= regex-id (:regex-id %)) content-index)
-        message (str message-header ":\n"
-                     (s/join "\n"
-                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
-                                  matches)))]
-      (build-bookmark-map criteria-id
-                          (empty? matches)
-                          (if manual-followup-required (str message "\n#### Manual followup required. ####") message)
-                          success-message)))
+  ([source content-index regex-id criteria-id message-header manual-followup-required success-message]
+   (standard-validation source content-index regex-id criteria-id message-header manual-followup-required success-message empty?))
+  ([source content-index regex-id criteria-id message-header manual-followup-required success-message comparison-fn]
+   (let [matches (filter #(= regex-id (:regex-id %)) content-index)
+         message (if (empty? matches)
+                   success-message
+                   (str message-header ":\n"
+                                (s/join "\n"
+                                        (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                             matches))))]
+       (build-bookmark-map criteria-id
+                           (comparison-fn matches)
+                           (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
 
 (defn- api05-inject-serviceregistry-not-services
   [source content-index]
@@ -167,8 +170,7 @@
                                   matches)))]
       (build-bookmark-map "COM03"
                           (not-empty matches)
-                          "No module identifier provided."
-                          (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####"))))
+                          (if (empty? matches) "No module identifier provided." (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####")))))
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
@@ -255,8 +257,7 @@
                                   matches)))]
     (build-bookmark-map "UP01"
                         (empty? matches)
-                        message
-                        "The technology does not extend the Explorer UI.")))
+                        (if (empty? matches) "The technology does not extend the Explorer UI." message))))
 
 (defn validate
   "Runs all source-based validations."
