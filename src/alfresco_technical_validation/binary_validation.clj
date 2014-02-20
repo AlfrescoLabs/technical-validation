@@ -296,7 +296,21 @@
                        ")]
     (standard-validation "STB04" res false "The technology does not access the database directly.")))
 
-(defn- stb06-stb18-manual-transactions
+(defn- stb06-dont-use-transaction-service
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name = 'org.alfresco.service.transaction.TransactionService'
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "STB06" res false "The technology does not use the TransactionService.")))
+
+
+(defn- stb18-prefer-automatic-transactions
   []
   (let [res (cy/tquery "
                          START n=NODE(*)
@@ -310,9 +324,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (merge
-      (standard-validation "STB06" res false "The technology does not manually demarcate transactions.")
-      (standard-validation "STB18" res false "The technology does not manually demarcate transactions."))))
+    (standard-validation "STB18" res false "The technology does not manually demarcate transactions.")))
 
 (defn- stb10-threading
   []
@@ -376,7 +388,8 @@
     (sec04-process-exec-builder)
     (stb03-servlets-servlet-filters)
     (stb04-database-access)
-    (stb06-stb18-manual-transactions)
+    (stb06-dont-use-transaction-service)
+    (stb18-prefer-automatic-transactions)
     (stb10-threading)
     (stb12-logging)
   ))
