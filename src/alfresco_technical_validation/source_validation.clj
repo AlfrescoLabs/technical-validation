@@ -22,6 +22,7 @@
             [clojure.java.io                    :as io]
             [clojure.set                        :as set]
             [alfresco-technical-validation.util :refer :all]
+            [multigrep.core                     :as mg]
             ))
 
 (def ^:private file-types
@@ -91,7 +92,7 @@
   (let [relevant-files   (file-type file-index)
         relevant-regexes (vals (file-type content-regexes-by-file-type))
         regex-id-lookup  (set/map-invert (file-type content-regexes-by-file-type))
-        raw-grep-result  (multi-grep-files relevant-regexes relevant-files)]
+        raw-grep-result  (mg/multigrep-files relevant-regexes relevant-files)]
     (flatten (map #(assoc % :regex-id (get regex-id-lookup (:regex %))) raw-grep-result))))
 
 (defn- build-content-index
@@ -102,7 +103,7 @@
   [file-index]
   (let [build-tools (s/join ","
                             (filter #(not (nil? %))
-                                    (vector (if (not-empty (:ant       file-index)) (if (empty? (grep-files #"antlib:org\.apache\.ivy\.ant" (:ant file-index)))
+                                    (vector (if (not-empty (:ant       file-index)) (if (empty? (mg/grep-files #"antlib:org\.apache\.ivy\.ant" (:ant file-index)))
                                                                                       "Ant"
                                                                                       "Ivy"))
                                             (if (not-empty (:maven     file-index)) "Maven")
