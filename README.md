@@ -1,6 +1,6 @@
 # technical-validation
 
-Tool(s) for the technical validation of custom code that extends the
+Tool for the technical validation of custom code that extends the
 [Alfresco](http://www.alfresco.com) open source document management system.
 
 ## Dependencies
