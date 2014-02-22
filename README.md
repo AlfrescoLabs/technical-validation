@@ -1,26 +1,27 @@
 # technical-validation
 
-Tool(s) for the technical validation of custom code that extends the [Alfresco](http://www.alfresco.com) open source document management system.
+Tool(s) for the technical validation of custom code that extends the
+[Alfresco](http://www.alfresco.com) open source document management system.
 
 ## Dependencies
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
- 2. [neo4j 2.0+](http://www.neo4j.org/)
+ 2. [Leiningen 2.0+](http://leiningen.org/) (until a binary release is prepared)
+ 3. [neo4j 2.0+](http://www.neo4j.org/)
 
-The following tool is also useful, though not used directly by the tool:
+The following tool is also useful, though it is not used directly by the tool:
 
  1. [Ohcount](https://github.com/blackducksw/ohcount)
 
-Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX, I strongly recommend [Homebrew](http://brew.sh/).
+Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX,
+I strongly recommend [Homebrew](http://brew.sh/).
 
 ## Installation
 
-...is a huge pain right now as it requires using [leiningen](http://leiningen.org/) to build [depends](https://github.com/pmonks/depends), [bookmark-writer](https://github.com/pmonks/bookmark-writer), and the [validation tool](https://github.com/AlfrescoLabs/technical-validation) from source, and installing the first 2 into a local Maven repository.
+Check out the [source](https://github.com/AlfrescoLabs/technical-validation) and use [leiningen](http://leiningen.org/) to run it.
 
-I'm working on getting a few more tests implemented, and will then prepare an uberjar-based release.
+I'm working on getting a few more validation tests implemented, and will then prepare a binary release.
 
 ## Running / usage
-
-Assuming you get the source built and installed properly, you can...
 
 ```shell
 $ lein run -- -h
@@ -44,7 +45,7 @@ $
 
 ## License
 
-Copyright © 2013,2014 Peter Monks (pmonks@alfresco.com)
+Copyright © 2013,2014 Peter Monks (pmonks@gmail.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
