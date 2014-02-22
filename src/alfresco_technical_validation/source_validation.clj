@@ -168,8 +168,8 @@
   (let [matches (filter #(= :com03 (:regex-id %)) content-index)
         message (str "Module identifier(s):\n"
                      (s/join "\n"
-                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
-                                  matches)))]
+                             (distinct (map #(second (first (:re-seq %)))
+                                        matches))))]
       (build-bookmark-map "COM03"
                           (not-empty matches)
                           (if (empty? matches) "No module identifier provided." (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####")))))
