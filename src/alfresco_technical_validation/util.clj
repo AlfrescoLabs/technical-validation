@@ -21,13 +21,13 @@
             [clojure.java.io       :as io]
             ))
 
-(defn build-bookmark-map
-  "Builds a bookmark map for a single validation criteria."
-  [criteria-id meets evidence]
-  (if meets
-    { (str criteria-id "_Evidence")    evidence
-      (str criteria-id "_DoesNotMeet") ""
-      (str criteria-id "_Remedy")      "" }
-    { (str criteria-id "_Evidence")    evidence
-      (str criteria-id "_Meets")       ""
-      (str criteria-id "_NoRemedy")    "" } ))
+(defn declare-result
+  "Builds a map representing the result of testing a single validation criteria."
+  ([criteria-id message] (declare-result criteria-id nil message))
+  ([criteria-id passes message]
+   (if (nil? passes)
+     { :criteria-id criteria-id
+       :message     message }
+     { :criteria-id criteria-id
+       :passes      passes
+       :message     message } )))

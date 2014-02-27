@@ -149,9 +149,9 @@
                                 (s/join "\n"
                                         (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
                                              matches))))]
-       (build-bookmark-map criteria-id
-                           (comparison-fn matches)
-                           (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
+       (declare-result criteria-id
+                       (comparison-fn matches)
+                       (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
 
 (defn- api05-inject-serviceregistry-not-services
   [source content-index]
@@ -161,7 +161,8 @@
                        "API05"
                        "Bean injections"
                        true
-                       "The technology does not perform bean injection."))
+                       "The technology does not perform bean injection."
+                       #(if (empty? %) true nil)))
 
 (defn- com03-unique-module-identifier
   [source content-index]
@@ -170,23 +171,26 @@
                      (s/join "\n"
                              (distinct (map #(second (first (:re-seq %)))
                                         matches))))]
-      (build-bookmark-map "COM03"
-                          (not-empty matches)
-                          (if (empty? matches) "No module identifier provided." (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####")))))
+      (declare-result "COM03"
+                      (if (empty? matches)
+                        "No module identifier provided."
+                        (str message "\n#### Manual followup required - check that module identifier is sufficiently unique. ####")))))
 
 (defn- com08-unique-namespace-prefixes
   [source content-index]
-  (standard-validation source
-                       content-index
-                       :com08
-                       "COM08"
-                       "Namespace declarations"
-                       true
-                       "The technology does not define content model namespaces."))
+  (let [matches (filter #(= :com08 (:regex-id %)) content-index)
+        message (str "Module identifier(s):\n"
+                     (s/join "\n"
+                             (distinct (map #(second (first (:re-seq %)))
+                                        matches))))]
+      (declare-result "COM08"
+                      (if (empty? matches)
+                        "No content model namespaces defined."
+                        (str message "\n#### Manual followup required - check that namespaces are sufficiently unique. ####")))))
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
-  (merge
+  (vector
     (standard-validation source
                          content-index
                          :stb08-stb09
@@ -204,7 +208,7 @@
 
 (defn- stb19-stb20-web-script-transaction-setting
   [source content-index]
-  (merge
+  (vector
     (standard-validation source
                          content-index
                          :stb19-stb20
@@ -267,9 +271,9 @@
                      (s/join "\n"
                              (map #(subs (str %) (.length ^String source))
                                   matches)))]
-    (build-bookmark-map "UP01"
-                        (empty? matches)
-                        (if (empty? matches) "The technology does not extend the Explorer UI." message))))
+    (declare-result "UP01"
+                    (empty? matches)
+                    (if (empty? matches) "The technology does not extend the Explorer UI." message))))
 
 (defn validate
   "Runs all source-based validations."
@@ -277,21 +281,23 @@
   (let [files         (file-seq (io/file source))
         file-index    (build-file-types-index files)
         content-index (build-content-index file-index)]
-    (merge
-      (detect-build-tools                         file-index)
-      (module-versions                            content-index)
-      (alfresco-min-versions                      content-index)
-      (alfresco-max-versions                      content-index)
-      (alfresco-editions                          content-index)
-      (api05-inject-serviceregistry-not-services  source content-index)
-      (com03-unique-module-identifier             source content-index)
-      (com08-unique-namespace-prefixes            source content-index)
-      (stb08-stb09-use-of-synchronized            source content-index)
-      (stb19-stb20-web-script-transaction-setting source content-index)
-      (perf02-judicious-use-of-indexed-properties source content-index)
-      (perf03-dont-store-property-values          source content-index)
-      (sec03-none-authentication-in-web-scripts   source content-index)
-      (sec05-use-of-eval                          source content-index)
-      (up01-explorer-ui-extension                 source file-index)
-    )))
+    [(merge (detect-build-tools    file-index)
+            (module-versions       content-index)
+            (alfresco-min-versions content-index)
+            (alfresco-max-versions content-index)
+            (alfresco-editions     content-index))
+     (concat
+       (vector
+         (api05-inject-serviceregistry-not-services  source content-index)
+         (com03-unique-module-identifier             source content-index)
+         (com08-unique-namespace-prefixes            source content-index)
+         (perf02-judicious-use-of-indexed-properties source content-index)
+         (perf03-dont-store-property-values          source content-index)
+         (sec03-none-authentication-in-web-scripts   source content-index)
+         (sec05-use-of-eval                          source content-index)
+         (up01-explorer-ui-extension                 source file-index)
+       )
+       (stb08-stb09-use-of-synchronized            source content-index)
+       (stb19-stb20-web-script-transaction-setting source content-index)
+     )]))
   

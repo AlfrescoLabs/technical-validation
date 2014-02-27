@@ -27,12 +27,32 @@
 
 (def ^:private report-template (io/resource "alfresco-technical-validation-template.docx"))
 
+(defn- result-to-bookmark
+  [result]
+  (let [criteria-id (:criteria-id result)
+        passes      (:passes      result)
+        message     (:message     result)]
+    (if (nil? passes)
+      { (str criteria-id "_Evidence") message }
+      (if passes
+        { (str criteria-id "_Evidence")    message
+          (str criteria-id "_DoesNotMeet") ""
+          (str criteria-id "_Remedy")      "" }
+        { (str criteria-id "_Evidence")    message
+          (str criteria-id "_Meets")       ""
+          (str criteria-id "_NoRemedy")    "" }
+  ))))
+
 (defn validate
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
   [source binaries neo4j-url report-filename]
-  (let [global-bookmarks { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
-        source-bookmarks (src/validate source)
-        binary-bookmarks (bin/validate neo4j-url binaries)
-        all-bookmarks    (merge global-bookmarks source-bookmarks binary-bookmarks)]
-    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)))
+  (let [[source-bookmarks source-validation-results] (src/validate source)
+        [binary-bookmarks binary-validation-results] (bin/validate neo4j-url binaries)
+        validation-results                           (concat source-validation-results
+                                                             binary-validation-results)
+        results-as-bookmarks                         (apply merge (map result-to-bookmark validation-results))
+        global-bookmarks                             { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
+        all-bookmarks                                (merge source-bookmarks binary-bookmarks global-bookmarks results-as-bookmarks)]
+    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
+    ))

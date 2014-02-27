@@ -68,9 +68,9 @@
                                                    (s/join ", " (get % "APIs")))
                                              query-result))
          message                (if (empty? query-result-as-string) success-message query-result-as-string)]
-     (build-bookmark-map criteria-id
-                         (comparison-fn query-result)
-                         (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
+     (declare-result criteria-id
+                     (comparison-fn query-result)
+                     (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
 
 (defn- api01-public-alfresco-java-api
   []
@@ -167,9 +167,8 @@
         message       (if (empty? res)
                         "The code does not have any Java packages.\n#### Manual followup required - validate whether there's any Java in the solution. ####"
                         (str res-as-string "\n#### Manual followup required - ensure reasonable uniqueness of these package names. ####"))]
-    (build-bookmark-map "COM01"
-                        (not-empty res)
-                        message)))
+    (declare-result "COM01"
+                    message)))
 
 (defn- com04-prefer-repository-actions
   []
@@ -185,7 +184,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-validation "COM04" res false "The technology does not provide any repository actions." not-empty)))
+    (standard-validation "COM04" res false "The technology does not provide any repository actions." #(not (empty? %)))))
 
 (defn- com06-compiled-jvm-version
   []
@@ -206,9 +205,9 @@
                                    " is compiled for JVM version "
                                    (get % "ClassVersion"))
                              res))]
-    (build-bookmark-map "COM06"
-                        (empty? res)
-                        (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
+    (declare-result "COM06"
+                    (empty? res)
+                    (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
 
 (defn- com09-stb07-stb14-search-apis
   []
@@ -224,10 +223,10 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (merge
-      (standard-validation "COM09" res true "The technology does not use the Search APIs.")
-      (standard-validation "STB07" res true "The technology does not use the Search APIs.")
-      (standard-validation "STB14" res true "The technology does not use the Search APIs."))))
+    (vector
+      (standard-validation "COM09" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
+      (standard-validation "STB07" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
+      (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil)))))
 
 (defn- sec02-minimise-manual-authentication
   []
@@ -386,20 +385,23 @@
   [neo4j-url binaries]
   (nr/connect! neo4j-url)
   (dn/write-dependencies! neo4j-url (dr/classes-info binaries))
-  (merge
-    (api01-public-alfresco-java-api)
-    (api06-service-locator)
-    (dev02-prefer-javascript-web-scripts)
-    (com01-unique-java-package)
-    (com04-prefer-repository-actions)
-    (com06-compiled-jvm-version)
-    (com09-stb07-stb14-search-apis)
-    (sec02-minimise-manual-authentication)
-    (sec04-process-exec-builder)
-    (stb03-servlets-servlet-filters)
-    (stb04-database-access)
-    (stb06-dont-use-transaction-service)
-    (stb18-prefer-automatic-transactions)
-    (stb10-threading)
-    (stb12-logging)
-  ))
+  [{}
+   (concat
+     (vector
+       (api01-public-alfresco-java-api)
+       (api06-service-locator)
+       (dev02-prefer-javascript-web-scripts)
+       (com01-unique-java-package)
+       (com04-prefer-repository-actions)
+       (com06-compiled-jvm-version)
+       (sec02-minimise-manual-authentication)
+       (sec04-process-exec-builder)
+       (stb03-servlets-servlet-filters)
+       (stb04-database-access)
+       (stb06-dont-use-transaction-service)
+       (stb18-prefer-automatic-transactions)
+       (stb10-threading)
+       (stb12-logging)
+     )
+     (com09-stb07-stb14-search-apis)
+   )])
