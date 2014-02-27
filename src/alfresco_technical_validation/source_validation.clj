@@ -59,10 +59,10 @@
   {
     :module-properties {
         :module-version #"module\.version\s*=(.*)\z"
-        :repo-min       #"module\.repo\.version\.min\s*=(.*)\z"
-        :repo-max       #"module\.repo\.version\.max\s*=(.*)\z"
-        :alf-edition    #"module\.edition\s*=(.*)\z"
         :com03          #"module\.id\s*=(.*)\z"
+        :up03-min       #"module\.repo\.version\.min\s*=(.*)\z"
+        :up03-max       #"module\.repo\.version\.max\s*=(.*)\z"
+        :up04           #"module\.edition\s*=(.*)\z"
       }
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
@@ -122,19 +122,19 @@
 
 (defn- alfresco-min-versions
   [content-index]
-  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-min (:regex-id %)) content-index)))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :up03-min (:regex-id %)) content-index)))
         message (s/join "," matches)]
     { "AlfrescoVersionMin" (if (empty? message) "Not specified" message) }))
 
 (defn- alfresco-max-versions
   [content-index]
-  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :repo-max (:regex-id %)) content-index)))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :up03-max (:regex-id %)) content-index)))
         message (s/join "," matches)]
     { "AlfrescoVersionMax" (if (empty? message) "Not specified" message) }))
 
 (defn- alfresco-editions
   [content-index]
-  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :alf-edition (:regex-id %)) content-index)))
+  (let [matches (distinct (map #(second (first (:re-seq %))) (filter #(= :up04 (:regex-id %)) content-index)))
         message (s/join "," matches)]
     { "AlfrescoEditions" (if (empty? message) "Not specified" message) }))
 
@@ -197,14 +197,14 @@
                          "STB08"
                          "Uses of synchronized"
                          true
-                         "The technology does not synchronized.")
+                         "The technology does not synchronize.")
     (standard-validation source
                          content-index
                          :stb08-stb09
                          "STB09"
                          "Uses of synchronized"
                          true
-                         "The technology does not synchronized.")))
+                         "The technology does not synchronize.")))
 
 (defn- stb19-stb20-web-script-transaction-setting
   [source content-index]
@@ -232,7 +232,8 @@
                        "PERF02"
                        "Indexed content model properties"
                        true
-                       "The technology does not index any content model properties."))
+                       "The technology does not index any content model properties."
+                       #(if (empty? %) true nil)))
 
 (defn- perf03-dont-store-property-values
   [source content-index]
@@ -275,6 +276,29 @@
                     (empty? matches)
                     (if (empty? matches) "The technology does not extend the Explorer UI." message))))
 
+(defn- up03-repo-min-max
+  [source content-index]
+  (let [repo-mins (distinct (map #(second (first (:re-seq %))) (filter #(= :up03-min (:regex-id %)) content-index)))
+        repo-maxs (distinct (map #(second (first (:re-seq %))) (filter #(= :up03-max (:regex-id %)) content-index)))]
+    (declare-result "UP03"
+                    (or (not (empty? repo-mins)) (not (empty? repo-maxs)))
+                    (s/join "\n"
+                      (filter identity
+                              (vector
+                                (if (not-empty repo-mins)                       (str "module.repo.version.min(s): " (s/join "," repo-mins)))
+                                (if (not-empty repo-maxs)                       (str "module.repo.version.max(s): " (s/join "," repo-maxs)))
+                                (if (and (empty? repo-mins) (empty? repo-maxs)) "The technology does not specify module.editions in its module.properties file(s).")))))))
+
+(defn- up04-module-editions
+  [source content-index]
+  (let [matches  (distinct (map #(second (first (:re-seq %))) (filter #(= :up04 (:regex-id %)) content-index)))
+        editions (s/join "," matches)]
+    (declare-result "UP04"
+                    (not (empty? matches))
+                    (if (empty? matches)
+                      "The technology does not specify module.editions in its module.properties file(s)."
+                      (str "module.editions:" editions)))))
+
 (defn validate
   "Runs all source-based validations."
   [source]
@@ -296,6 +320,8 @@
          (sec03-none-authentication-in-web-scripts   source content-index)
          (sec05-use-of-eval                          source content-index)
          (up01-explorer-ui-extension                 source file-index)
+         (up03-repo-min-max                          source content-index)
+         (up04-module-editions                       source content-index)
        )
        (stb08-stb09-use-of-synchronized            source content-index)
        (stb19-stb20-web-script-transaction-setting source content-index)
