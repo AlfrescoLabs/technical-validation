@@ -62,7 +62,7 @@
         :com03          #"module\.id\s*=(.*)\z"
         :up03-min       #"module\.repo\.version\.min\s*=(.*)\z"
         :up03-max       #"module\.repo\.version\.max\s*=(.*)\z"
-        :up04           #"module\.edition\s*=(.*)\z"
+        :up04           #"module\.editions\s*=(.*)\z"
       }
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
@@ -297,7 +297,7 @@
                     (not (empty? matches))
                     (if (empty? matches)
                       "The technology does not specify module.editions in its module.properties file(s)."
-                      (str "module.editions:" editions)))))
+                      (str "module.editions: " editions)))))
 
 (defn validate
   "Runs all source-based validations."
