@@ -209,7 +209,25 @@
                     (empty? res)
                     (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
 
-(defn- com09-stb07-stb14-search-apis
+(defn- com09-prefer-cmisql
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name = 'org.alfresco.service.cmr.search.SearchService'
+                        RETURN n.name AS ClassName
+                         ORDER BY n.name
+                       ")
+        message (str "The following class(es) use SearchService:\n"
+                     (s/join "\n" (map #(get % "ClassName") res))
+                     "\n#### Manual followup required - check search language. ####")]
+    (if (empty? res)
+      (declare-result "COM09" true "The technology does not use the Search APIs.")
+      (declare-result "COM09" message))))
+
+(defn- stb07-stb14-search-apis
   []
   (let [res (cy/tquery "
                          START n=NODE(*)
@@ -224,7 +242,6 @@
                          ORDER BY n.name
                        ")]
     (vector
-      (standard-validation "COM09" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
       (standard-validation "STB07" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
       (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil)))))
 
@@ -394,6 +411,7 @@
        (com01-unique-java-package)
        (com04-prefer-repository-actions)
        (com06-compiled-jvm-version)
+       (com09-prefer-cmisql)
        (sec02-minimise-manual-authentication)
        (sec04-process-exec-builder)
        (stb03-servlets-servlet-filters)
@@ -403,5 +421,5 @@
        (stb10-threading)
        (stb12-logging)
      )
-     (com09-stb07-stb14-search-apis)
+     (stb07-stb14-search-apis)
    )])
