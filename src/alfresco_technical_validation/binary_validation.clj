@@ -227,25 +227,7 @@
       (declare-result "COM09" true "The technology does not use the Search APIs.")
       (declare-result "COM09" message))))
 
-(defn- stb07-stb14-search-apis
-  []
-  (let [res (cy/tquery "
-                         START n=NODE(*)
-                         MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
-                           AND m.name IN [
-                                           'org.alfresco.service.cmr.search.SearchService',
-                                           'org.alfresco.service.cmr.search.ResultSet'
-                                         ]
-                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
-                         ORDER BY n.name
-                       ")]
-    (vector
-      (standard-validation "STB07" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
-      (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil)))))
-
-(defn- sec02-minimise-manual-authentication 
+(defn- sec02-minimise-manual-authentication
   []
   (let [res (cy/tquery "
                          START n=NODE(*)
@@ -338,8 +320,7 @@
                        ")]
     (standard-validation "STB06" res false "The technology does not use the TransactionService.")))
 
-
-(defn- stb18-prefer-automatic-transactions
+(defn- stb07-close-all-resources
   []
   (let [res (cy/tquery "
                          START n=NODE(*)
@@ -347,13 +328,26 @@
                          WHERE HAS(n.name)
                            AND HAS(m.name)
                            AND m.name IN [
-                                          'org.alfresco.repo.transaction.RetryingTransactionHelper',
-                                          'org.alfresco.service.transaction.TransactionService'
+                                           'org.alfresco.service.cmr.search.ResultSet',
+                                           'java.io.Closeable',
+                                           'java.io.InputStream',
+                                           'java.io.FileInputStream',
+                                           'java.io.OutputStream',
+                                           'java.io.FileOutputStream',
+                                           'java.io.Reader',
+                                           'java.io.FileReader',
+                                           'java.io.Writer',
+                                           'java.io.FileWriter',
+                                           'java.net.Socket',
+                                           'java.net.ServerSocket',
+                                           'javax.net.ssl.SSLSocket',
+                                           'javax.net.ssl.SSLServerSocket'
+                                           // Add to this list as other closeable resources are identified - http://docs.oracle.com/javase/7/docs/api/java/io/Closeable.html is a good starting point for further research
                                          ]
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-validation "STB18" res false "The technology does not manually demarcate transactions.")))
+    (standard-validation "STB07" res true "The technology does not use resources that need to be closed." #(if (empty? %) true nil))))
 
 (defn- stb10-threading
   []
@@ -400,6 +394,38 @@
                        ")]
     (standard-validation "STB12" res true "The technology does not use improper logging techniques.")))
 
+(defn- stb14-search-during-bootstrap
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'org.alfresco.service.cmr.search.SearchService',
+                                           'org.alfresco.service.cmr.search.ResultSet'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+  (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))))
+
+(defn- stb18-prefer-automatic-transactions
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                          'org.alfresco.repo.transaction.RetryingTransactionHelper',
+                                          'org.alfresco.service.transaction.TransactionService'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "STB18" res false "The technology does not manually demarcate transactions.")))
+
 (defn validate
   "Runs all binary-based validations."
   [neo4j-url binaries]
@@ -420,9 +446,11 @@
        (stb03-servlets-servlet-filters)
        (stb04-database-access)
        (stb06-dont-use-transaction-service)
+       (stb07-close-all-resources)
+       (stb14-search-during-bootstrap)
        (stb18-prefer-automatic-transactions)
        (stb10-threading)
        (stb12-logging)
      )
-     (stb07-stb14-search-apis)
+     []
    )])
