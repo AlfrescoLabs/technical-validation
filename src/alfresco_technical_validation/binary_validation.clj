@@ -252,11 +252,14 @@
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
                            AND HAS(m.name)
-                           AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil'
-                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                           AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil$RunAsWork'
+                        RETURN n.name AS ClassName
                          ORDER BY n.name
-                       ")]
-    (standard-validation "SEC02" res false "The technology does not manually control the authenticated session.")))
+                       ")
+        message (str "The following manually authenticate:\n"
+                     (s/join "\n" (map #(get % "ClassName") res))
+                     "\n#### Manual followup required - check search language. ####")]
+    (declare-result "SEC02" (empty? res) (if (empty? res) "The technology does not use the Search APIs." message))))
 
 (defn- sec04-process-exec-builder
   []
