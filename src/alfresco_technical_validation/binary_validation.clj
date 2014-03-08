@@ -245,7 +245,7 @@
       (standard-validation "STB07" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))
       (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil)))))
 
-(defn- sec02-minimise-manual-authentication
+(defn- sec02-minimise-manual-authentication 
   []
   (let [res (cy/tquery "
                          START n=NODE(*)
