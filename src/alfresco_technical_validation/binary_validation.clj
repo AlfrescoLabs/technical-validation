@@ -326,6 +326,26 @@
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'java.*')
+                           AND NOT(n.package =~ 'sun.*')
+                           AND NOT(n.package =~ 'com.sun.*')
+                           AND NOT(n.package =~ 'org.w3c.*')
+                           AND NOT(n.package =~ 'org.apache.*')
+                           AND NOT(n.package =~ 'org.alfresco.*')
+                           AND NOT(n.package =~ 'org.json.*')
+                           AND NOT(n.package =~ 'org.xml.*')
+                           AND NOT(n.package =~ 'org.springframework.*')
+                           AND NOT(n.package =~ 'org.hibernate.*')
+                           AND NOT(n.package =~ 'org.mybatis.*')
+                           AND NOT(n.package =~ 'net.sf.ehcache.*')
+                           AND NOT(n.package =~ 'org.quartz.*')
+                           AND NOT(n.package =~ 'org.mozilla.*')
+                           AND NOT(n.package =~ 'com.google.*')
+                           AND NOT(n.package =~ 'com.sap.*')
+                           AND NOT(n.package =~ 'com.license4j.*')
+                           AND NOT(n.package =~ 'com.aspose.*')
+                           AND NOT(n.package =~ 'asposewobfuscated.*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'org.alfresco.service.cmr.search.ResultSet',
@@ -401,10 +421,7 @@
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
                            AND HAS(m.name)
-                           AND m.name IN [
-                                           'org.alfresco.service.cmr.search.SearchService',
-                                           'org.alfresco.service.cmr.search.ResultSet'
-                                         ]
+                           AND m.name = 'org.alfresco.service.cmr.search.SearchService'
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
