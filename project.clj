@@ -36,7 +36,7 @@
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
                 ]
   :profiles {:dev {:dependencies [
-                                   [midje          "1.6.2"]
+                                   [midje          "1.6.3"]
                                    [clj-ns-browser "1.3.1"]
                                  ]}
              :uberjar {:aot :all}}
