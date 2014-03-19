@@ -33,5 +33,5 @@
          api-list-text ^String (.substring api-page-html (+ (.indexOf api-page-html api-list-open-tag) (.length api-list-open-tag))
                                                          (.indexOf api-page-html api-list-close-tag))
          api-list              (map #(s/replace % #"\s" "") (s/split-lines api-list-text))   ; Strip whitespace chars *within* API names, due to https://issues.alfresco.com/jira/browse/MNT-10346
-         sorted-api-list       (sort api-list)]
+         sorted-api-list       (sort (set api-list))]
      sorted-api-list)))
