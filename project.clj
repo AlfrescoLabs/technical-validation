@@ -26,7 +26,7 @@
   :dependencies [
                   [org.clojure/clojure                "1.5.1"]
                   [org.clojure/tools.cli              "0.3.1"]
-                  [org.clojure/tools.trace            "0.7.6"]
+;                  [org.clojure/tools.trace            "0.7.6"]
                   [org.clojure/tools.logging          "0.2.6"]
                   [clojurewerkz/neocons               "2.0.1"]
                   [ch.qos.logback/logback-classic     "1.1.1"]

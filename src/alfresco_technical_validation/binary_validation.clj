@@ -240,8 +240,8 @@
                        ")
         message (str "The following manually authenticate:\n"
                      (s/join "\n" (map #(get % "ClassName") res))
-                     "\n#### Manual followup required - check search language. ####")]
-    (declare-result "SEC02" (empty? res) (if (empty? res) "The technology does not use the Search APIs." message))))
+                     "\n#### Manual followup required - check use of RunAsWork. ####")]
+    (declare-result "SEC02" (empty? res) (if (empty? res) "The technology does not manually authenticate." message))))
 
 (defn- sec04-process-exec-builder
   []
