@@ -261,9 +261,9 @@
                        content-index
                        :sec05
                        "SEC05"
-                       "Uses of eval in Javascript"
+                       "Uses of eval() in Javascript"
                        false
-                       "The technology does not use eval in Javascript."))
+                       "The technology does not use eval() in Javascript."))
 
 (defn- up01-explorer-ui-extension
   [source file-index]
