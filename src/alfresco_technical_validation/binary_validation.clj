@@ -413,6 +413,32 @@
                        ")]
     (standard-validation "STB12" res true "The technology does not use improper logging techniques.")))
 
+(defn- stb13-use-timeouts-for-rpcs
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'java.net.HttpURLConnection',
+                                           'org.apache.commons.httpclient.HttpClient',
+                                           'org.apache.http.impl.client.AutoRetryHttpClient',
+                                           'org.apache.http.impl.client.CloseableHttpClient',
+                                           'org.apache.http.impl.client.ContentEncodingHttpClient',
+                                           'org.apache.http.impl.client.DecompressingHttpClient',
+                                           'org.apache.http.impl.client.DefaultHttpClient',
+                                           'org.apache.http.impl.client.SystemDefaultHttpClient'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "STB13" res true "The technology does not use common HTTP RPC client libraries.")))
+
 (defn- stb14-search-during-bootstrap
   []
   (let [res (cy/tquery "
@@ -481,6 +507,7 @@
        (stb04-database-access)
        (stb06-dont-use-transaction-service)
        (stb07-close-all-resources)
+       (stb13-use-timeouts-for-rpcs)
        (stb14-search-during-bootstrap)
        (stb18-prefer-automatic-transactions)
        (stb10-threading)
