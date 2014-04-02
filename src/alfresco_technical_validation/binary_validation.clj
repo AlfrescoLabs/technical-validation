@@ -92,6 +92,7 @@
         res                      (cy/tquery cypher-query)]
     (standard-validation "API01" res false "The technology only uses Alfresco's Public Java APIs.")))
 
+; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- api06-service-locator
   []
   (let [res (cy/tquery "
@@ -112,6 +113,7 @@
                        ")]
     (standard-validation "API06" res false "The technology does not use the service locator pattern.")))
 
+; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- dev02-prefer-javascript-web-scripts
   []
   (let [res (cy/tquery "
@@ -170,6 +172,7 @@
     (declare-result "COM01"
                     message)))
 
+; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- com04-prefer-repository-actions
   []
   (let [res (cy/tquery "
@@ -263,6 +266,7 @@
                        ")]
     (standard-validation "SEC04" res false "The technology does not use Process.exec() or ProcessBuilder.")))
 
+; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- stb03-servlets-servlet-filters
   []
   (let [res (cy/tquery "
