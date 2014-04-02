@@ -7,10 +7,7 @@ Tool for the technical validation of custom code that extends the
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
  2. [Leiningen 2.0+](http://leiningen.org/) (until a binary release is prepared)
  3. [neo4j 2.0+](http://www.neo4j.org/)
-
-The following tool is also useful, though it is not used directly by the tool:
-
- 1. [Ohcount](https://github.com/blackducksw/ohcount)
+ 4. [Ohcount](https://github.com/blackducksw/ohcount)
 
 Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX,
 I strongly recommend [Homebrew](http://brew.sh/).
