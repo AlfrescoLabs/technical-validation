@@ -439,8 +439,12 @@
                                          ]
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
-                       ")]
-    (standard-validation "STB18" res false "The technology does not manually demarcate transactions.")))
+                       ")
+        message (str "The following classes manually demarcate transactions:\n"
+                     (s/join "\n" (map #(get % "ClassName") res)))]
+    (declare-result "STB18"
+                    (empty? res)
+                    (if (empty? res) "The technology does not manually demarcate transactions." message))))
 
 (defn- stb22-minimise-threadlocals
   []
