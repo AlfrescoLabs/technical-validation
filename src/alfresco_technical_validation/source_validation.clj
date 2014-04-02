@@ -197,7 +197,7 @@
                          :stb08-stb09
                          "STB08"
                          "Uses of synchronized"
-                         true
+                         false
                          "The technology does not synchronize.")
     (standard-validation source
                          content-index
