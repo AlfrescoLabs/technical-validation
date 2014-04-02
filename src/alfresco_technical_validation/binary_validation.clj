@@ -86,11 +86,18 @@
                                                          AND NOT(m.name IN [
                                                                              {in-clause-values}
                                                                            ])
-                                                      RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
-                                                       ORDER BY n.name
+                                                      RETURN DISTINCT m.name AS PrivateAPIs
+                                                       ORDER BY m.name
                                                      ", alfresco-public-java-api)
-        res                      (cy/tquery cypher-query)]
-    (standard-validation "API01" res false "The technology only uses Alfresco's Public Java APIs.")))
+        res                      (cy/tquery cypher-query)
+        res-as-string            (str "The following private Java APIs are used:\n"
+                                   (s/join "\n" (map #(str (get % "PrivateAPIs")) res)))
+        message                  (if (empty? res)
+                                   "The technology only uses Alfresco's Public Java APIs."
+                                   res-as-string)]
+    (declare-result "API01"
+                    (empty? res)
+                    message)))
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- api06-service-locator
