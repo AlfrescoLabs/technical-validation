@@ -82,6 +82,7 @@
         :perf02         #"<index\s+enabled\s*=\s*\"true"
         :perf03         #"<stored>\s*true\s*</stored>"
         :com08          #"<namespace\s+uri\s*=\s*\".*\"\s+prefix\s*=\s*\"(.*)\"\s*/>"
+        :stb15          #"parent=\"dictionaryModelBootstrap\""
       }
     :ant {
         :ivy            #"antlib:org\.apache\.ivy\.ant"
@@ -207,6 +208,19 @@
                          false
                          "The technology does not synchronize.")))
 
+(defn- stb15-load-content-models-via-bootstrap
+  [source content-index]
+  (let [matches (filter #(= :stb15 (:regex-id %)) content-index)
+        message (str "Dictionary bootstrap(s):\n"
+                     (s/join "\n"
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                  matches)))]
+      (declare-result "STB15"
+                      (not (empty? matches))
+                      (if (empty? matches)
+                        "#### Manual followup required - content models (if any) are not loaded via bootstrap."
+                        message))))
+
 (defn- stb19-avoid-none-transactions
   [source content-index]
   (standard-validation source
@@ -318,6 +332,7 @@
          (api05-inject-serviceregistry-not-services  source content-index)
          (com03-unique-module-identifier             source content-index)
          (com08-unique-namespace-prefixes            source content-index)
+         (stb15-load-content-models-via-bootstrap    source content-index)
          (stb19-avoid-none-transactions              source content-index)
          (stb20-avoid-transaction-setting            source content-index)
          (perf02-judicious-use-of-indexed-properties source content-index)
