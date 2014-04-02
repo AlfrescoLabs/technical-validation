@@ -71,7 +71,8 @@
         :sec05          #"(?:^|\s)eval\("
       }
     :web-script-descriptor {
-        :stb19-stb20    #"<transaction>"
+        :stb19          #"<transaction>\s*none\s*</transaction>"
+        :stb20          #"<transaction>"
         :sec03          #"<authentication>\s*none\s*</authentication>"
       }
     :spring-app-context {
@@ -206,23 +207,25 @@
                          true
                          "The technology does not synchronize.")))
 
-(defn- stb19-stb20-web-script-transaction-setting
+(defn- stb19-avoid-none-transactions
   [source content-index]
-  (vector
-    (standard-validation source
-                         content-index
-                         :stb19-stb20
-                         "STB19"
-                         "Uses of <transaction> setting"
-                         false
-                         "The technology does not use the <transaction> setting.")
-    (standard-validation source
-                         content-index
-                         :stb19-stb20
-                         "STB20"
-                         "Uses of <transaction> setting"
-                         false
-                         "The technology does not use the <transaction> setting.")))
+  (standard-validation source
+                       content-index
+                       :stb19
+                       "STB19"
+                       "Uses of <transaction>none</transaction>"
+                       false
+                       "The technology does not use <transaction>none</transaction>."))
+
+(defn- stb20-avoid-transaction-setting
+  [source content-index]
+  (standard-validation source
+                       content-index
+                       :stb20
+                       "STB20"
+                       "Uses of <transaction> setting"
+                       false
+                       "The technology does not use the <transaction> setting."))
 
 (defn- perf02-judicious-use-of-indexed-properties
   [source content-index]
@@ -315,6 +318,8 @@
          (api05-inject-serviceregistry-not-services  source content-index)
          (com03-unique-module-identifier             source content-index)
          (com08-unique-namespace-prefixes            source content-index)
+         (stb19-avoid-none-transactions              source content-index)
+         (stb20-avoid-transaction-setting            source content-index)
          (perf02-judicious-use-of-indexed-properties source content-index)
          (perf03-dont-store-property-values          source content-index)
          (sec03-none-authentication-in-web-scripts   source content-index)
@@ -323,7 +328,6 @@
          (up03-repo-min-max                          source content-index)
          (up04-module-editions                       source content-index)
        )
-       (stb08-stb09-use-of-synchronized            source content-index)
-       (stb19-stb20-web-script-transaction-setting source content-index)
+       (stb08-stb09-use-of-synchronized source content-index)
      )]))
   
