@@ -204,7 +204,7 @@
                          :stb08-stb09
                          "STB09"
                          "Uses of synchronized"
-                         true
+                         false
                          "The technology does not synchronize.")))
 
 (defn- stb19-avoid-none-transactions
