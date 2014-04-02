@@ -383,7 +383,6 @@
                                     AND m.name IN [
                                                     'java.lang.Thread',
                                                     'java.lang.ThreadGroup',
-                                                    'java.lang.ThreadLocal',
                                                     'java.lang.Runnable'
                                                   ])
                                 OR (    HAS(m.package)
@@ -443,6 +442,20 @@
                        ")]
     (standard-validation "STB18" res false "The technology does not manually demarcate transactions.")))
 
+(defn- stb22-minimise-threadlocals
+  []
+  (let [res (cy/tquery "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND HAS(m.name)
+                           AND m.name = 'java.lang.ThreadLocal'
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-validation "STB22" res false "The technology does not use ThreadLocals.")))
+
 (defn validate
   "Runs all binary-based validations."
   [neo4j-url binaries]
@@ -468,6 +481,7 @@
        (stb18-prefer-automatic-transactions)
        (stb10-threading)
        (stb12-logging)
+       (stb22-minimise-threadlocals)
      )
      []
    )])
