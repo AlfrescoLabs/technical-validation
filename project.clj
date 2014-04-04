@@ -29,7 +29,7 @@
 ;                  [org.clojure/tools.trace            "0.7.6"]
                   [org.clojure/tools.logging          "0.2.6"]
                   [clojurewerkz/neocons               "2.0.1"]
-                  [ch.qos.logback/logback-classic     "1.1.1"]
+                  [ch.qos.logback/logback-classic     "1.1.2"]
                   [me.raynes/conch                    "0.6.0"]
                   [io.aviso/pretty                    "0.1.10"]
                   [org.clojars.pmonks/depends         "0.2.0"]
@@ -43,4 +43,5 @@
              :uberjar {:aot :all}}
   :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Merge Java ServiceLocator descriptors during uberjar construction
   :jvm-opts ^:replace []  ; Stop Leiningen from turning off JVM optimisations - makes it slower to start but ensures code runs as fast as possible
-  :main alfresco-technical-validation.core)
+  :main alfresco-technical-validation.main
+  :bin {:name "atv"})

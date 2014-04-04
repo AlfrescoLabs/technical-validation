@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.core
+(ns alfresco-technical-validation.main
   (:require [clojure.string                           :as s]
             [clojure.tools.logging                    :as log]
             [clojure.tools.cli                        :refer [parse-opts]]
