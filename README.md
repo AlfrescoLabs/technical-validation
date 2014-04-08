@@ -34,6 +34,45 @@ $ lein run -- -h
 $ 
 ```
 
+Alternatively, you can build an executable binary with the [lein-bin](https://github.com/Raynes/lein-bin) plugin.
+Once you've installed the plugin:
+
+```shell
+$ lein bin
+$ mv target/atv .
+$ ./atv -h
+ ------------------------------+-------------------------------+--------------------------------------------------------
+  Parameter                    | Default Value                 | Description
+ ------------------------------+-------------------------------+--------------------------------------------------------
+  -s, --source SOURCE                                            Source folder (mandatory)
+  -b, --binaries BINARIES                                        Binary folder or archive (mandatory)
+  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
+  -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
+  -h, --help                                                     This message
+ ------------------------------+-------------------------------+--------------------------------------------------------
+$ 
+```
+
+or on Windows:
+
+```Batchfile
+C:\atv> lein bin
+C:\atv> move target\atv .
+C:\atv> atv -h
+ ------------------------------+-------------------------------+--------------------------------------------------------
+  Parameter                    | Default Value                 | Description
+ ------------------------------+-------------------------------+--------------------------------------------------------
+  -s, --source SOURCE                                            Source folder (mandatory)
+  -b, --binaries BINARIES                                        Binary folder or archive (mandatory)
+  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
+  -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
+  -h, --help                                                     This message
+ ------------------------------+-------------------------------+--------------------------------------------------------
+C:\atv> 
+```
+
+
+
 ## Developer Information
 
 [GitHub project](https://github.com/AlfrescoLabs/technical-validation)
