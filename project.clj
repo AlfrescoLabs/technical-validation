@@ -26,7 +26,6 @@
   :dependencies [
                   [org.clojure/clojure                "1.6.0"]
                   [org.clojure/tools.cli              "0.3.1"]
-;                  [org.clojure/tools.trace            "0.7.6"]
                   [org.clojure/tools.logging          "0.2.6"]
                   [clojurewerkz/neocons               "2.0.1"]
                   [ch.qos.logback/logback-classic     "1.1.2"]
@@ -41,7 +40,6 @@
                                    [clj-ns-browser "1.3.1"]
                                  ]}
              :uberjar {:aot :all}}
-  :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Merge Java ServiceLocator descriptors during uberjar construction
-  :jvm-opts ^:replace []  ; Stop Leiningen from turning off JVM optimisations - makes it slower to start but ensures code runs as fast as possible
+  :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Awaiting Leiningen 2.3.5 - see https://github.com/technomancy/leiningen/issues/1455
   :main alfresco-technical-validation.main
   :bin {:name "atv"})
