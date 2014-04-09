@@ -112,13 +112,13 @@
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
   [source binaries neo4j-url report-filename]
-  (let [source-index                                 (idx/index neo4j-url binaries source)
-        loc-bookmarks                                (count-locs source source-index)
-        global-bookmarks                             (global-bookmarks source-index)
-        [source-bookmarks source-validation-results] (src/validate source source-index)
-        [binary-bookmarks binary-validation-results] (bin/validate)
-        validation-results                           (concat source-validation-results
-                                                             binary-validation-results)
-        results-as-bookmarks                         (into {} (map result-to-bookmark validation-results))
-        all-bookmarks                                (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
+  (let [source-index              (idx/index neo4j-url binaries source)
+        loc-bookmarks             (count-locs source source-index)
+        global-bookmarks          (global-bookmarks source-index)
+        source-validation-results (src/validate source source-index)
+        binary-validation-results (bin/validate)
+        validation-results        (concat source-validation-results
+                                          binary-validation-results)
+        results-as-bookmarks      (into {} (map result-to-bookmark validation-results))
+        all-bookmarks             (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
     (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)))

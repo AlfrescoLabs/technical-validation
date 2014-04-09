@@ -207,6 +207,8 @@
   [source source-index]
   (let [files-by-type (:source-files-by-type source-index)
         content-index (:source-content-index source-index)]
+    (assert (not (nil? files-by-type)))
+    (assert (not (nil? content-index)))
     (concat
       (vector
          (api05-inject-serviceregistry-not-services  source content-index)
