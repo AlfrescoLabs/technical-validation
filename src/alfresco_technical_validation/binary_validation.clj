@@ -499,9 +499,7 @@
 
 (defn validate
   "Runs all binary-based validations."
-  [neo4j-url binaries]
-  (nr/connect! neo4j-url)
-  (dn/write-dependencies! neo4j-url (dr/classes-info binaries))
+  []
   [{}
    (concat
      (vector
