@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(defproject alfresco-technical-validation "0.1.0-SNAPSHOT"
+(defproject alfresco-technical-validation "0.1.0"
   :description      "Performs technical validation of an Alfresco extension."
   :url              "https://github.com/pmonks/depends"
   :license          {:name "Apache License, Version 2.0"
@@ -43,4 +43,5 @@
              :uberjar {:aot :all}}
   :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Awaiting Leiningen 2.3.5 - see https://github.com/technomancy/leiningen/issues/1455
   :main alfresco-technical-validation.main
+  :jvm-opts ["-server"]
   :bin {:name "atv"})
