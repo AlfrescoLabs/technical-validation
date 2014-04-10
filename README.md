@@ -5,41 +5,20 @@ Tool for the technical validation of custom code that extends the
 
 ## Dependencies
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
- 2. [Leiningen 2.0+](http://leiningen.org/) (until a binary release is prepared)
- 3. [neo4j 2.0+](http://www.neo4j.org/)
- 4. [Ohcount](https://github.com/blackducksw/ohcount)
+ 2. [neo4j 2.0+](http://www.neo4j.org/)
+ 3. [Ohcount](https://github.com/blackducksw/ohcount)
 
 Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX,
 I strongly recommend [Homebrew](http://brew.sh/).
 
 ## Installation
 
-Check out the [source](https://github.com/AlfrescoLabs/technical-validation) and use [leiningen](http://leiningen.org/) to run it.
-
-I'm working on getting a few more validation tests implemented, and will then prepare a binary release.
+Download the [latest release](https://github.com/AlfrescoLabs/technical-validation/releases) and unzip the zip file
+somewhere convenient.
 
 ## Running / usage
 
 ```shell
-$ lein run -- -h
- ------------------------------+-------------------------------+--------------------------------------------------------
-  Parameter                    | Default Value                 | Description
- ------------------------------+-------------------------------+--------------------------------------------------------
-  -s, --source SOURCE                                            Source folder (mandatory)
-  -b, --binaries BINARIES                                        Binary folder or archive (mandatory)
-  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
-  -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
-  -h, --help                                                     This message
- ------------------------------+-------------------------------+--------------------------------------------------------
-$ 
-```
-
-Alternatively, you can build an executable binary with the [lein-bin](https://github.com/Raynes/lein-bin) plugin.
-Once you've installed the plugin:
-
-```shell
-$ lein bin
-$ mv target/atv .
 $ ./atv -h
  ------------------------------+-------------------------------+--------------------------------------------------------
   Parameter                    | Default Value                 | Description
@@ -56,9 +35,7 @@ $
 or on Windows:
 
 ```Batchfile
-C:\atv> lein bin
-C:\atv> move target\atv .
-C:\atv> atv -h
+C:\atv-0.1.0> atv -h
  ------------------------------+-------------------------------+--------------------------------------------------------
   Parameter                    | Default Value                 | Description
  ------------------------------+-------------------------------+--------------------------------------------------------
@@ -68,10 +45,8 @@ C:\atv> atv -h
   -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
   -h, --help                                                     This message
  ------------------------------+-------------------------------+--------------------------------------------------------
-C:\atv> 
+C:\atv-0.1.0> 
 ```
-
-
 
 ## Developer Information
 

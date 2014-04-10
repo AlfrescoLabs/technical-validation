@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(defproject alfresco-technical-validation "0.1.0"
+(defproject alfresco-technical-validation "0.2.0-SNAPSHOT"
   :description      "Performs technical validation of an Alfresco extension."
   :url              "https://github.com/pmonks/depends"
   :license          {:name "Apache License, Version 2.0"

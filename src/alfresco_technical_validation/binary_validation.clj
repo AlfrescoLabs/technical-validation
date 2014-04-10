@@ -515,11 +515,11 @@
       (stb04-database-access)
       (stb06-dont-use-transaction-service)
       (stb07-close-all-resources)
+      (stb10-threading)
+      (stb12-logging)
       (stb13-use-timeouts-for-rpcs)
       (stb14-search-during-bootstrap)
       (stb18-prefer-automatic-transactions)
-      (stb10-threading)
-      (stb12-logging)
       (stb22-minimise-threadlocals)
     )
     []   ; Multi-result validations, if any, go here
