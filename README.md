@@ -48,6 +48,11 @@ C:\atv-0.1.0> atv -h
 C:\atv-0.1.0> 
 ```
 
+The tool will write a lot of data to the Neo4J database specified in the command line parameters - it is strongly
+recommended that that database be empty prior to each run of the tool.  It will also write the report file (in Word
+.docx format) to disk.  Other than that it will not modify anything else on the machine its run on (most especially
+the source code or binaries of your extension - they are only read).
+
 ## Developer Information
 
 [GitHub project](https://github.com/AlfrescoLabs/technical-validation)
