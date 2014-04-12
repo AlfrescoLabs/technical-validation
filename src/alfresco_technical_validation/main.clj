@@ -98,7 +98,7 @@
             (let [spinner (start-spinner)]
               (atv/validate source binaries neo4j-url report-filename)
               (.interrupt ^Thread spinner))
-            (println (str "\033[26D" (ava/green "✔") " " report-filename))
+            (println (str "\033[1G\033[2K" (ava/green "✔") " " report-filename))
             (flush))))
       nil)
     (catch Exception e
