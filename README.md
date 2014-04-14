@@ -59,6 +59,8 @@ the source code or binaries of your extension - they are only read).
 
 [Bug Tracker](https://github.com/AlfrescoLabs/technical-validation/issues)
 
+[![endorse](https://api.coderwall.com/pmonks/endorsecount.png)](https://coderwall.com/pmonks)
+
 ## License
 
 Copyright © 2013,2014 Peter Monks (pmonks@gmail.com)
