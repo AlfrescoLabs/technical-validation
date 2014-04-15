@@ -20,8 +20,8 @@
   (:require [clojure.string                           :as s]
             [clojure.tools.logging                    :as log]
             [clojure.tools.cli                        :refer [parse-opts]]
+            [jansi-clj.core                           :as jansi]
             [io.aviso.exception                       :as ave]
-            [io.aviso.ansi                            :as ava]
             [alfresco-technical-validation.validation :as atv]
             )
   (:use [clojure.tools.cli :only [cli]]
@@ -51,13 +51,16 @@
     :quadrants       "┤┘┴└├┌┬┐"
   })
 
+(def ^:private os-name     (System/getProperty "os.name"))
+(def ^:private is-windows? (.startsWith (.toLowerCase os-name) "windows"))
+
 (defn- infini-spinner
-  ([] (infini-spinner 100 :up-and-down))
+  ([] (infini-spinner 100 (if is-windows? :spinner :up-and-down)))
   ([delay-in-ms spinner-style]
     (try
       (loop [characters ^String (spinner-style spinner-styles)
              i                  0]
-        (print (str "\033[2D" (ava/blue (nth characters i)) " "))
+        (print (str (jansi/cursor-left 2) (jansi/cyan (nth characters i)) " "))
         (flush)
         (Thread/sleep delay-in-ms)
         (recur characters (mod (inc i) (.length characters))))
@@ -92,17 +95,20 @@
                         " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         summary
                         "\n ------------------------------+-------------------------------+--------------------------------------------------------"))
-          (do
-            (print "Reticulating splines...   ")
+          (let [message "Reticulating splines...   "]
+            (if is-windows? (jansi/install!))  ; This shouldn't be conditional - see https://github.com/xsc/jansi-clj/issues/1
+            (print message)
             (flush)
             (let [spinner (start-spinner)]
               (atv/validate source binaries neo4j-url report-filename)
               (.interrupt ^Thread spinner))
-            (println (str "\033[1G\033[2K" (ava/green "✔") " " report-filename))
+            (println (str (jansi/cursor-left (.length message)) (jansi/erase-line)
+                          (jansi/green (if is-windows? (String. (.getBytes "√" "cp437")) "✔")) " " report-filename))
             (flush))))
       nil)
     (catch Exception e
       (log/error e)
+      (jansi/install!)
       (println (ave/format-exception e)))
     (finally
       (shutdown-agents))))
