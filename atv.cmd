@@ -1,1 +1,1 @@
-@cmd < atv
+@java -jar atv %*
