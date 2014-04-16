@@ -19,6 +19,7 @@
 (ns alfresco-technical-validation.loc-counter
   (:require [clojure.string        :as s]
             [clojure.tools.logging :as log]
+            [clojure.java.io       :as io]
             [me.raynes.conch       :refer [with-programs]]))
 
 (defn- ohcount-output-to-map
@@ -28,17 +29,27 @@
                              (nth ohcount-output 2) ]  ; Lines of code, excluding comments
   })
 
-;####TODO: ADD COUNTING OF FREEMARKER, CONTENT MODELS, ETC.
+(defn- line-count
+  [file]
+  (with-open [reader (io/reader file)]
+    (count (line-seq reader))))
+
+(defn- count-freemarker
+  [source-index]
+  (let [freemarker-files (:freemarker (:source-files-by-type source-index))]
+    { "freemarker" [(count freemarker-files) (reduce + (map line-count freemarker-files))] } ))
+
+;####TODO: ADD COUNTING OF CONTENT MODELS, ETC.
 
 (defn count-locs
-  [source-directory]
+  [source source-index]
   (with-programs [ohcount]
     (try
-      (let [raw-output       (ohcount source-directory {:seq true})
+      (let [raw-output       (ohcount source {:seq true})
             output-wo-header (drop 6 raw-output)                                     ; OHCount header is 6 lines
             output-wo-footer (take (- (count output-wo-header) 2) output-wo-header)  ; OHCount footer is 2 lines
             split-lines      (map #(s/split % #"\s+") output-wo-footer)
-            mapped-lines     (into {} (map ohcount-output-to-map split-lines))]
+            mapped-lines     (into (count-freemarker source-index) (map ohcount-output-to-map split-lines))]
         mapped-lines)
       (catch java.io.IOException ioe
         (log/warn "Unable to fork ohcount - is it installed?" ioe)))))

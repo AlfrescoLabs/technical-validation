@@ -47,16 +47,17 @@
 (defn- build-loc-bookmarks
   [locs type]
   (let [[files loc] (get locs type)]
-    { (str type "Files") files
-      (str type "LOC")   loc
+    { (str type "Files") (str files)
+      (str type "LOC")   (str loc)
     }))
 
 (defn- count-locs
   [source source-index]
-  (let [locs (loc/count-locs source)]
+  (let [locs (loc/count-locs source source-index)]
     (merge
       (build-loc-bookmarks locs "java")
-      (build-loc-bookmarks locs "javascript"))))
+      (build-loc-bookmarks locs "javascript")
+      (build-loc-bookmarks locs "freemarker"))))
 
 (defn- detect-build-tools
   [files-by-type]

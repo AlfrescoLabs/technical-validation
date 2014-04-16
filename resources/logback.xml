@@ -17,9 +17,9 @@
 
   <logger name="depends" level="WARN"/>
   <logger name="bookmark_writer" level="WARN"/>
-  <logger name="alfresco_technical_validation" level="DEBUG"/>
+  <logger name="alfresco_technical_validation" level="INFO"/>
 
-  <root level="WARN">
+  <root level="ERROR">
 <!--    <appender-ref ref="STDOUT" /> -->
     <appender-ref ref="FILE" />
   </root>
