@@ -95,20 +95,20 @@
                         " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         summary
                         "\n ------------------------------+-------------------------------+--------------------------------------------------------"))
-          (let [message "Reticulating splines...   "]
-            (if is-windows? (jansi/install!))  ; This shouldn't be conditional - see https://github.com/xsc/jansi-clj/issues/1
+          (let [message    "Reticulating splines...   "
+                check-mark (if is-windows? (String. (.getBytes "√" "cp437")) "✔")]  ; Ugh Windoze
+            (jansi/install!)
             (print message)
             (flush)
             (let [spinner (start-spinner)]
               (atv/validate source binaries neo4j-url report-filename)
               (.interrupt ^Thread spinner))
             (println (str (jansi/cursor-left (.length message)) (jansi/erase-line)
-                          (jansi/green (if is-windows? (String. (.getBytes "√" "cp437")) "✔")) " " report-filename))
+                          (jansi/green check-mark) " " report-filename))
             (flush))))
       nil)
     (catch Exception e
       (log/error e)
-      (jansi/install!)
       (println (ave/format-exception e)))
     (finally
       (shutdown-agents))))
