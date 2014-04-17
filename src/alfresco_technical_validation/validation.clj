@@ -46,10 +46,11 @@
 
 (defn- build-loc-bookmarks
   [locs type]
-  (let [[files loc] (get locs type)]
-    { (str type "Files") (str files)
-      (str type "LOC")   (str loc)
-    }))
+  (let [[f l] (get locs type)
+        files (str f)
+        loc   (str l)]
+    { (str type "Files") (if (s/blank? files) "0" files)
+      (str type "LOC")   (if (s/blank? loc)   "0" loc) }))
 
 (defn- count-locs
   [source source-index]
