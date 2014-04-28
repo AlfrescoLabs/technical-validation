@@ -41,6 +41,9 @@
     :validate [#(not (.exists (clojure.java.io/file %))) "Report file must not exist"]]
    ["-h" "--help" "This message"]])
 
+(def ^:private os-name     (System/getProperty "os.name"))
+(def ^:private is-windows? (.startsWith (.toLowerCase os-name) "windows"))
+(def ^:private check-mark  (if is-windows? (String. (.getBytes "√" "cp437")) "✔"))  ; Ugh Windoze
 (def ^:private spinner-styles
   {
     :spinner         "|/-\\"
@@ -50,9 +53,6 @@
     :side-to-side    "▉▊▋▌▍▎▏▎▍▌▋▊▉"
     :quadrants       "┤┘┴└├┌┬┐"
   })
-
-(def ^:private os-name     (System/getProperty "os.name"))
-(def ^:private is-windows? (.startsWith (.toLowerCase os-name) "windows"))
 
 (defn- infini-spinner
   ([] (infini-spinner 100 (if is-windows? :spinner :up-and-down)))
@@ -73,6 +73,14 @@
     (Thread. ^Runnable infini-spinner)
     (.setDaemon true)
     (.start)))
+
+(defn- spin
+  [fn]
+  (let [spinner (start-spinner)]
+    (try
+      (fn)
+      (finally
+        (.interrupt ^Thread spinner)))))
 
 (defn -main
   "Command line access for Alfresco Technical Validation."
@@ -95,14 +103,11 @@
                         " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         summary
                         "\n ------------------------------+-------------------------------+--------------------------------------------------------"))
-          (let [message    "Reticulating splines...   "
-                check-mark (if is-windows? (String. (.getBytes "√" "cp437")) "✔")]  ; Ugh Windoze
+          (let [message "Reticulating splines...   "]
             (jansi/install!)
             (print message)
             (flush)
-            (let [spinner (start-spinner)]
-              (atv/validate source binaries neo4j-url report-filename)
-              (.interrupt ^Thread spinner))
+            (spin #(atv/validate-and-write-report source binaries neo4j-url report-filename))
             (println (str (jansi/cursor-left (.length message)) (jansi/erase-line)
                           (jansi/green check-mark) " " report-filename))
             (flush))))
