@@ -39,8 +39,6 @@
   (let [freemarker-files (:freemarker (:source-files-by-type source-index))]
     { "freemarker" [(str (count freemarker-files)) (str (reduce + (map line-count freemarker-files)))] } ))
 
-;####TODO: ADD COUNTING OF CONTENT MODELS, ETC.
-
 (defn count-locs
   [source source-index]
   (with-programs [ohcount]

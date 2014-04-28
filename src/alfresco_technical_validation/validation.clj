@@ -52,10 +52,48 @@
     { (str type "Files") files
       (str type "LOC")   loc }))
 
+
+(defn- count-file-type
+  [bookmark-name file-type source-index]
+  { bookmark-name (str (count (file-type (:source-files-by-type source-index)))) })
+
+(defn- count-content-models
+  [source-index]
+  (count-file-type "ContentModels" :content-model source-index))
+
+(defn- count-spring-app-contexts
+  [source-index]
+  (count-file-type "SpringAppContexts" :spring-app-context source-index))
+
+(defn- count-web-scripts
+  [source-index]
+  (count-file-type "WebScripts" :web-script-descriptor source-index))
+
+(comment  ;####TODO: :actions files aren't source-indexed!!!!
+(defn- count-actions
+  [source-index]
+  (count-file-type "Actions" :actions source-index))
+)
+
+(comment  ;####TODO: :behaviours files aren't source-indexed!!!!
+(defn- count-behaviours
+  [source-index]
+  (count-file-type "Behaviours" :behaviours source-index))
+)
+
+(comment  ;####TODO: :quartz-jobs files aren't source-indexed!!!!
+(defn- count-quartz-jobs
+  [source-index]
+  (count-file-type "QuartzJobs" :quartz-jobs source-index))
+)
+
 (defn- count-locs
   [source source-index]
   (let [locs (loc/count-locs source source-index)]
     (merge
+      (count-content-models      source-index)
+      (count-spring-app-contexts source-index)
+      (count-web-scripts         source-index)
       (build-loc-bookmarks locs "java")
       (build-loc-bookmarks locs "javascript")
       (build-loc-bookmarks locs "freemarker"))))
