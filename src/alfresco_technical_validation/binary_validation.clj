@@ -205,6 +205,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(n.`class-version`)
                            AND n.`class-version` < 50
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
@@ -264,6 +265,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND m.name IN [
                                            'java.lang.Process',
                                            'java.lang.ProcessBuilder'
@@ -284,6 +286,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(m.package)
                            AND m.package IN [
                                               'javax.servlet',
@@ -304,6 +307,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(m.name)
                            AND HAS(m.package)
                            AND m.package IN [
@@ -413,6 +417,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'java.lang.Throwable',
@@ -434,6 +439,7 @@
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
+                           AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'java.net.HttpURLConnection',
