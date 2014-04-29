@@ -20,6 +20,8 @@
   (:require [clojure.string                                  :as s]
             [clojure.tools.logging                           :as log]
             [clojure.java.io                                 :as io]
+            [clojurewerkz.neocons.rest                       :as nr]
+            [clojurewerkz.neocons.rest.cypher                :as cy]
             [alfresco-technical-validation.indexer           :as idx]
             [alfresco-technical-validation.binary-validation :as bin]
             [alfresco-technical-validation.source-validation :as src]
@@ -52,40 +54,46 @@
     { (str type "Files") files
       (str type "LOC")   loc }))
 
-
-(defn- count-file-type
+(defn- count-file-type-from-source
   [bookmark-name file-type source-index]
   { bookmark-name (str (count (file-type (:source-files-by-type source-index)))) })
 
 (defn- count-content-models
   [source-index]
-  (count-file-type "ContentModels" :content-model source-index))
+  (count-file-type-from-source "ContentModels" :content-model source-index))
 
 (defn- count-spring-app-contexts
   [source-index]
-  (count-file-type "SpringAppContexts" :spring-app-context source-index))
+  (count-file-type-from-source "SpringAppContexts" :spring-app-context source-index))
 
 (defn- count-web-scripts
   [source-index]
-  (count-file-type "WebScripts" :web-script-descriptor source-index))
+  (count-file-type-from-source "WebScripts" :web-script-descriptor source-index))
 
-(comment  ;####TODO: :actions files aren't source-indexed!!!!
+(defn- count-file-type-from-binary
+  [bookmark-name type]
+  (let [query (str "
+                     START n=NODE(*),
+                           m=NODE:node_auto_index('name:*')
+                     WHERE m.name = '" type "'
+                       AND m.name <> n.name
+                     MATCH SHORTESTPATH((n)-[*]->(m))
+                    RETURN COUNT(n.name) AS TypeCount;
+                   ")  ; ####TODO: UPDATE THIS TO ONLY CONSIDER ":implements" AND ":extends" DEPENDENCIES!!
+        res   (cy/tquery query)]
+    { bookmark-name (str (get (first res) "TypeCount")) } ))
+
 (defn- count-actions
-  [source-index]
-  (count-file-type "Actions" :actions source-index))
-)
+  []
+  (count-file-type-from-binary "Actions" "org.alfresco.service.cmr.action.Action"))
 
-(comment  ;####TODO: :behaviours files aren't source-indexed!!!!
 (defn- count-behaviours
-  [source-index]
-  (count-file-type "Behaviours" :behaviours source-index))
-)
+  []
+  (count-file-type-from-binary "Behaviours" "org.alfresco.repo.policy.Behaviour"))  ;####TODO: this doesn't provide an accurate count, due to the way behaviours are implemented
 
-(comment  ;####TODO: :quartz-jobs files aren't source-indexed!!!!
 (defn- count-quartz-jobs
-  [source-index]
-  (count-file-type "QuartzJobs" :quartz-jobs source-index))
-)
+  []
+  (count-file-type-from-binary "QuartzJobs" "org.quartz.Job"))
 
 (defn- count-locs
   [source source-index]
@@ -94,6 +102,9 @@
       (count-content-models      source-index)
       (count-spring-app-contexts source-index)
       (count-web-scripts         source-index)
+      (count-actions)
+      (count-behaviours)
+      (count-quartz-jobs)
       (build-loc-bookmarks locs "java")
       (build-loc-bookmarks locs "javascript")
       (build-loc-bookmarks locs "freemarker"))))

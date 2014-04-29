@@ -21,8 +21,6 @@
             [clojure.tools.logging                             :as log]
             [clojurewerkz.neocons.rest                         :as nr]
             [clojurewerkz.neocons.rest.cypher                  :as cy]
-            [depends.reader                                    :as dr]
-            [depends.neo4jwriter                               :as dn]
             [alfresco-technical-validation.alfresco-public-api :as alf-api]
             [alfresco-technical-validation.util                :refer :all]
             ))
