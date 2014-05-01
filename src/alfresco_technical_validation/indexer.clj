@@ -39,7 +39,7 @@
   (let [relevant-files   (file-type file-index)
         relevant-regexes (vals (file-type content-regexes-by-file-type))
         regex-id-lookup  (set/map-invert (file-type content-regexes-by-file-type))
-        raw-grep-result  (mg/multigrep-files relevant-regexes relevant-files)]
+        raw-grep-result  (mg/grep relevant-regexes relevant-files)]
     (flatten (map #(assoc % :regex-id (get regex-id-lookup (:regex %))) raw-grep-result))))
 
 (defn- build-content-index

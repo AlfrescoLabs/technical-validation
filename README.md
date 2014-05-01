@@ -1,7 +1,19 @@
 # technical-validation
 
 Tool for the technical validation of custom code that extends the
-[Alfresco](http://www.alfresco.com) open source document management system.
+[Alfresco](http://www.alfresco.com) open source document management system.  In other words it's an
+automated AMP file checker (both repo AMPs and Share AMPs).
+
+Important note: this tool is still in alpha, and has issues including:
+ * Criteria that are not yet checked at all
+ * False positives
+ * False negatives
+ * Ugly output
+ * Confusing output
+ * Implicated in the recent measles outbreak in the United States
+
+That said, in careful hands it can greatly expedite the process of technically validating an Alfresco extension,
+by identifying potentially problematic areas of the code worthy of further, detailed manual investigation.
 
 ## Dependencies
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
@@ -13,6 +25,9 @@ Note: these dependencies should be installed via your OS package manager, where 
 I strongly recommend [Homebrew](http://brew.sh/).
 
 ## Installation
+
+Ensure "auto indexing" is enabled in Neo4J for the properties "name", "package" and "typename".  These are set in
+the neo4j.properties file.
 
 Download the [latest release](https://github.com/AlfrescoLabs/technical-validation/releases) and unzip the zip file
 somewhere convenient.
@@ -36,7 +51,7 @@ $
 or on Windows:
 
 ```Batchfile
-C:\atv-0.1.0> atv -h
+C:\atv-0.2.0> atv -h
  ------------------------------+-------------------------------+--------------------------------------------------------
   Parameter                    | Default Value                 | Description
  ------------------------------+-------------------------------+--------------------------------------------------------
@@ -46,7 +61,7 @@ C:\atv-0.1.0> atv -h
   -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
   -h, --help                                                     This message
  ------------------------------+-------------------------------+--------------------------------------------------------
-C:\atv-0.1.0> 
+C:\atv-0.2.0> 
 ```
 
 The tool will write a lot of data to the Neo4J database specified in the command line parameters - it is strongly
