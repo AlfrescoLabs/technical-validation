@@ -64,7 +64,7 @@
         :sec03          #"<authentication>\s*none\s*</authentication>"
       }
     :spring-app-context {
-        :api05          #"(?:^|\s)ref="
+        :api05          #"(?:^|\s)ref=\s*\"(?!ServiceRegistry)"
       }
     :content-model {
         :perf02         #"<index\s+enabled\s*=\s*\"true"
