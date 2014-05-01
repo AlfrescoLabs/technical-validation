@@ -22,7 +22,6 @@
             [clojure.java.io                    :as io]
             [clojure.set                        :as set]
             [alfresco-technical-validation.util :refer :all]
-            [multigrep.core                     :as mg]
             ))
 
 

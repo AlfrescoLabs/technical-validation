@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=0.2.0
+VERSION=0.3.0-SNAPSHOT
 
 lein clean && lein check && lein bin
 rc=$?
