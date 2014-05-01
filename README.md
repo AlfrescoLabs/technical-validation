@@ -13,7 +13,7 @@ Important note: this tool is still in alpha, and has issues including:
  * Implicated in the recent measles outbreak in the United States
 
 That said, in careful hands it can greatly expedite the process of technically validating an Alfresco extension,
-by identifying potentially problematic areas of the code worthy of further, detailed manual investigation.
+by pinpointing potentially problematic areas of the code for further manual investigation.
 
 ## Dependencies
  1. [Java 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
