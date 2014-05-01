@@ -48,11 +48,14 @@
 
 (defn- build-loc-bookmarks
   [locs type]
-  (let [[f l] (get locs type)
-        files (if (or (nil? f) (s/blank? f)) "0" f)
-        loc   (if (or (nil? l) (s/blank? l)) "0" l)]
-    { (str type "Files") files
-      (str type "LOC")   loc }))
+  (let [[f l] (get locs type)]
+    (if (and (or (nil? f) (s/blank? f))
+             (or (nil? l) (s/blank? l)))
+      nil
+      (let [files (if (or (nil? f) (s/blank? f)) "0" f)
+            loc   (if (or (nil? l) (s/blank? l)) "0" l)]
+        { (str type "Files") files
+          (str type "LOC")   loc }))))
 
 (defn- count-file-type-from-source
   [bookmark-name file-type source-index]
@@ -113,7 +116,7 @@
   [files-by-type]
   (let [build-tools (s/join ","
                             (filter #(not (nil? %))
-                                    (vector (if (not-empty (:ant       files-by-type)) (if (empty? (mg/grep-files #"antlib:org\.apache\.ivy\.ant" (:ant files-by-type)))
+                                    (vector (if (not-empty (:ant       files-by-type)) (if (empty? (mg/grep #"antlib:org\.apache\.ivy\.ant" (:ant files-by-type)))
                                                                                          "Ant"
                                                                                          "Ivy"))
                                             (if (not-empty (:maven     files-by-type)) "Maven")
