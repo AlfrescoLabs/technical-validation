@@ -31,7 +31,7 @@
     :xml                   #".*\.xml"
     :web-script-descriptor #".*\.desc\.xml"
     :spring-app-context    #".*-context\.xml"
-    :content-model         #".*[mM]odel.*\.xml"
+    :content-model         #".*[mM]odel\.xml"
     :explorer-config       #"web-client-config-custom\.xml"
     :ant                   #"build\.xml"
     :maven                 #"pom\.xml"

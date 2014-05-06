@@ -46,7 +46,7 @@
                        content-index
                        :api05
                        "API05"
-                       "Bean injections"
+                       "Bean injections other than ServiceRegistry:"
                        true
                        "The technology does not perform bean injection."
                        #(if (empty? %) true nil)))
