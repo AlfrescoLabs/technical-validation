@@ -42,7 +42,7 @@
    ["-h" "--help" "This message"]])
 
 (def ^:private os-name     (System/getProperty "os.name"))
-(def ^:private is-windows? (.startsWith (.toLowerCase os-name) "windows"))
+(def ^:private is-windows? (.startsWith (.toLowerCase ^String os-name) "windows"))
 (def ^:private check-mark  (if is-windows? (String. (.getBytes "√" "cp437")) "✔"))  ; Ugh Windoze
 (def ^:private spinner-styles
   {
