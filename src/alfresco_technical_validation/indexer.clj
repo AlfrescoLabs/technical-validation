@@ -28,7 +28,7 @@
 
 (defn- build-file-type-index
   [files file-type file-regex]
-  { file-type (filter #(and (.isFile ^java.io.File %) re-matches file-regex (.getName ^java.io.File %)) files) })
+  { file-type (filter #(and (.isFile ^java.io.File %) (re-matches file-regex (.getName ^java.io.File %))) files) })
 
 (defn- build-file-types-index
   [files]
