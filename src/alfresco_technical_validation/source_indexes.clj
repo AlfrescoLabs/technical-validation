@@ -65,12 +65,12 @@
       }
     :spring-app-context {
         :api05          #"(?:^|\s)ref=\s*\"(?!ServiceRegistry)"
+        :stb15          #"parent=\"dictionaryModelBootstrap\""
       }
     :content-model {
         :perf02         #"<index\s+enabled\s*=\s*\"true"
         :perf03         #"<stored>\s*true\s*</stored>"
         :com08          #"<namespace\s+uri\s*=\s*\".*\"\s+prefix\s*=\s*\"(.*)\"\s*/>"
-        :stb15          #"parent=\"dictionaryModelBootstrap\""
       }
     :ant {
         :ivy            #"antlib:org\.apache\.ivy\.ant"
