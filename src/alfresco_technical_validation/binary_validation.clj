@@ -371,12 +371,16 @@
                                            'java.io.Closeable',
                                            'java.io.InputStream',
                                            'java.io.FileInputStream',
+                                           'java.io.BufferedInputStream',
                                            'java.io.OutputStream',
                                            'java.io.FileOutputStream',
+                                           'java.io.BufferedOuputStream',
                                            'java.io.Reader',
                                            'java.io.FileReader',
+                                           'java.io.BufferedReader',
                                            'java.io.Writer',
                                            'java.io.FileWriter',
+                                           'java.io.BufferedWriter',
                                            'java.net.Socket',
                                            'java.net.ServerSocket',
                                            'javax.net.ssl.SSLSocket',
@@ -418,13 +422,31 @@
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
                            AND HAS(n.package)
-                           AND NOT(n.package =~ 'org.apache..*')
-                           AND NOT(n.package =~ 'com.google..*')
-                           AND NOT(n.package =~ 'com.sap..*')
-                           AND NOT(n.package =~ 'com.sun..*')
+                           AND NOT(n.package =~ 'java.*')
+                           AND NOT(n.package =~ 'sun.*')
+                           AND NOT(n.package =~ 'com.sun.*')
+                           AND NOT(n.package =~ 'org.w3c.*')
+                           AND NOT(n.package =~ 'org.apache.*')
+                           AND NOT(n.package =~ 'org.alfresco.*')
+                           AND NOT(n.package =~ 'org.json.*')
+                           AND NOT(n.package =~ 'org.xml.*')
+                           AND NOT(n.package =~ 'org.springframework.*')
+                           AND NOT(n.package =~ 'org.hibernate.*')
+                           AND NOT(n.package =~ 'org.mybatis.*')
+                           AND NOT(n.package =~ 'net.sf.ehcache.*')
+                           AND NOT(n.package =~ 'org.quartz.*')
+                           AND NOT(n.package =~ 'org.mozilla.*')
+                           AND NOT(n.package =~ 'com.google.*')
+                           AND NOT(n.package =~ 'com.sap.*')
+                           AND NOT(n.package =~ 'com.license4j.*')
+                           AND NOT(n.package =~ 'com.aspose.*')
+                           AND NOT(n.package =~ 'asposewobfuscated.*')
+                           AND NOT(n.package =~ 'groovy.*')
+                           AND NOT(n.package =~ 'org.gradle.*')
+                           AND NOT(n.package =~ 'proguard.*')
                            AND HAS(m.name)
                            AND m.name IN [
-                                           'java.lang.Throwable',
+//                                           'java.lang.Throwable',   // Every class has this dependency
                                            'java.lang.Error',
                                            'java.lang.System'
                                          ]
