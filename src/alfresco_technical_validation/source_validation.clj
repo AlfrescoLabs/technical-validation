@@ -66,14 +66,14 @@
 (defn- com08-unique-namespace-prefixes
   [source content-index]
   (let [matches (filter #(= :com08 (:regex-id %)) content-index)
-        message (str "Module identifier(s):\n"
+        message (str "Content model prefix(es):\n"
                      (s/join "\n"
                              (distinct (map #(second (first (:re-seq %)))
                                         matches))))]
       (declare-result "COM08"
                       (if (empty? matches)
                         "No content model namespaces defined."
-                        (str message "\n#### Manual followup required - check that namespaces are sufficiently unique. ####")))))
+                        (str message "\n#### Manual followup required - check that content model prefixes are sufficiently unique. ####")))))
 
 (defn- stb08-stb09-use-of-synchronized
   [source content-index]
