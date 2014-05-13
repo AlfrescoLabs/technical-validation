@@ -166,6 +166,9 @@
                            AND NOT(n.package =~ 'com.license4j.*')
                            AND NOT(n.package =~ 'com.aspose.*')
                            AND NOT(n.package =~ 'asposewobfuscated.*')
+                           AND NOT(n.package =~ 'groovy.*')
+                           AND NOT(n.package =~ 'org.gradle.*')
+                           AND NOT(n.package =~ 'proguard.*')
                         RETURN DISTINCT n.package AS PackageName
                          ORDER BY PackageName
                        ")
@@ -359,6 +362,9 @@
                            AND NOT(n.package =~ 'com.license4j.*')
                            AND NOT(n.package =~ 'com.aspose.*')
                            AND NOT(n.package =~ 'asposewobfuscated.*')
+                           AND NOT(n.package =~ 'groovy.*')
+                           AND NOT(n.package =~ 'org.gradle.*')
+                           AND NOT(n.package =~ 'proguard.*')
                            AND HAS(m.name)
                            AND m.name IN [
                                            'org.alfresco.service.cmr.search.ResultSet',
