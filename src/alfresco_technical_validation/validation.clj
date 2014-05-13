@@ -96,7 +96,7 @@
 
 (defn- count-quartz-jobs
   []
-  (count-file-type-from-binary "QuartzJobs" "org.quartz.Job"))
+  (count-file-type-from-binary "QuartzJobs" "org.quartz.Job"))   ;####TODO: add count for org.alfresco.util.CronTriggerBean
 
 (defn- count-locs
   [source source-index]
