@@ -96,7 +96,16 @@
 
 (defn- count-quartz-jobs
   []
-  (count-file-type-from-binary "QuartzJobs" "org.quartz.Job"))   ;####TODO: add count for org.alfresco.util.CronTriggerBean
+  (let [query (str "
+                     START n=NODE(*),
+                           m=NODE:node_auto_index('name:*')
+                     WHERE m.name IN ['org.quartz.Job', 'org.alfresco.util.CronTriggerBean']
+                       AND m.name <> n.name
+                     MATCH SHORTESTPATH((n)-[*]->(m))
+                    RETURN COUNT(n.name) AS QuartzJobCount;
+                   ")
+        res   (cy/tquery query)]
+    { "QuartzJobs" (str (get (first res) "QuartzJobCount")) } ))
 
 (defn- count-locs
   [source source-index]
