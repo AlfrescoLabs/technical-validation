@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.impl.validation
+(ns alfresco-technical-validation.api
   (:require [clojure.string                                       :as s]
             [clojure.tools.logging                                :as log]
             [clojure.java.io                                      :as io]
@@ -175,27 +175,32 @@
            (alfresco-max-versions content-index)
            (alfresco-editions     content-index))))
 
+(defn index-extension
+  [source binaries neo4j-url]
+  (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source))
+
 (defn validate
   "Validates the given source and binaries."
-  [indexes]
-  (let [source                    (:source       indexes)
-        binaries                  (:binaries     indexes)
-        source-index              (:source-index indexes)
-        source-validation-results (src/validate source source-index)
-        binary-validation-results (bin/validate)
-        validation-results        (concat source-validation-results
+  ([source binaries neo4j-url] (validate (index-extension source binaries neo4j-url)))
+  ([indexes]
+   (let [source                    (:source       indexes)
+         binaries                  (:binaries     indexes)
+         source-index              (:source-index indexes)
+         source-validation-results (src/validate source source-index)
+         binary-validation-results (bin/validate)
+         validation-results        (concat source-validation-results
                                           binary-validation-results)]
-    validation-results))
+     validation-results)))
 
 (defn validate-and-write-report
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
-  [source binaries neo4j-url report-filename]
-  (let [indexes                   (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source)
-        loc-bookmarks             (count-locs indexes)
-        global-bookmarks          (global-bookmarks indexes)
-        validation-results        (validate indexes)
-        results-as-bookmarks      (into {} (map result-to-bookmark validation-results))
-        all-bookmarks             (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
-    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
-    nil))
+  ([source binaries neo4j-url report-filename] (validate-and-write-report (index-extension source binaries neo4j-url) report-filename))
+  ([indexes report-filename]
+   (let [loc-bookmarks             (count-locs indexes)
+         global-bookmarks          (global-bookmarks indexes)
+         validation-results        (validate indexes)
+         results-as-bookmarks      (into {} (map result-to-bookmark validation-results))
+         all-bookmarks             (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
+     (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
+     nil)))
