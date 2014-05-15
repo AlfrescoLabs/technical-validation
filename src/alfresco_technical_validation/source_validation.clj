@@ -34,7 +34,7 @@
                    success-message
                    (str message-header ":\n"
                                 (s/join "\n"
-                                        (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                                        (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %)))
                                              matches))))]
        (declare-result criteria-id
                        (comparison-fn matches)
