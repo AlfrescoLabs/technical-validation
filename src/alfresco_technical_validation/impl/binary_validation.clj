@@ -16,13 +16,13 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.binary-validation
+(ns alfresco-technical-validation.impl.binary-validation
   (:require [clojure.string                                    :as s]
             [clojure.tools.logging                             :as log]
             [clojurewerkz.neocons.rest                         :as nr]
             [clojurewerkz.neocons.rest.cypher                  :as cy]
             [alfresco-technical-validation.alfresco-public-api :as alf-api]
-            [alfresco-technical-validation.util                :refer :all]
+            [alfresco-technical-validation.impl.util           :refer :all]
             ))
 
 ; List of special characters is from http://lucene.apache.org/core/3_6_2/queryparsersyntax.html#Escaping Special Characters

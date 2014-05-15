@@ -16,18 +16,18 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.validation
-  (:require [clojure.string                                  :as s]
-            [clojure.tools.logging                           :as log]
-            [clojure.java.io                                 :as io]
-            [clojurewerkz.neocons.rest                       :as nr]
-            [clojurewerkz.neocons.rest.cypher                :as cy]
-            [alfresco-technical-validation.indexer           :as idx]
-            [alfresco-technical-validation.binary-validation :as bin]
-            [alfresco-technical-validation.source-validation :as src]
-            [alfresco-technical-validation.loc-counter       :as loc]
-            [bookmark-writer.core                            :as bw]
-            [multigrep.core                                  :as mg]))
+(ns alfresco-technical-validation.impl.validation
+  (:require [clojure.string                                       :as s]
+            [clojure.tools.logging                                :as log]
+            [clojure.java.io                                      :as io]
+            [clojurewerkz.neocons.rest                            :as nr]
+            [clojurewerkz.neocons.rest.cypher                     :as cy]
+            [alfresco-technical-validation.impl.indexer           :as idx]
+            [alfresco-technical-validation.impl.binary-validation :as bin]
+            [alfresco-technical-validation.impl.source-validation :as src]
+            [alfresco-technical-validation.impl.loc-counter       :as loc]
+            [bookmark-writer.core                                 :as bw]
+            [multigrep.core                                       :as mg]))
 
 (def ^:private report-template (io/resource "alfresco-technical-validation-template.docx"))
 
@@ -74,7 +74,7 @@
   (count-file-type-from-source "WebScripts" :web-script-descriptor source-index))
 
 (defn- count-file-type-from-binary
-  [bookmark-name type]
+  [binary-index bookmark-name type]
   (let [query (str "
                      START n=NODE(*),
                            m=NODE:node_auto_index('name:*')
@@ -87,15 +87,15 @@
     { bookmark-name (str (get (first res) "TypeCount")) } ))
 
 (defn- count-actions
-  []
-  (count-file-type-from-binary "Actions" "org.alfresco.service.cmr.action.Action"))
+  [binary-index]
+  (count-file-type-from-binary binary-index "Actions" "org.alfresco.service.cmr.action.Action"))
 
 (defn- count-behaviours
-  []
-  (count-file-type-from-binary "Behaviours" "org.alfresco.repo.policy.Behaviour"))  ;####TODO: this doesn't provide an accurate count, due to the way behaviours are implemented
+  [binary-index ]
+  (count-file-type-from-binary binary-index "Behaviours" "org.alfresco.repo.policy.Behaviour"))  ;####TODO: this doesn't provide an accurate count, due to the way behaviours are implemented
 
 (defn- count-quartz-jobs
-  []
+  [binary-index ]
   (let [query (str "
                      START n=NODE(*),
                            m=NODE:node_auto_index('name:*')
@@ -108,15 +108,18 @@
     { "QuartzJobs" (str (get (first res) "QuartzJobCount")) } ))
 
 (defn- count-locs
-  [source source-index]
-  (let [locs (loc/count-locs source source-index)]
+  [indexes]
+  (let [source       (:source       indexes)
+        source-index (:source-index indexes)
+        binary-index (:binary-index indexes)
+        locs         (loc/count-locs source source-index)]
     (merge
       (count-content-models      source-index)
       (count-spring-app-contexts source-index)
       (count-web-scripts         source-index)
-      (count-actions)
-      (count-behaviours)
-      (count-quartz-jobs)
+      (count-actions             binary-index)
+      (count-behaviours          binary-index)
+      (count-quartz-jobs         binary-index)
       (build-loc-bookmarks locs "java")
       (build-loc-bookmarks locs "javascript")
       (build-loc-bookmarks locs "freemarker"))))
@@ -161,8 +164,9 @@
     { "AlfrescoEditions" (if (empty? message) "Not specified" message) }))
 
 (defn- global-bookmarks
-  [source-index]
-  (let [files-by-type (:source-files-by-type source-index)
+  [indexes]
+  (let [source-index  (:source-index indexes)
+        files-by-type (:source-files-by-type source-index)
         content-index (:source-content-index source-index)]
     (merge { "Date" (java.lang.String/format "%1$tF" (into-array Object [(java.util.Date.)])) }
            (detect-build-tools    files-by-type)
@@ -173,8 +177,11 @@
 
 (defn validate
   "Validates the given source and binaries."
-  [source binaries source-index]
-  (let [source-validation-results (src/validate source source-index)
+  [indexes]
+  (let [source                    (:source       indexes)
+        binaries                  (:binaries     indexes)
+        source-index              (:source-index indexes)
+        source-validation-results (src/validate source source-index)
         binary-validation-results (bin/validate)
         validation-results        (concat source-validation-results
                                           binary-validation-results)]
@@ -184,10 +191,11 @@
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
   [source binaries neo4j-url report-filename]
-  (let [source-index              (idx/index neo4j-url binaries source)
-        loc-bookmarks             (count-locs source source-index)
-        global-bookmarks          (global-bookmarks source-index)
-        validation-results        (validate source binaries source-index)
+  (let [indexes                   (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source)
+        loc-bookmarks             (count-locs indexes)
+        global-bookmarks          (global-bookmarks indexes)
+        validation-results        (validate indexes)
         results-as-bookmarks      (into {} (map result-to-bookmark validation-results))
         all-bookmarks             (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
-    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)))
+    (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
+    nil))

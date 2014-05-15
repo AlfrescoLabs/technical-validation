@@ -17,12 +17,12 @@
 ;
 
 (ns alfresco-technical-validation.main
-  (:require [clojure.string                           :as s]
-            [clojure.tools.logging                    :as log]
-            [clojure.tools.cli                        :refer [parse-opts]]
-            [jansi-clj.core                           :as jansi]
-            [io.aviso.exception                       :as ave]
-            [alfresco-technical-validation.validation :as atv]
+  (:require [clojure.string                                :as s]
+            [clojure.tools.logging                         :as log]
+            [clojure.tools.cli                             :refer [parse-opts]]
+            [jansi-clj.core                                :as jansi]
+            [io.aviso.exception                            :as ave]
+            [alfresco-technical-validation.impl.validation :as atv]
             )
   (:use [clojure.tools.cli :only [cli]]
         [clojure.pprint :only [pprint]])

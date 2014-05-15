@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.loc-counter
+(ns alfresco-technical-validation.impl.loc-counter
   (:require [clojure.string        :as s]
             [clojure.tools.logging :as log]
             [clojure.java.io       :as io]

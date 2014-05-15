@@ -16,12 +16,12 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.source-validation
-  (:require [clojure.string                     :as s]
-            [clojure.tools.logging              :as log]
-            [clojure.java.io                    :as io]
-            [clojure.set                        :as set]
-            [alfresco-technical-validation.util :refer :all]
+(ns alfresco-technical-validation.impl.source-validation
+  (:require [clojure.string                          :as s]
+            [clojure.tools.logging                   :as log]
+            [clojure.java.io                         :as io]
+            [clojure.set                             :as set]
+            [alfresco-technical-validation.impl.util :refer :all]
             ))
 
 

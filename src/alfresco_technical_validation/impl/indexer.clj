@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.indexer
+(ns alfresco-technical-validation.impl.indexer
   (:require [clojure.string        :as s]
             [clojure.tools.logging :as log]
             [clojure.java.io       :as io]
@@ -24,7 +24,7 @@
             [depends.reader        :as dr]
             [depends.neo4jwriter   :as dn]
             [multigrep.core        :as mg])
-  (:use [alfresco-technical-validation.source-indexes]))
+  (:use [alfresco-technical-validation.impl.source-indexes]))
 
 (defn- build-file-type-index
   [files file-type file-regex]
@@ -59,11 +59,11 @@
   "Indexes the binaries in the given location to the specified Neo4J server."
   [neo4j-url binaries]
   (let [classes-info (dr/classes-info binaries)]
-    (dn/write-dependencies! neo4j-url classes-info)))
+    (dn/write-dependencies! neo4j-url classes-info)
+    nil))   ; For now - awaiting neocons v3.0.0
 
-(defn index
-  "Indexes the binaries and sources, returning the in-memory source index."
+(defn indexes
+  "Returns a map containing the :binary-index and the :source-index."
   [neo4j-url binaries source]
-  (index-binaries neo4j-url binaries)
-  (index-source source))
-
+  { :binary-index (index-binaries neo4j-url binaries)
+    :source-index (index-source source) } )

@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.source-indexes)
+(ns alfresco-technical-validation.impl.source-indexes)
 
 ; We put these regexes in their own file because Sublime Text barfs on the embedded double quote characters
 ; and we lose all of syntax highlighting goodness.
