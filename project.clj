@@ -35,6 +35,7 @@
                   [org.clojars.pmonks/depends         "0.2.0"]
                   [org.clojars.pmonks/multigrep       "0.2.0"]
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
+                  [org.clojars.pmonks/spinner         "0.1.0"]
                 ]
   :profiles {:dev {:dependencies [
                                    [midje          "1.6.3"]

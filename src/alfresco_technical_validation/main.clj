@@ -23,6 +23,7 @@
             [jansi-clj.core                    :as jansi]
             [io.aviso.exception                :as ave]
             [alfresco-technical-validation.api :as atv]
+            [spinner.core                      :as spin]
             )
   (:use [clojure.tools.cli :only [cli]]
         [clojure.pprint :only [pprint]])
@@ -41,52 +42,15 @@
     :validate [#(not (.exists (clojure.java.io/file %))) "Report file must not exist"]]
    ["-h" "--help" "This message"]])
 
-(def ^:private os-name     (System/getProperty "os.name"))
-(def ^:private is-windows? (.startsWith (.toLowerCase ^String os-name) "windows"))
-(def ^:private check-mark  (if is-windows? (String. (.getBytes "√" "cp437")) "✔"))  ; Ugh Windoze
-(def ^:private spinner-styles
-  {
-    :spinner         "|/-\\"
-    :unicode-spinner "⋮⋰⋯⋱"
-    :up-and-down     "▁▃▄▅▆▇█▇▆▅▄▃"
-    :fade-in-and-out " ░▒▓█▓▒░"
-    :side-to-side    "▉▊▋▌▍▎▏▎▍▌▋▊▉"
-    :quadrants       "┤┘┴└├┌┬┐"
-  })
-
-(defn- infini-spinner
-  ([] (infini-spinner 100 (if is-windows? :spinner :up-and-down)))
-  ([delay-in-ms spinner-style]
-    (try
-      (loop [characters ^String (spinner-style spinner-styles)
-             i                  0]
-        (print (str (jansi/cursor-left 2) (jansi/cyan (nth characters i)) " "))
-        (flush)
-        (Thread/sleep delay-in-ms)
-        (recur characters (mod (inc i) (.length characters))))
-      (catch InterruptedException ie
-        (comment "Swallow exception and terminate.")))))
-
-(defn- start-spinner
-  []
-  (doto 
-    (Thread. ^Runnable infini-spinner)
-    (.setDaemon true)
-    (.start)))
-
-(defn- spin
-  [fn]
-  (let [spinner (start-spinner)]
-    (try
-      (fn)
-      (finally
-        (.interrupt ^Thread spinner)))))
+(def ^:private check-mark (if spin/is-windows? (String. (.getBytes "√" "cp437")) "✔"))  ; Ugh Windoze you suck
+(def ^:private spin-opts  { :style     (if spin/is-windows? :spinner :up-and-down)
+                            :fg-colour :cyan } )
 
 (defn -main
   "Command line access for Alfresco Technical Validation."
   [& args]
   (try
-    (let [parsed-args     (parse-opts args cli-options)
+    (let [parsed-args     (parse-opts   args cli-options)
           options         (:options     parsed-args)
           source          (:source      options)
           binaries        (:binaries    options)
@@ -103,11 +67,11 @@
                         " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         summary
                         "\n ------------------------------+-------------------------------+--------------------------------------------------------"))
-          (let [message "Reticulating splines...   "]
+          (let [message "Reticulating splines... "]
             (jansi/install!)
             (print message)
             (flush)
-            (spin #(atv/validate-and-write-report source binaries neo4j-url report-filename))
+            (spin/spin! #(atv/validate-and-write-report source binaries neo4j-url report-filename) spin-opts)
             (println (str (jansi/cursor-left (.length message)) (jansi/erase-line)
                           (jansi/green check-mark) " " report-filename))
             (flush))))
