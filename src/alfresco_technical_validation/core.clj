@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.api
+(ns alfresco-technical-validation.core
   (:require [clojure.string                                       :as s]
             [clojure.tools.logging                                :as log]
             [clojure.java.io                                      :as io]
@@ -176,6 +176,7 @@
            (alfresco-editions     content-index))))
 
 (defn index-extension
+  "Indexes an extension, given its source, binaries, and with a Neo4J server running at neo4j-url."
   [source binaries neo4j-url]
   (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source))
 
@@ -189,7 +190,7 @@
          source-validation-results (src/validate source source-index)
          binary-validation-results (bin/validate)
          validation-results        (concat source-validation-results
-                                          binary-validation-results)]
+                                           binary-validation-results)]
      validation-results)))
 
 (defn validate-and-write-report
@@ -197,10 +198,10 @@
   writing the report to the specified Word document."
   ([source binaries neo4j-url report-filename] (validate-and-write-report (index-extension source binaries neo4j-url) report-filename))
   ([indexes report-filename]
-   (let [loc-bookmarks             (count-locs indexes)
-         global-bookmarks          (global-bookmarks indexes)
-         validation-results        (validate indexes)
-         results-as-bookmarks      (into {} (map result-to-bookmark validation-results))
-         all-bookmarks             (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
+   (let [loc-bookmarks        (count-locs       indexes)
+         global-bookmarks     (global-bookmarks indexes)
+         validation-results   (validate         indexes)
+         results-as-bookmarks (into {} (map result-to-bookmark validation-results))
+         all-bookmarks        (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
      (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
      nil)))
