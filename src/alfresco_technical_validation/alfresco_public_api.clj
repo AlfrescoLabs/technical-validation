@@ -22,7 +22,7 @@
 
 
 (def ^:private ^String api-page-url       "http://docs.alfresco.com/4.2/topic/com.alfresco.enterprise.doc/concepts/java-public-api-list.html")
-(def ^:private ^String api-list-open-tag  "<pre class=\"pre codeblock\" xml:space=\"preserve\">")
+(def ^:private ^String api-list-open-tag  "<pre class=\"pre codeblock\">")
 (def ^:private ^String api-list-close-tag "</pre>")
 
 (defn public-java-api
