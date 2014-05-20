@@ -98,7 +98,7 @@
   (let [matches (filter #(= :stb15 (:regex-id %)) content-index)
         message (str "Dictionary bootstrap(s):\n"
                      (s/join "\n"
-                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (:line %))
+                             (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %)))
                                   matches)))]
       (declare-result "STB15"
                       (not (empty? matches))
