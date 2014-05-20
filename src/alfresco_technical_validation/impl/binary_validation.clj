@@ -307,10 +307,12 @@
                            AND NOT(n.package =~ 'com.sap..*')
                            AND NOT(n.package =~ 'com.sun..*')
                            AND HAS(m.package)
-                           AND m.package IN [
-                                              'javax.servlet',
-                                              'javax.servlet.http'
-                                            ]
+                           AND m.name IN [
+                                           'javax.servlet.Servlet',
+                                           'javax.servlet.GenericServlet',
+                                           'javax.servlet.http.HttpServlet',
+                                           'javax.servlet.Filter'
+                                         ]
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
