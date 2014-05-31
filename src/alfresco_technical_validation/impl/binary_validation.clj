@@ -71,8 +71,9 @@
                      (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
 
 (defn- api01-public-alfresco-java-api
-  []
-  (let [alfresco-public-java-api (cypher-escaped-alfresco-api)
+  [binary-index]
+  (let [con                      binary-index
+        alfresco-public-java-api (cypher-escaped-alfresco-api)
         cypher-query             (populate-in-clause "
                                                        START n=NODE(*)
                                                        MATCH (n)-->(m)
@@ -87,7 +88,7 @@
                                                       RETURN DISTINCT m.name AS PrivateAPIs
                                                        ORDER BY m.name
                                                      ", alfresco-public-java-api)
-        res                      (cy/tquery cypher-query)
+        res                      (cy/tquery con cypher-query)
         res-as-string            (str "The following private Java APIs are used:\n"
                                    (s/join "\n" (map #(str (get % "PrivateAPIs")) res)))
         message                  (if (empty? res)
@@ -99,8 +100,10 @@
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- api06-service-locator
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -120,8 +123,10 @@
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- dev02-prefer-javascript-web-scripts
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -142,8 +147,10 @@
     (standard-validation "DEV02" res false "The technology does not contain any Java-backed Web Scripts.")))
 
 (defn- com01-unique-java-package
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          WHERE HAS(n.name)
                            AND HAS(n.package)
@@ -182,8 +189,10 @@
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- com04-prefer-repository-actions
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -198,8 +207,10 @@
     (standard-validation "COM04" res false "The technology does not provide any repository actions." #(not (empty? %)))))
 
 (defn- com06-compiled-jvm-version
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          WHERE HAS(n.name)
                            AND HAS(n.package)
@@ -240,8 +251,10 @@
                     (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
 
 (defn- com09-prefer-cmisql
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -258,8 +271,10 @@
       (declare-result "COM09" message))))
 
 (defn- sec02-minimise-manual-authentication
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -274,8 +289,10 @@
     (declare-result "SEC02" (empty? res) (if (empty? res) "The technology does not manually authenticate." message))))
 
 (defn- sec04-process-exec-builder
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -296,8 +313,10 @@
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- stb03-servlets-servlet-filters
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -319,8 +338,10 @@
     (standard-validation "STB03" res false "The technology does not use servlets or servlet filters.")))
 
 (defn- stb04-database-access
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -344,8 +365,10 @@
     (standard-validation "STB04" res false "The technology does not access the database directly.")))
 
 (defn- stb06-dont-use-transaction-service
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -357,8 +380,10 @@
     (standard-validation "STB06" res false "The technology does not use the TransactionService.")))
 
 (defn- stb07-close-all-resources
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -413,8 +438,10 @@
     (standard-validation "STB07" res true "The technology does not use resources that need to be closed." #(if (empty? %) true nil))))
 
 (defn- stb10-threading
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -436,8 +463,10 @@
     (standard-validation "STB10" res false "The technology does not use threading APIs.")))
 
 (defn- stb12-logging
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -476,8 +505,10 @@
     (standard-validation "STB12" res true "The technology does not use improper logging techniques.")))
 
 (defn- stb13-use-timeouts-for-rpcs
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -503,8 +534,10 @@
     (standard-validation "STB13" res true "The technology does not use common HTTP RPC client libraries.")))
 
 (defn- stb14-search-during-bootstrap
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -516,8 +549,10 @@
   (standard-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))))
 
 (defn- stb18-prefer-automatic-transactions
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -536,8 +571,10 @@
                     (if (empty? res) "The technology does not manually demarcate transactions." message))))
 
 (defn- stb22-minimise-threadlocals
-  []
-  (let [res (cy/tquery "
+  [binary-index]
+  (let [con binary-index
+        res (cy/tquery con
+                       "
                          START n=NODE(*)
                          MATCH (n)-->(m)
                          WHERE HAS(n.name)
@@ -551,28 +588,28 @@
 
 (defn validate
   "Runs all binary-based validations."
-  []
+  [binary-index]
   (concat
     (vector
-      (api01-public-alfresco-java-api)
-      (api06-service-locator)
-      (dev02-prefer-javascript-web-scripts)
-      (com01-unique-java-package)
-      (com04-prefer-repository-actions)
-      (com06-compiled-jvm-version)
-      (com09-prefer-cmisql)
-      (sec02-minimise-manual-authentication)
-      (sec04-process-exec-builder)
-      (stb03-servlets-servlet-filters)
-      (stb04-database-access)
-      (stb06-dont-use-transaction-service)
-      (stb07-close-all-resources)
-      (stb10-threading)
-      (stb12-logging)
-      (stb13-use-timeouts-for-rpcs)
-      (stb14-search-during-bootstrap)
-      (stb18-prefer-automatic-transactions)
-      (stb22-minimise-threadlocals)
+      (api01-public-alfresco-java-api       binary-index)
+      (api06-service-locator                binary-index)
+      (dev02-prefer-javascript-web-scripts  binary-index)
+      (com01-unique-java-package            binary-index)
+      (com04-prefer-repository-actions      binary-index)
+      (com06-compiled-jvm-version           binary-index)
+      (com09-prefer-cmisql                  binary-index)
+      (sec02-minimise-manual-authentication binary-index)
+      (sec04-process-exec-builder           binary-index)
+      (stb03-servlets-servlet-filters       binary-index)
+      (stb04-database-access                binary-index)
+      (stb06-dont-use-transaction-service   binary-index)
+      (stb07-close-all-resources            binary-index)
+      (stb10-threading                      binary-index)
+      (stb12-logging                        binary-index)
+      (stb13-use-timeouts-for-rpcs          binary-index)
+      (stb14-search-during-bootstrap        binary-index)
+      (stb18-prefer-automatic-transactions  binary-index)
+      (stb22-minimise-threadlocals          binary-index)
     )
     []   ; Multi-result validations, if any, go here
    ))

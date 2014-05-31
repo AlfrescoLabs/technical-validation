@@ -20,7 +20,6 @@
   (:require [clojure.string                                       :as s]
             [clojure.tools.logging                                :as log]
             [clojure.java.io                                      :as io]
-            [clojurewerkz.neocons.rest                            :as nr]
             [clojurewerkz.neocons.rest.cypher                     :as cy]
             [alfresco-technical-validation.impl.indexer           :as idx]
             [alfresco-technical-validation.impl.binary-validation :as bin]
@@ -75,7 +74,8 @@
 
 (defn- count-file-type-from-binary
   [binary-index bookmark-name type]
-  (let [query (str "
+  (let [con   binary-index
+        query (str "
                      START n=NODE(*),
                            m=NODE:node_auto_index('name:*')
                      WHERE m.name = '" type "'
@@ -83,7 +83,7 @@
                      MATCH SHORTESTPATH((n)-[*]->(m))
                     RETURN COUNT(n.name) AS TypeCount;
                    ")  ; ####TODO: UPDATE THIS TO ONLY CONSIDER ":implements" AND ":extends" DEPENDENCIES!!
-        res   (cy/tquery query)]
+        res   (cy/tquery con query)]
     { bookmark-name (str (get (first res) "TypeCount")) } ))
 
 (defn- count-actions
@@ -91,12 +91,13 @@
   (count-file-type-from-binary binary-index "Actions" "org.alfresco.service.cmr.action.Action"))
 
 (defn- count-behaviours
-  [binary-index ]
+  [binary-index]
   (count-file-type-from-binary binary-index "Behaviours" "org.alfresco.repo.policy.Behaviour"))  ;####TODO: this doesn't provide an accurate count, due to the way behaviours are implemented
 
 (defn- count-quartz-jobs
-  [binary-index ]
-  (let [query (str "
+  [binary-index]
+  (let [con   binary-index
+        query (str "
                      START n=NODE(*),
                            m=NODE:node_auto_index('name:*')
                      WHERE m.name IN ['org.quartz.Job', 'org.alfresco.util.CronTriggerBean']
@@ -104,7 +105,7 @@
                      MATCH SHORTESTPATH((n)-[*]->(m))
                     RETURN COUNT(n.name) AS QuartzJobCount;
                    ")
-        res   (cy/tquery query)]
+        res   (cy/tquery con query)]
     { "QuartzJobs" (str (get (first res) "QuartzJobCount")) } ))
 
 (defn- count-locs
@@ -185,10 +186,11 @@
   ([source binaries neo4j-url] (validate (index-extension source binaries neo4j-url)))
   ([indexes]
    (let [source                    (:source       indexes)
-         binaries                  (:binaries     indexes)
          source-index              (:source-index indexes)
+         binaries                  (:binaries     indexes)
+         binary-index              (:binary-index indexes)
          source-validation-results (src/validate source source-index)
-         binary-validation-results (bin/validate)
+         binary-validation-results (bin/validate binary-index)
          validation-results        (concat source-validation-results
                                            binary-validation-results)]
      validation-results)))

@@ -59,11 +59,10 @@
   "Indexes the binaries in the given location to the specified Neo4J server."
   [neo4j-url binaries]
   (let [classes-info (dr/classes-info binaries)]
-    (dn/write-dependencies! neo4j-url classes-info)
-    nil))   ; For now - awaiting neocons v3.0.0
+    (dn/write-dependencies! neo4j-url classes-info)))
 
 (defn indexes
   "Returns a map containing the :binary-index and the :source-index."
   [neo4j-url binaries source]
   { :binary-index (index-binaries neo4j-url binaries)
-    :source-index (index-source source) } )
+    :source-index (index-source source) })
