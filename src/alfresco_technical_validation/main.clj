@@ -43,8 +43,8 @@
    ["-h" "--help" "This message"]])
 
 (def ^:private check-mark (if spin/is-windows? (String. (.getBytes "√" "cp437")) "✔"))  ; Ugh Windoze you suck
-(def ^:private spin-opts  { :style     (if spin/is-windows? :spinner :up-and-down)
-                            :fg-colour :cyan } )
+(def ^:private spin-opts  { :characters (if spin/is-windows? (:spinner spin/styles) (:up-and-down spin/styles))
+                            :fg-colour  :cyan } )
 
 (defn -main
   "Command line access for Alfresco Technical Validation."
@@ -67,13 +67,11 @@
                         " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         summary
                         "\n ------------------------------+-------------------------------+--------------------------------------------------------"))
-          (let [message "Reticulating splines... "]
+          (do
             (jansi/install!)
-            (print message)
-            (flush)
-            (spin/spin! #(atv/validate-and-write-report source binaries neo4j-url report-filename) spin-opts)
-            (println (str (jansi/cursor-left (.length message)) (jansi/erase-line)
-                          (jansi/green check-mark) " " report-filename))
+            (log/debug "Starting...")  ; We do this primarily to force slf4j to initialise itself - it's rather whiny on startup
+            (spin/spin! #(atv/validate-and-write-report source binaries neo4j-url report-filename spin/print) spin-opts)
+            (println (str "\n" (jansi/green check-mark) " " report-filename))
             (flush))))
       nil)
     (catch Exception e

@@ -178,17 +178,21 @@
 
 (defn index-extension
   "Indexes an extension, given its source, binaries, and with a Neo4J server running at neo4j-url."
-  [source binaries neo4j-url]
-  (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source))
+  ([source binaries neo4j-url] (index-extension source binaries neo4j-url nil))
+  ([source binaries neo4j-url status-fn]
+   (if status-fn (status-fn "Analysing extension... "))
+   (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source)))
 
 (defn validate
   "Validates the given source and binaries."
-  ([source binaries neo4j-url] (validate (index-extension source binaries neo4j-url)))
-  ([indexes]
+  ([source binaries neo4j-url]           (validate source binaries neo4j-url nil))
+  ([source binaries neo4j-url status-fn] (validate (index-extension source binaries neo4j-url status-fn) status-fn))
+  ([indexes status-fn]
    (let [source                    (:source       indexes)
          source-index              (:source-index indexes)
          binaries                  (:binaries     indexes)
          binary-index              (:binary-index indexes)
+         _                         (if status-fn (status-fn "\nValidating criteria... "))
          source-validation-results (src/validate source source-index)
          binary-validation-results (bin/validate binary-index)
          validation-results        (concat source-validation-results
@@ -198,12 +202,14 @@
 (defn validate-and-write-report
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
-  ([source binaries neo4j-url report-filename] (validate-and-write-report (index-extension source binaries neo4j-url) report-filename))
-  ([indexes report-filename]
+  ([source binaries neo4j-url report-filename]           (validate-and-write-report source binaries neo4j-url report-filename nil))
+  ([source binaries neo4j-url report-filename status-fn] (validate-and-write-report (index-extension source binaries neo4j-url status-fn) report-filename status-fn))
+  ([indexes report-filename status-fn]
    (let [loc-bookmarks        (count-locs       indexes)
          global-bookmarks     (global-bookmarks indexes)
-         validation-results   (validate         indexes)
+         validation-results   (validate         indexes status-fn)
          results-as-bookmarks (into {} (map result-to-bookmark validation-results))
          all-bookmarks        (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
+     (if status-fn (status-fn "\nGenerating report... "))
      (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
      nil)))
