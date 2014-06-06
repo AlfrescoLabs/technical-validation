@@ -240,7 +240,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "STB12" res true "The technology does not use improper logging techniques.")))
+    (standard-binary-validation "STB12" res true "The technology does not use improper logging techniques." #(if (empty? %) true nil))))
 
 (defn- stb13
   [indexes]
@@ -269,7 +269,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries.")))
+    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries." #(if (empty? %) true nil))))
 
 (defn- stb14
   [indexes]

@@ -43,7 +43,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "PERF01" res true "The technology does not contain any behaviours.")))
+    (standard-binary-validation "PERF01" res true "The technology does not contain any behaviours." #(if (empty? %) true nil))))
 
 (defn- perf02
   [indexes]
