@@ -93,3 +93,7 @@
 (def tests
   "List of SEC validation functions."
   [sec02 sec03 sec04 sec05])
+
+(def missing-tests
+  "List of SEC tests that aren't yet implemented."
+  ["SEC01"])

@@ -370,3 +370,8 @@
 (def tests
   "List of STB validation functions."
   [stb03 stb04 stb06 stb07 stb08 stb09 stb10 stb12 stb13 stb14 stb15 stb18 stb19 stb20 stb22])
+
+(def missing-tests
+  "List of STB tests that aren't yet implemented."
+  ["STB01" "STB02" "STB05" "STB11" "STB16" "STB17" "STB21"])
+

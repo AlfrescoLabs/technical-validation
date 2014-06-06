@@ -27,3 +27,7 @@
 (def tests
   "List of LGL validation functions."
   [])
+
+(def missing-tests
+  "List of LGL tests that aren't yet implemented."
+  ["LGL01" "LGL02"])

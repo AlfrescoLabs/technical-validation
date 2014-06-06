@@ -51,3 +51,7 @@
 (def tests
   "List of DEV validation functions."
   [dev02])
+
+(def missing-tests
+  "List of DEV tests that aren't yet implemented."
+  ["DEV01"])

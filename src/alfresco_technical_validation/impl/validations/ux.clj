@@ -16,18 +16,18 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.impl.validations.cm
+(ns alfresco-technical-validation.impl.validations.ux
   (:require [clojure.string                          :as s]
             [clojure.tools.logging                   :as log]
             [clojurewerkz.neocons.rest               :as nr]
             [clojurewerkz.neocons.rest.cypher        :as cy]
             [alfresco-technical-validation.impl.util :refer :all]))
 
+
 (def tests
-  "List of CM validation functions."
+  "List of UX validation functions."
   [])
 
 (def missing-tests
-  "List of CM tests that aren't yet implemented."
-  ["CM01"])
-
+  "List of UX tests that aren't yet implemented."
+  ["UX01"])

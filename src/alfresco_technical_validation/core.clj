@@ -30,6 +30,7 @@
             [alfresco-technical-validation.impl.validations.perf :as val-perf]
             [alfresco-technical-validation.impl.validations.sec  :as val-sec]
             [alfresco-technical-validation.impl.validations.stb  :as val-stb]
+            [alfresco-technical-validation.impl.validations.ux   :as val-ux]
             [alfresco-technical-validation.impl.validations.up   :as val-up]
             [alfresco-technical-validation.impl.validations.lgl  :as val-lgl]
             [bookmark-writer.core                                :as bw]
@@ -44,8 +45,20 @@
                                       val-perf/tests
                                       val-sec/tests
                                       val-stb/tests
+                                      val-ux/tests
                                       val-up/tests
                                       val-lgl/tests))
+
+(def ^:private missing-tests (concat val-api/missing-tests
+                                     val-cm/missing-tests
+                                     val-dev/missing-tests
+                                     val-com/missing-tests
+                                     val-perf/missing-tests
+                                     val-sec/missing-tests
+                                     val-stb/missing-tests
+                                     val-ux/missing-tests
+                                     val-up/missing-tests
+                                     val-lgl/missing-tests))
 
 (defn- result-to-bookmark
   [result]
@@ -53,14 +66,21 @@
         passes      (:passes      result)
         message     (:message     result)]
     (if (nil? passes)
-      { (str criteria-id "_Evidence") message }
+      { (str criteria-id "_Evidence")    message
+        (str criteria-id "_DoesNotMeet") "#### UNKNOWN: Manual followup required. ####"
+        (str criteria-id "_Meets")       "" }
       (if passes
         { (str criteria-id "_Evidence")    message
           (str criteria-id "_DoesNotMeet") ""
           (str criteria-id "_Remedy")      "" }
         { (str criteria-id "_Evidence")    message
           (str criteria-id "_Meets")       ""
-          (str criteria-id "_NoRemedy")    "" }))))
+          (str criteria-id "_NoRemedy")    "" } ))))
+
+(defn- missing-test-to-bookmark
+  [criteria-id]
+  { (str criteria-id "_DoesNotMeet") "#### UNKNOWN: This criterion isn't checked by the tool yet. ####"
+    (str criteria-id "_Meets")       "" } )
 
 (defn- build-loc-bookmarks
   [locs type]
@@ -213,11 +233,12 @@
   ([source binaries neo4j-url report-filename]           (validate-and-write-report source binaries neo4j-url report-filename nil))
   ([source binaries neo4j-url report-filename status-fn] (validate-and-write-report (index-extension source binaries neo4j-url status-fn) report-filename status-fn))
   ([indexes report-filename status-fn]
-   (let [loc-bookmarks        (count-locs       indexes)
-         global-bookmarks     (global-bookmarks indexes)
-         validation-results   (validate         indexes status-fn)
-         results-as-bookmarks (into {} (map result-to-bookmark validation-results))
-         all-bookmarks        (merge loc-bookmarks global-bookmarks results-as-bookmarks)]
+   (let [loc-bookmarks              (count-locs       indexes)
+         global-bookmarks           (global-bookmarks indexes)
+         validation-results         (validate         indexes status-fn)
+         results-as-bookmarks       (into {} (map result-to-bookmark validation-results))
+         missing-tests-as-bookmarks (into {} (map missing-test-to-bookmark missing-tests))
+         all-bookmarks              (merge loc-bookmarks global-bookmarks results-as-bookmarks missing-tests-as-bookmarks)]
      (if status-fn (status-fn "\nGenerating report... "))
      (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
      nil)))

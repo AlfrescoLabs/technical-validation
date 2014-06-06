@@ -69,3 +69,7 @@
 (def tests
   "List of UP validation functions."
   [up01 up03 up04])
+
+(def missing-tests
+  "List of UP tests that aren't yet implemented."
+  ["UP02"])

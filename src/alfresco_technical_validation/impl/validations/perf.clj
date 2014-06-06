@@ -75,3 +75,7 @@
 (def tests
   "List of PERF validation functions."
   [perf01 perf02 perf03])
+
+(def missing-tests
+  "List of PERF tests that aren't yet implemented."
+  [])

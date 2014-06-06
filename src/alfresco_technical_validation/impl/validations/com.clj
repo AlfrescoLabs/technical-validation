@@ -179,3 +179,7 @@
 (def tests
   "List of COM validation functions."
   [com01 com03 com04 com06 com08 com09])
+
+(def missing-tests
+  "List of COM tests that aren't yet implemented."
+  ["COM02" "COM05" "COM07" "COM10"])

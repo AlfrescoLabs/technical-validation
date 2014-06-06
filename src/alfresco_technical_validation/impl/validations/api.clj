@@ -124,3 +124,8 @@
 (def tests
   "List of API validation functions."
   [api01 api05 api06])
+
+(def missing-tests
+  "List of API tests that aren't yet implemented."
+  ["API02" "API03" "API04"])
+
