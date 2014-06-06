@@ -17,7 +17,8 @@
 ;
 
 (ns alfresco-technical-validation.impl.util
-  (:require [clojure.tools.logging :as log]
+  (:require [clojure.string        :as s]
+            [clojure.tools.logging :as log]
             [clojure.java.io       :as io]
             ))
 
@@ -31,3 +32,33 @@
      { :criteria-id criteria-id
        :passes      passes
        :message     message } )))
+
+(defn standard-binary-validation
+  ([criteria-id query-result manual-followup-required success-message]
+   (standard-binary-validation criteria-id query-result manual-followup-required success-message empty?))
+  ([criteria-id query-result manual-followup-required success-message comparison-fn]
+   (let [query-result-as-string (s/join "\n"
+                                        (map #(str (get % "ClassName")
+                                                   " uses "
+                                                   (s/join ", " (get % "APIs")))
+                                             query-result))
+         message                (if (empty? query-result-as-string) success-message query-result-as-string)]
+     (declare-result criteria-id
+                     (comparison-fn query-result)
+                     (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
+
+(defn standard-source-validation
+  ([source content-index regex-id criteria-id message-header manual-followup-required success-message]
+   (standard-source-validation source content-index regex-id criteria-id message-header manual-followup-required success-message empty?))
+  ([source content-index regex-id criteria-id message-header manual-followup-required success-message comparison-fn]
+   (let [matches (filter #(= regex-id (:regex-id %)) content-index)
+         message (if (empty? matches)
+                   success-message
+                   (str message-header ":\n"
+                                (s/join "\n"
+                                        (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %)))
+                                             matches))))]
+       (declare-result criteria-id
+                       (comparison-fn matches)
+                       (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
+

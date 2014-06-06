@@ -17,18 +17,35 @@
 ;
 
 (ns alfresco-technical-validation.core
-  (:require [clojure.string                                       :as s]
-            [clojure.tools.logging                                :as log]
-            [clojure.java.io                                      :as io]
-            [clojurewerkz.neocons.rest.cypher                     :as cy]
-            [alfresco-technical-validation.impl.indexer           :as idx]
-            [alfresco-technical-validation.impl.binary-validation :as bin]
-            [alfresco-technical-validation.impl.source-validation :as src]
-            [alfresco-technical-validation.impl.loc-counter       :as loc]
-            [bookmark-writer.core                                 :as bw]
-            [multigrep.core                                       :as mg]))
+  (:require [clojure.string                                      :as s]
+            [clojure.tools.logging                               :as log]
+            [clojure.java.io                                     :as io]
+            [clojurewerkz.neocons.rest.cypher                    :as cy]
+            [alfresco-technical-validation.impl.indexer          :as idx]
+            [alfresco-technical-validation.impl.loc-counter      :as loc]
+            [alfresco-technical-validation.impl.validations.api  :as val-api]
+            [alfresco-technical-validation.impl.validations.cm   :as val-cm]
+            [alfresco-technical-validation.impl.validations.dev  :as val-dev]
+            [alfresco-technical-validation.impl.validations.com  :as val-com]
+            [alfresco-technical-validation.impl.validations.perf :as val-perf]
+            [alfresco-technical-validation.impl.validations.sec  :as val-sec]
+            [alfresco-technical-validation.impl.validations.stb  :as val-stb]
+            [alfresco-technical-validation.impl.validations.up   :as val-up]
+            [alfresco-technical-validation.impl.validations.lgl  :as val-lgl]
+            [bookmark-writer.core                                :as bw]
+            [multigrep.core                                      :as mg]))
 
 (def ^:private report-template (io/resource "alfresco-technical-validation-template.docx"))
+
+(def ^:private validation-fns (concat val-api/tests
+                                      val-cm/tests
+                                      val-dev/tests
+                                      val-com/tests
+                                      val-perf/tests
+                                      val-sec/tests
+                                      val-stb/tests
+                                      val-up/tests
+                                      val-lgl/tests))
 
 (defn- result-to-bookmark
   [result]
@@ -180,24 +197,15 @@
   "Indexes an extension, given its source, binaries, and with a Neo4J server running at neo4j-url."
   ([source binaries neo4j-url] (index-extension source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn]
-   (if status-fn (status-fn "Analysing extension... "))
-   (assoc (idx/indexes neo4j-url binaries source) :binaries binaries :source source)))
+   (assoc (idx/indexes neo4j-url binaries source status-fn) :binaries binaries :source source)))
 
 (defn validate
   "Validates the given source and binaries."
   ([source binaries neo4j-url]           (validate source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn] (validate (index-extension source binaries neo4j-url status-fn) status-fn))
   ([indexes status-fn]
-   (let [source                    (:source       indexes)
-         source-index              (:source-index indexes)
-         binaries                  (:binaries     indexes)
-         binary-index              (:binary-index indexes)
-         _                         (if status-fn (status-fn "\nValidating criteria... "))
-         source-validation-results (src/validate source source-index)
-         binary-validation-results (bin/validate binary-index)
-         validation-results        (concat source-validation-results
-                                           binary-validation-results)]
-     validation-results)))
+    (if status-fn (status-fn "\nValidating criteria... "))
+    (map #(% indexes) validation-fns)))
 
 (defn validate-and-write-report
   "Validates the given source and binaries, using the Neo4J server available at the given URL,

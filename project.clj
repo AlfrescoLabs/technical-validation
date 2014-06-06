@@ -45,5 +45,6 @@
              :uberjar {:aot :all}}
   :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Awaiting Leiningen 2.3.5 - see https://github.com/technomancy/leiningen/issues/1455
   :main alfresco-technical-validation.main
+;  :jvm-opts ["-server" "-agentpath:/Applications/YourKit/bin/mac/libyjpagent.jnilib"]
   :jvm-opts ["-server"]
   :bin {:name "atv"})

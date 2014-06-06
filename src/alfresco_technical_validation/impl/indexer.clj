@@ -46,7 +46,7 @@
   [file-index]
   (flatten (map #(build-content-index-for-file-type % file-index) (keys content-regexes-by-file-type))))
 
-(defn index-source
+(defn- index-source
   "Indexes the sources in the given location and returns an in-memory index."
   [source]
   (let [source-files         (file-seq (io/file source))
@@ -55,7 +55,7 @@
     { :source-files-by-type source-files-by-type
       :source-content-index source-content-index }))
 
-(defn index-binaries
+(defn- index-binaries
   "Indexes the binaries in the given location to the specified Neo4J server."
   [neo4j-url binaries]
   (let [classes-info (dr/classes-info binaries)]
@@ -63,6 +63,12 @@
 
 (defn indexes
   "Returns a map containing the :binary-index and the :source-index."
-  [neo4j-url binaries source]
-  { :binary-index (index-binaries neo4j-url binaries)
-    :source-index (index-source source) })
+  ([neo4j-url binaries source]
+    (indexes neo4j-url binaries source nil))
+  ([neo4j-url binaries source status-fn]
+    (let [_            (if status-fn (status-fn "Indexing binaries... "))
+          binary-index (index-binaries neo4j-url binaries)
+          _            (if status-fn (status-fn "\nIndexing source... "))
+          source-index (index-source source)]
+  { :binary-index binary-index
+    :source-index source-index } )))
