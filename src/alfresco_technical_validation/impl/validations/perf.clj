@@ -23,6 +23,28 @@
             [clojurewerkz.neocons.rest.cypher        :as cy]
             [alfresco-technical-validation.impl.util :refer :all]))
 
+; Would be preferable to do a deeper search here, but Neo4J is super slow at those
+(defn- perf01
+  [indexes]
+  (let [con (:binary-index indexes)
+        res (cy/tquery con
+                       "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(n.package)
+                           AND NOT(n.package =~ 'org.apache..*')
+                           AND NOT(n.package =~ 'com.google..*')
+                           AND NOT(n.package =~ 'com.sap..*')
+                           AND HAS(m.name)
+                           AND m.name IN [
+                                           'org.alfresco.repo.policy.Behaviour'
+                                         ]
+                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                         ORDER BY n.name
+                       ")]
+    (standard-binary-validation "PERF01" res true "The technology does not contain any behaviours.")))
+
 (defn- perf02
   [indexes]
   (let [source        (:source       indexes)
@@ -52,4 +74,4 @@
 
 (def tests
   "List of PERF validation functions."
-  [perf02 perf03])
+  [perf01 perf02 perf03])
