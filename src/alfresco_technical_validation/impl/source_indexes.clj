@@ -54,6 +54,7 @@
       }
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
+        :stb11          #"(?:^|\s)catch(?:\s|$)"
       }
     :javascript {
         :sec05          #"(?:^|\s)eval\("

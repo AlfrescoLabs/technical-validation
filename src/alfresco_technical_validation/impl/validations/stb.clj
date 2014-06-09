@@ -200,6 +200,20 @@
                        ")]
     (standard-binary-validation "STB10" res false "The technology does not use threading APIs.")))
 
+(defn- stb11
+  [indexes]
+  (let [source        (:source       indexes)
+        source-index  (:source-index indexes)
+        content-index (:source-content-index source-index)]
+    (standard-source-validation source
+                                content-index
+                                :stb11
+                                "STB11"
+                                "Catch clauses that require manual inspection"
+                                true
+                                "#### Manual followup required - the technology does not catch exceptions anywhere, which seems suspicious ."
+                                (constantly nil))))
+
 (defn- stb12
   [indexes]
   (let [con (:binary-index indexes)
@@ -369,9 +383,9 @@
 
 (def tests
   "List of STB validation functions."
-  [stb03 stb04 stb06 stb07 stb08 stb09 stb10 stb12 stb13 stb14 stb15 stb18 stb19 stb20 stb22])
+  [stb03 stb04 stb06 stb07 stb08 stb09 stb10 stb11 stb12 stb13 stb14 stb15 stb18 stb19 stb20 stb22])
 
 (def missing-tests
   "List of STB tests that aren't yet implemented."
-  ["STB01" "STB02" "STB05" "STB11" "STB16" "STB17" "STB21"])
+  ["STB01" "STB02" "STB05" "STB16" "STB17" "STB21"])
 
