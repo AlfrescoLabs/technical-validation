@@ -26,27 +26,33 @@
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- dev02
   [indexes]
-  (let [con (:binary-index indexes)
-        res (cy/tquery con
-                       "
-                         START n=NODE(*)
-                         MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
-                           AND NOT(n.package =~ 'org.apache..*')
-                           AND NOT(n.package =~ 'com.google..*')
-                           AND NOT(n.package =~ 'com.sap..*')
-                           AND HAS(m.name)
-                           AND m.name IN [
-                                           'org.springframework.extensions.webscripts.WebScript',
-                                           'org.springframework.extensions.webscripts.AbstractWebScript',
-                                           'org.springframework.extensions.webscripts.DeclarativeWebScript',
-                                           'org.springframework.extensions.webscripts.atom.AtomWebScript'
-                                         ]
-                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
-                         ORDER BY n.name
-                       ")]
-    (standard-binary-validation "DEV02" res false "The technology does not contain any Java-backed Web Scripts.")))
+  (let [source          (:source       indexes)
+        source-index    (:source-index indexes)
+        content-index   (:source-content-index source-index)
+        webscript-count (count (:web-script-descriptor (:source-files-by-type source-index)))
+        con             (:binary-index indexes)
+        res             (cy/tquery con
+                                   "
+                                     START n=NODE(*)
+                                     MATCH (n)-->(m)
+                                     WHERE HAS(n.name)
+                                       AND HAS(n.package)
+                                       AND NOT(n.package =~ 'org.apache..*')
+                                       AND NOT(n.package =~ 'com.google..*')
+                                       AND NOT(n.package =~ 'com.sap..*')
+                                       AND HAS(m.name)
+                                       AND m.name IN [
+                                                       'org.springframework.extensions.webscripts.WebScript',
+                                                       'org.springframework.extensions.webscripts.AbstractWebScript',
+                                                       'org.springframework.extensions.webscripts.DeclarativeWebScript',
+                                                       'org.springframework.extensions.webscripts.atom.AtomWebScript'
+                                                     ]
+                                    RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                                     ORDER BY n.name
+                                   ")
+        java-webscript-count (count res)
+        java-webscript-ratio (float (* 100 (/ java-webscript-count webscript-count)))]
+    (declare-result "DEV02" (< java-webscript-ratio 50) (str java-webscript-count " of " webscript-count " Web Scripts are Java-backed."))))
 
 (def tests
   "List of DEV validation functions."
