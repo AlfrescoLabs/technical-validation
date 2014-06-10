@@ -51,7 +51,7 @@ $
 or on Windows:
 
 ```Batchfile
-C:\atv-0.2.0> atv -h
+C:\atv> atv -h
  ------------------------------+-------------------------------+--------------------------------------------------------
   Parameter                    | Default Value                 | Description
  ------------------------------+-------------------------------+--------------------------------------------------------
@@ -61,7 +61,7 @@ C:\atv-0.2.0> atv -h
   -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
   -h, --help                                                     This message
  ------------------------------+-------------------------------+--------------------------------------------------------
-C:\atv-0.2.0> 
+C:\atv> 
 ```
 
 The tool will write a lot of data to the Neo4J database specified in the command line parameters - it is strongly
