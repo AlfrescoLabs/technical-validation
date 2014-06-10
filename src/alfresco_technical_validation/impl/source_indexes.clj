@@ -57,7 +57,7 @@
         :stb11          #"(?:^|\s)catch(?:\s|$)"
       }
     :javascript {
-        :sec05          #"(?:^|\s)eval\("
+        :sec05          #"(?:^|\s)eval\s*\("
       }
     :web-script-descriptor {
         :stb19          #"<transaction>\s*none\s*</transaction>"
@@ -66,7 +66,7 @@
       }
     :spring-app-context {
         :api05          #"(?:^|\s)ref=\s*\"(?!ServiceRegistry)"
-        :stb15          #"parent=\"dictionaryModelBootstrap\""
+        :stb15          #"parent=\s*\"dictionaryModelBootstrap\""
       }
     :content-model {
         :perf02         #"<index\s+enabled\s*=\s*\"true"
