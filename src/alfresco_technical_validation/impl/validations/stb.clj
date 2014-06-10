@@ -216,45 +216,60 @@
 
 (defn- stb12
   [indexes]
-  (let [con (:binary-index indexes)
-        res (cy/tquery con
-                       "
-                         START n=NODE(*)
-                         MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
-                           AND NOT(n.package =~ 'java.*')
-                           AND NOT(n.package =~ 'sun.*')
-                           AND NOT(n.package =~ 'com.sun.*')
-                           AND NOT(n.package =~ 'org.w3c.*')
-                           AND NOT(n.package =~ 'org.apache.*')
-                           AND NOT(n.package =~ 'org.alfresco.*')
-                           AND NOT(n.package =~ 'org.json.*')
-                           AND NOT(n.package =~ 'org.xml.*')
-                           AND NOT(n.package =~ 'org.springframework.*')
-                           AND NOT(n.package =~ 'org.hibernate.*')
-                           AND NOT(n.package =~ 'org.mybatis.*')
-                           AND NOT(n.package =~ 'net.sf.ehcache.*')
-                           AND NOT(n.package =~ 'org.quartz.*')
-                           AND NOT(n.package =~ 'org.mozilla.*')
-                           AND NOT(n.package =~ 'com.google.*')
-                           AND NOT(n.package =~ 'com.sap.*')
-                           AND NOT(n.package =~ 'com.license4j.*')
-                           AND NOT(n.package =~ 'com.aspose.*')
-                           AND NOT(n.package =~ 'asposewobfuscated.*')
-                           AND NOT(n.package =~ 'groovy.*')
-                           AND NOT(n.package =~ 'org.gradle.*')
-                           AND NOT(n.package =~ 'proguard.*')
-                           AND HAS(m.name)
-                           AND m.name IN [
-//                                           'java.lang.Throwable',   // Every class has this dependency
-                                           'java.lang.Error',
-                                           'java.lang.System'
-                                         ]
-                        RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
-                         ORDER BY n.name
-                       ")]
-    (standard-binary-validation "STB12" res true "The technology does not use improper logging techniques." #(if (empty? %) true nil))))
+  (let [source        (:source       indexes)
+        source-index  (:source-index indexes)
+        content-index (:source-content-index source-index)
+        system-print  (:stb12-1 content-index)
+        print-stack   (:stb12-2 content-index)
+        con           (:binary-index indexes)
+        res           (cy/tquery con
+                                 "
+                                   START n=NODE(*)
+                                   MATCH (n)-->(m)
+                                   WHERE HAS(n.name)
+                                     AND HAS(n.package)
+                                     AND NOT(n.package =~ 'java.*')
+                                     AND NOT(n.package =~ 'sun.*')
+                                     AND NOT(n.package =~ 'com.sun.*')
+                                     AND NOT(n.package =~ 'org.w3c.*')
+                                     AND NOT(n.package =~ 'org.apache.*')
+                                     AND NOT(n.package =~ 'org.alfresco.*')
+                                     AND NOT(n.package =~ 'org.json.*')
+                                     AND NOT(n.package =~ 'org.xml.*')
+                                     AND NOT(n.package =~ 'org.springframework.*')
+                                     AND NOT(n.package =~ 'org.hibernate.*')
+                                     AND NOT(n.package =~ 'org.mybatis.*')
+                                     AND NOT(n.package =~ 'net.sf.ehcache.*')
+                                     AND NOT(n.package =~ 'org.quartz.*')
+                                     AND NOT(n.package =~ 'org.mozilla.*')
+                                     AND NOT(n.package =~ 'com.google.*')
+                                     AND NOT(n.package =~ 'com.sap.*')
+                                     AND NOT(n.package =~ 'com.license4j.*')
+                                     AND NOT(n.package =~ 'com.aspose.*')
+                                     AND NOT(n.package =~ 'asposewobfuscated.*')
+                                     AND NOT(n.package =~ 'groovy.*')
+                                     AND NOT(n.package =~ 'org.gradle.*')
+                                     AND NOT(n.package =~ 'proguard.*')
+                                     AND HAS(m.name)
+                                     AND m.name IN [
+//                                                     'java.lang.Throwable',   // Every class has this dependency
+                                                     'java.lang.Error'
+                                                   ]
+                                  RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
+                                   ORDER BY n.name
+                                 ")
+        passes        (= 0 (count system-print) (count print-stack) (count res))
+        message       (if passes
+                        "The technology does not use improper logging techniques."
+                        (s/join "\n"
+                                [
+                                  (if (> (count system-print) 0)
+                                    (build-source-message source "Uses of System.out.print* / System.err.print*" system-print))
+                                  (if (> (count print-stack) 0)
+                                    (build-source-message source "Uses of printStackTrace" print-stack))
+                                  (if (> (count res) 0)
+                                    (build-binary-message res))]))]
+    (declare-result "STB12" passes message)))
 
 (defn- stb13
   [indexes]

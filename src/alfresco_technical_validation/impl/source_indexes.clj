@@ -55,6 +55,8 @@
     :java {
         :stb08-stb09    #"(?:^|\s)synchronized(?:\s|$)"
         :stb11          #"(?:^|\s)catch(?:\s|$)"
+        :stb12-1        #"System\.(out|err)\.print"
+        :stb12-2        #"printStackTrace"
       }
     :javascript {
         :sec05          #"(?:^|\s)eval\s*\("

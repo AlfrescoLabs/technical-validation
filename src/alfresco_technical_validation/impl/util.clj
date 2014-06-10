@@ -33,19 +33,30 @@
        :passes      passes
        :message     message } )))
 
+(defn build-binary-message
+  [query-result]
+  (s/join "\n"
+          (map #(str (get % "ClassName")
+                     " uses "
+                     (s/join ", " (get % "APIs")))
+               query-result)))
+
 (defn standard-binary-validation
   ([criteria-id query-result manual-followup-required success-message]
    (standard-binary-validation criteria-id query-result manual-followup-required success-message empty?))
   ([criteria-id query-result manual-followup-required success-message comparison-fn]
-   (let [query-result-as-string (s/join "\n"
-                                        (map #(str (get % "ClassName")
-                                                   " uses "
-                                                   (s/join ", " (get % "APIs")))
-                                             query-result))
+   (let [query-result-as-string (build-binary-message query-result)
          message                (if (empty? query-result-as-string) success-message query-result-as-string)]
      (declare-result criteria-id
                      (comparison-fn query-result)
                      (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
+
+(defn build-source-message
+  [source header matches]
+  (str header ":\n"
+       (s/join "\n"
+               (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %)))
+                    matches))))
 
 (defn standard-source-validation
   ([source content-index regex-id criteria-id message-header manual-followup-required success-message]
@@ -54,10 +65,7 @@
    (let [matches (filter #(= regex-id (:regex-id %)) content-index)
          message (if (empty? matches)
                    success-message
-                   (str message-header ":\n"
-                                (s/join "\n"
-                                        (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %)))
-                                             matches))))]
+                   (build-source-message source message-header matches))]
        (declare-result criteria-id
                        (comparison-fn matches)
                        (if manual-followup-required (str message "\n#### Manual followup required. ####") message)))))
