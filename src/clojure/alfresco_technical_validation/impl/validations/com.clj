@@ -182,4 +182,4 @@
 
 (def missing-tests
   "List of COM tests that aren't yet implemented."
-  ["COM02" "COM05" "COM07" "COM10"])
+  ["COM02" "COM05" "COM07" "COM10" "COM11"])

@@ -43,6 +43,8 @@
                                  ]
                    :plugins      [[lein-midje "3.1.3"]]}   ; Don't remove this or travis-ci will assplode!
              :uberjar {:aot :all}}
+  :source-paths      ["src/clojure"]
+  :java-source-paths ["src/java"]
   :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Awaiting Leiningen 2.3.5 - see https://github.com/technomancy/leiningen/issues/1455
   :main alfresco-technical-validation.main
 ;  :jvm-opts ["-server" "-agentpath:/Applications/YourKit/bin/mac/libyjpagent.jnilib"]
