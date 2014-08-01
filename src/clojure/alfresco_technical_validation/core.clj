@@ -246,12 +246,12 @@
 (defn- java-ify-result
   "Converts a single validation result into something Java can digest.  Specifically it replaces keyword keys with strings."
   [result]
-  (into {} (remove #(nil? (val %)))
+  (into {} (remove #(nil? (val %))
     {
       "criteriaId" (:criteria-id result)
       "passes"     (:passes      result)
       "message"    (:message     result)
-    }))
+    })))
 
 (defn validate-java
   "Validates the given source and binaries, returning a Java-friendly result."

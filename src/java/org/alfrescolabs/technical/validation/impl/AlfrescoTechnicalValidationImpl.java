@@ -30,21 +30,28 @@ import org.alfrescolabs.technical.validation.*;
 public class AlfrescoTechnicalValidationImpl
     implements AlfrescoTechnicalValidation
 {
+    private final IFn techValImpl;
+
+    public AlfrescoTechnicalValidationImpl()
+    {
+        // Bootstrap Clojure RT
+        IFn require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("alfresco-technical-validation.core"));
+        
+        techValImpl = Clojure.var("alfresco-technical-validation.core", "validate-java");
+    }
+
     @Override
     public List<Map<String,Object>> validate(final String sourceLocation,
                                              final String binaryLocation,
                                              final String neo4jUrl)
     {
-        IFn techValImpl = null;
-
         // PRECONDITIONS
         assert sourceLocation != null && sourceLocation.trim().length() > 0 : "sourceLocation must not be null, empty or blank.";
         assert binaryLocation != null && binaryLocation.trim().length() > 0 : "binaryLocation must not be null, empty or blank.";
         assert neo4jUrl       != null && neo4jUrl.trim().length()       > 0 : "neo4jUrl must not be null, empty or blank.";
 
         // BODY
-        techValImpl = Clojure.var("alfresco-technical-validation.core", "validate-java");
-
         @SuppressWarnings("unchecked")
         List<Map<String,Object>> result = (List<Map<String,Object>>)techValImpl.invoke(sourceLocation, binaryLocation, neo4jUrl);
 
