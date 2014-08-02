@@ -73,9 +73,9 @@ the source code or binaries of your extension - they are only read).
 
 ## Programmatic Access to the Tool
 
-If you wish to use the tool as a library, it's available as a Maven artifact from [Clojars](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation):
+If you wish to use the tool as a library, it's available as a Maven artifact from [Clojars](https://clojars.org/org.alfrescolabs.alfresco-technical-validation):
 
-[![version](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation/latest-version.svg)](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation)
+[![version](https://clojars.org/org.alfrescolabs.alfresco-technical-validation/latest-version.svg)](https://clojars.org/org.alfrescolabs.alfresco-technical-validation)
 
 The library's functionality is provided in the `alfresco-technical-validation.core` namespace, specifically
 these functions:
