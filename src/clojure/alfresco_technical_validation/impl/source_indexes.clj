@@ -67,8 +67,9 @@
         :sec03          #"<authentication>\s*none\s*</authentication>"
       }
     :spring-app-context {
-        :api05          #"(?:^|\s)ref=\s*\"(?!ServiceRegistry)"
-        :stb15          #"parent=\s*\"dictionaryModelBootstrap\""
+        :api05          #"(?:^|\s)ref\s*=\s*\"(?!ServiceRegistry)"
+        :stb15          #"parent\s*=\s*\"dictionaryModelBootstrap\""
+        :com10          #"<bean[^>]*id\s*=\s*\"([^\"]*)\""
       }
     :content-model {
         :perf02         #"<index\s+enabled\s*=\s*\"true"

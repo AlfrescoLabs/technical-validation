@@ -152,10 +152,10 @@
                            (s/join "\n"
                                    (distinct (map #(second (first (:re-seq %)))
                                               matches))))]
-      (declare-result "COM08"
-                      (if (empty? matches)
-                        "No content model namespaces defined."
-                        (str message "\n#### Manual followup required - check that content model prefixes are sufficiently unique. ####")))))
+      (if (empty? matches)
+        (declare-result "COM08" true "The technology does not define any content model namespaces.")
+        (declare-result "COM08" (str message "\n#### Manual followup required - check that these content model prefixes are sufficiently unique. ####")))))
+
 (defn- com09
   [indexes]
   (let [con (:binary-index indexes)
@@ -176,10 +176,24 @@
       (declare-result "COM09" true "The technology does not use the Search APIs.")
       (declare-result "COM09" message))))
 
+(defn- com10
+  [indexes]
+  (let [source        (:source       indexes)
+        source-index  (:source-index indexes)
+        content-index (:source-content-index source-index)
+        matches       (filter #(= :com10 (:regex-id %)) content-index)
+        message       (str "Bean id(s):\n"
+                           (s/join "\n"
+                                   (distinct (map #(second (first (:re-seq %)))
+                                              matches))))]
+      (if (empty? matches)
+        (declare-result "COM10" true "The technology does not define any Spring beans.")
+        (declare-result "COM10" (str message "\n#### Manual followup required - check that these bean ids are sufficiently unique. ####")))))
+
 (def tests
   "List of COM validation functions."
-  [com01 com03 com04 com06 com08 com09])
+  [com01 com03 com04 com06 com08 com09 com10])
 
 (def missing-tests
   "List of COM tests that aren't yet implemented."
-  ["COM02" "COM05" "COM07" "COM10" "COM11"])
+  ["COM02" "COM05" "COM07" "COM11"])

@@ -34,10 +34,10 @@ public class AlfrescoTechnicalValidationImpl
 
     public AlfrescoTechnicalValidationImpl()
     {
-        // Bootstrap Clojure RT
+        // Bootstrap Clojure runtime and squirrel away a reference to the technical validation tool's entry point function
         IFn require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("alfresco-technical-validation.core"));
-        
+
         techValImpl = Clojure.var("alfresco-technical-validation.core", "validate-java");
     }
 
