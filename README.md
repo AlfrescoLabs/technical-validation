@@ -71,6 +71,36 @@ recommended that that database be empty prior to each run of the tool.  It will 
 .docx format) to disk.  Other than that it will not modify anything else on the machine its run on (most especially
 the source code or binaries of your extension - they are only read).
 
+## Programmatic Access to the Tool
+
+If you wish to use the tool as a library, it's available as a Maven artifact from [Clojars](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation):
+
+[![version](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation/latest-version.svg)](https://clojars.org/groups/org.alfrescolabs.alfresco-technical-validation)
+
+The library's functionality is provided in the `alfresco-technical-validation.core` namespace, specifically
+these functions:
+
+```clojure
+user=> (require '[alfresco-technical-validation.core :as atv])
+nil
+user=> (doc atv/validate)
+-------------------------
+alfresco-technical-validation.core/validate
+([source binaries neo4j-url] [source binaries neo4j-url status-fn] [indexes status-fn])
+  Validates the given source and binaries.
+nil
+user=> (doc atv/validate-and-write-report)
+-------------------------
+alfresco-technical-validation.core/validate-and-write-report
+([source binaries neo4j-url report-filename] [source binaries neo4j-url report-filename status-fn] [indexes report-filename status-fn])
+  Validates the given source and binaries, using the Neo4J server available at the given URL,
+  writing the report to the specified Word document.
+nil
+```
+
+As of v0.4.0, preliminary Java access has been added to the tool - please see
+[this worked example](https://github.com/AlfrescoLabs/technical-validation-java-example) for details.
+
 ## Developer Information
 
 [GitHub project](https://github.com/AlfrescoLabs/technical-validation)
