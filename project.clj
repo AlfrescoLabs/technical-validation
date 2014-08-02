@@ -16,12 +16,12 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(defproject org.alfrescolabs.alfresco-technical-validation "0.4.0-SNAPSHOT"
+(defproject org.alfrescolabs.alfresco-technical-validation "0.4.0"
   :description      "Performs technical validation of an Alfresco extension."
   :url              "https://github.com/pmonks/depends"
   :license          {:name "Apache License, Version 2.0"
                      :url "http://www.apache.org/licenses/LICENSE-2.0"}
-  :min-lein-version "2.0.0"
+  :min-lein-version "2.4.0"
   :javac-target     "1.7"
   :dependencies [
                   [org.clojure/clojure                "1.6.0"]
@@ -37,16 +37,10 @@
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
                   [org.clojars.pmonks/spinner         "0.2.0"]
                 ]
-  :profiles {:dev {:dependencies [
-                                   [midje          "1.6.3"]
-                                   [clj-ns-browser "1.3.1"]
-                                 ]
-                   :plugins      [[lein-midje "3.1.3"]]}   ; Don't remove this or travis-ci will assplode!
-             :uberjar {:aot :all}}
+  :profiles {:uberjar {:aot :all}}
   :source-paths      ["src/clojure"]
   :java-source-paths ["src/java"]
-  :uberjar-merge-with {#"META-INF/services/.*" [slurp str spit]}   ; Awaiting Leiningen 2.3.5 - see https://github.com/technomancy/leiningen/issues/1455
   :main alfresco-technical-validation.main
-;  :jvm-opts ["-server" "-agentpath:/Applications/YourKit/bin/mac/libyjpagent.jnilib"]
+;  :jvm-opts ["-server" "-agentpath:/Applications/YourKit/bin/mac/libyjpagent.jnilib"]   ; To allow YourKit profiling
   :jvm-opts ["-server"]
   :bin {:name "atv"})
