@@ -24,7 +24,7 @@ by pinpointing potentially problematic areas of the code for further manual inve
 Note: these dependencies should be installed via your OS package manager, where possible.  On Mac OSX,
 I strongly recommend [Homebrew](http://brew.sh/).
 
-## Installation
+## Configuration
 
 Ensure "auto indexing" is enabled in Neo4J for the properties "name", "package" and "typename".  These are set in
 the neo4j.properties file.
