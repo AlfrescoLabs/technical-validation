@@ -31,8 +31,7 @@ public interface AlfrescoTechnicalValidation
      *
      * The returned data structure is a list of maps, with each entry in the list representing the
      * result of a single validation criteria. Note that not all validation criteria are checked by the
-     * tool yet; those that aren't are not included in the result list (note: this may change in a
-     * future version).
+     * tool yet - those criteria are included in the result but are marked as not being checked.
      * 
      * Each result map may have the following keys:
      * 
