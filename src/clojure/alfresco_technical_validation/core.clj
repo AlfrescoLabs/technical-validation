@@ -264,4 +264,4 @@
   ([source binaries neo4j-url]           (validate-java source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn] (validate-java (index-extension source binaries neo4j-url status-fn) status-fn))
   ([indexes status-fn]
-    (doall (concat (map java-ify-result (validate indexes status-fn)) (java-ify-missing-results)))))
+    (doall (sort-by #(get % "criteriaId") (concat (map java-ify-result (validate indexes status-fn)) (java-ify-missing-results))))))
