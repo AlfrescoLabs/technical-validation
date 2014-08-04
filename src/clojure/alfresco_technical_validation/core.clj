@@ -246,17 +246,22 @@
 (defn- java-ify-result
   "Converts a single validation result into something Java can digest.  Specifically it replaces keyword keys with strings."
   [result]
-  (into {} (remove #(nil? (val %))
-    {
-      "criteriaId" (:criteria-id result)
-      "passes"     (:passes      result)
-      "message"    (:message     result)
-    })))
+  (into {}
+        (remove #(nil? (val %))
+                {
+                  "criteriaId" (:criteria-id result)
+                  "checked"    true
+                  "passes"     (:passes      result)
+                  "message"    (:message     result)
+                })))
+
+(defn- java-ify-missing-results
+  []
+  (map #(hash-map "criteriaId" %, "checked" false) missing-tests))
 
 (defn validate-java
   "Validates the given source and binaries, returning a Java-friendly result."
   ([source binaries neo4j-url]           (validate-java source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn] (validate-java (index-extension source binaries neo4j-url status-fn) status-fn))
   ([indexes status-fn]
-    (doall (map java-ify-result (validate indexes status-fn)))))
-
+    (doall (concat (map java-ify-result (validate indexes status-fn)) (java-ify-missing-results)))))
