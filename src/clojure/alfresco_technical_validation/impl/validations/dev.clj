@@ -51,7 +51,9 @@
                                      ORDER BY n.name
                                    ")
         java-webscript-count (count res)
-        java-webscript-ratio (float (* 100 (/ java-webscript-count webscript-count)))]
+        java-webscript-ratio (if (= 0 webscript-count)
+                               0.0
+                               (float (* 100 (/ java-webscript-count webscript-count))))]
     (declare-result "DEV02" (< java-webscript-ratio 50) (str java-webscript-count " of " webscript-count " Web Scripts are Java-backed."))))
 
 (def tests
