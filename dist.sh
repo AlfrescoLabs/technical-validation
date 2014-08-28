@@ -1,6 +1,7 @@
 #!/bin/sh
-VERSION=0.5.0
+VERSION=0.6.0-SNAPSHOT
 
+echo "Compiling binary distribution..."
 lein clean && lein check && lein bin
 rc=$?
 if [[ $rc != 0 ]] ; then
@@ -18,3 +19,6 @@ fi
 cd target
 zip -r9 ../atv-${VERSION}.zip atv-${VERSION}
 cd ..
+
+echo "Deploying as a library to clojars..."
+lein deploy clojars
