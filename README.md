@@ -30,7 +30,11 @@ Notes:
 ## Configuration
 
 Ensure "auto indexing" is enabled in Neo4J for the properties "name", "package" and "typename".  These are set in
-the neo4j.properties file.
+the neo4j.properties file, as follows:
+```INI
+node_auto_indexing=true
+node_keys_indexable=name,package,typename
+```
 
 ## Installation
 
