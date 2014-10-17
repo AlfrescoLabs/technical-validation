@@ -190,10 +190,30 @@
         (declare-result "COM10" true "The technology does not define any Spring beans.")
         (declare-result "COM10" (str message "\n#### Manual followup required - check that these bean ids are sufficiently unique. ####")))))
 
+(defn- com11
+  [indexes]
+  (let [con (:binary-index indexes)
+        res (cy/tquery con
+                       "
+                         START n=NODE(*)
+                         MATCH (n)-->(m)
+                         WHERE HAS(n.name)
+                           AND HAS(m.name)
+                           AND m.name = 'org.alfresco.service.cmr.attributes.AttributeService'
+                        RETURN DISTINCT n.name AS ClassName
+                         ORDER BY n.name
+                       ")
+        message (str "The following class(es) use the AttributeService:\n"
+                     (s/join "\n" (map #(get % "ClassName") res))
+                     "\n#### Manual followup required - check keys for uniqueness. ####")]
+    (if (empty? res)
+      (declare-result "COM11" true "The technology does not use the AttributeService.")
+      (declare-result "COM11" message))))
+
 (def tests
   "List of COM validation functions."
-  [com01 com03 com04 com06 com08 com09 com10])
+  [com01 com03 com04 com06 com08 com09 com10 com11])
 
 (def missing-tests
   "List of COM tests that aren't yet implemented."
-  ["COM02" "COM05" "COM07" "COM11"])
+  ["COM02" "COM05" "COM07"])
