@@ -47,17 +47,19 @@
 
 (defn- perf02
   [indexes]
-  (let [source        (:source       indexes)
-        source-index  (:source-index indexes)
-        content-index (:source-content-index source-index)]
-    (standard-source-validation source
-                                content-index
-                                :perf02
-                                "PERF02"
-                                "Indexed content model properties"
-                                false
-                                "The technology does not index any content model properties."
-                                #(if (empty? %) true nil))))
+  (let [source                 (:source               indexes)
+        source-index           (:source-index         indexes)
+        content-index          (:source-content-index source-index)
+        property-count         (count (filter #(= :properties (:regex-id %)) content-index))
+        indexed-property-count (count (filter #(= :perf02     (:regex-id %)) content-index))
+        indexed-property-ratio (if (= 0 property-count)
+                                 0.0
+                                 (float (* 100 (/ indexed-property-count property-count))))]
+    (declare-result "PERF02"
+                    (< indexed-property-ratio 50)
+                    (if (= 0 property-count)
+                      "The technology does not define any content model properties."
+                      (str indexed-property-count " of " property-count " content model properties are indexed.")))))
 
 (defn- perf03
   [indexes]
