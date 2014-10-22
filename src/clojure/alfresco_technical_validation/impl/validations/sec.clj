@@ -23,6 +23,20 @@
             [clojurewerkz.neocons.rest.cypher        :as cy]
             [alfresco-technical-validation.impl.util :refer :all]))
 
+(defn- sec01
+  [indexes]
+  (let [source        (:source       indexes)
+        source-index  (:source-index indexes)
+        content-index (:source-content-index source-index)]
+    (standard-source-validation source
+                                content-index
+                                :sec01
+                                "SEC01"
+                                "Bean injections"
+                                true
+                                "The technology does not perform bean injection."
+                                #(if (empty? %) true nil))))
+
 (defn- sec02
   [indexes]
   (let [con (:binary-index indexes)
@@ -92,8 +106,8 @@
 
 (def tests
   "List of SEC validation functions."
-  [sec02 sec03 sec04 sec05])
+  [sec01 sec02 sec03 sec04 sec05])
 
 (def missing-tests
   "List of SEC tests that aren't yet implemented."
-  ["SEC01"])
+  [])

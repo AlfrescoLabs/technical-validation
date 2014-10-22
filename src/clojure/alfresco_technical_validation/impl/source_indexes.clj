@@ -68,6 +68,7 @@
       }
     :spring-app-context {
         :api05          #"(?:^|\s)ref\s*=\s*\"(?!ServiceRegistry)"
+        :sec01          #"(?:^|\s)ref\s*=\s*\"([^\"]+)\""             ; Can this be merged with :api05, without losing fidelity?
         :stb15          #"parent\s*=\s*\"dictionaryModelBootstrap\""
         :com10          #"<bean[^>]*id\s*=\s*\"([^\"]+)\""
       }
