@@ -4,15 +4,15 @@
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
-; 
+;
 ;     http://www.apache.org/licenses/LICENSE-2.0
-; 
+;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-; 
+;
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
@@ -37,7 +37,7 @@
     :validate [#(.exists (clojure.java.io/file %)) "Binary folder or archive must exist"]]
    ["-n" "--neo4j-url NEO4J_URL" "URL of the Neo4J server to use (optional - see default)"
     :default "http://localhost:7474/db/data/"
-    :validate [#(not (or (nil? %) (= 0 (.length ^String %)))) "URL must be provided"]]
+    :validate [#(not (or (nil? %) (zero? (.length ^String %)))) "URL must be provided"]]
    ["-r" "--report-file REPORT_FILE" "The filename of the output report (mandatory)"
     :validate [#(not (.exists (clojure.java.io/file %))) "Report file must not exist"]]
    ["-h" "--help" "This message"]])
