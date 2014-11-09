@@ -4,15 +4,15 @@
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
-; 
+;
 ;     http://www.apache.org/licenses/LICENSE-2.0
-; 
+;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-; 
+;
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
@@ -51,12 +51,12 @@
                                      ORDER BY n.name
                                    ")
         java-webscript-count (count res)
-        java-webscript-ratio (if (= 0 webscript-count)
+        java-webscript-ratio (if (zero? webscript-count)
                                0.0
                                (float (* 100 (/ java-webscript-count webscript-count))))]
     (declare-result "DEV02"
                     (< java-webscript-ratio 50)
-                    (if (= 0 webscript-count)
+                    (if (zero? webscript-count)
                       "The technology does not include any Web Scripts."
                       (str java-webscript-count " of " webscript-count " Web Scripts are Java-backed.")))))
 

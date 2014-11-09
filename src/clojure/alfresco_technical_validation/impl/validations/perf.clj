@@ -4,15 +4,15 @@
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
-; 
+;
 ;     http://www.apache.org/licenses/LICENSE-2.0
-; 
+;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-; 
+;
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
@@ -43,7 +43,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "PERF01" res true "The technology does not contain any behaviours." #(if (empty? %) true nil))))
+    (standard-binary-validation "PERF01" res true "The technology does not contain any behaviours." #(when (empty? %) true))))
 
 (defn- perf02
   [indexes]
@@ -52,12 +52,12 @@
         content-index          (:source-content-index source-index)
         property-count         (count (filter #(= :properties (:regex-id %)) content-index))
         indexed-property-count (count (filter #(= :perf02     (:regex-id %)) content-index))
-        indexed-property-ratio (if (= 0 property-count)
+        indexed-property-ratio (if (zero? property-count)
                                  0.0
                                  (float (* 100 (/ indexed-property-count property-count))))]
     (declare-result "PERF02"
                     (< indexed-property-ratio 50)
-                    (if (= 0 property-count)
+                    (if (zero? property-count)
                       "The technology does not define any content model properties."
                       (str indexed-property-count " of " property-count " content model properties are indexed.")))))
 

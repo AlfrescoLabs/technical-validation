@@ -4,15 +4,15 @@
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
-; 
+;
 ;     http://www.apache.org/licenses/LICENSE-2.0
-; 
+;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-; 
+;
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
@@ -147,7 +147,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "STB07" res true "The technology does not use resources that need to be closed." #(if (empty? %) true nil))))
+    (standard-binary-validation "STB07" res true "The technology does not use resources that need to be closed." #(when (empty? %) true))))
 
 (defn- stb08
   [indexes]
@@ -263,11 +263,11 @@
                         "The technology does not use improper logging techniques."
                         (s/join "\n"
                                 [
-                                  (if (> (count system-print) 0)
+                                  (if (pos? (count system-print))
                                     (build-source-message source "Uses of System.out.print* / System.err.print*" system-print))
-                                  (if (> (count print-stack) 0)
+                                  (if (pos? (count print-stack))
                                     (build-source-message source "Uses of printStackTrace" print-stack))
-                                  (if (> (count res) 0)
+                                  (if (pos? (count res))
                                     (build-binary-message res))]))]
     (declare-result "STB12" passes message)))
 
@@ -298,7 +298,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries." #(if (empty? %) true nil))))
+    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries." #(when (empty? %) true))))
 
 (defn- stb14
   [indexes]
@@ -313,7 +313,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-  (standard-binary-validation "STB14" res true "The technology does not use the Search APIs." #(if (empty? %) true nil))))
+  (standard-binary-validation "STB14" res true "The technology does not use the Search APIs." #(when (empty? %) true))))
 
 (defn- stb15
   [indexes]
