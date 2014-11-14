@@ -12,7 +12,7 @@ Important note: this tool is a beta, and has issues including:
  * Ugly output
  * Confusing output
 
-That said, in careful hands it can greatly expedite the process of technically validating an Alfresco extension,
+That said, in experienced hands it can greatly expedite the process of technically validating an Alfresco extension,
 by pinpointing potentially problematic areas of the code for further manual investigation.
 
 ## Dependencies
