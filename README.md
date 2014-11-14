@@ -4,13 +4,13 @@ Tool for the technical validation of custom code that extends the
 [Alfresco](http://www.alfresco.com) open source document management system.  In other words it's an
 automated AMP file checker (both repo AMPs and Share AMPs).
 
-Important note: this tool is still in alpha, and has issues including:
+Important note: this tool is a beta, and has issues including:
+ * Criteria that require manual followup
  * Criteria that are not yet checked at all
  * False positives
  * False negatives
  * Ugly output
  * Confusing output
- * Implicated in the recent measles outbreak in the United States
 
 That said, in careful hands it can greatly expedite the process of technically validating an Alfresco extension,
 by pinpointing potentially problematic areas of the code for further manual investigation.
@@ -54,7 +54,7 @@ $ ./atv -h
   -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
   -h, --help                                                     This message
  ------------------------------+-------------------------------+--------------------------------------------------------
-$ 
+$
 ```
 
 or on Windows:
@@ -70,7 +70,7 @@ C:\atv> atv -h
   -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
   -h, --help                                                     This message
  ------------------------------+-------------------------------+--------------------------------------------------------
-C:\atv> 
+C:\atv>
 ```
 
 The tool will write a lot of data to the Neo4J database specified in the command line parameters - it is strongly
