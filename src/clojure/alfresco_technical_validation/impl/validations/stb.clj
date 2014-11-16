@@ -298,7 +298,7 @@
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
                        ")]
-    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries." #(when (empty? %) true))))
+    (standard-binary-validation "STB13" res true "The technology does not use common HTTP RPC client libraries." (constantly nil))))
 
 (defn- stb14
   [indexes]
