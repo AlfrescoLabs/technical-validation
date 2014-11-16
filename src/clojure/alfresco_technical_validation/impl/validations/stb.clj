@@ -219,8 +219,8 @@
   (let [source        (:source       indexes)
         source-index  (:source-index indexes)
         content-index (:source-content-index source-index)
-        system-print  (:stb12-1 content-index)
-        print-stack   (:stb12-2 content-index)
+        system-print  (filter #(= :stb12-1 (:regex-id %)) content-index)
+        print-stack   (filter #(= :stb12-2 (:regex-id %)) content-index)
         con           (:binary-index indexes)
         res           (cy/tquery con
                                  "
