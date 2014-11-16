@@ -226,6 +226,15 @@
     (if status-fn (status-fn "\nValidating criteria... "))
     (map #(% indexes) validation-fns)))
 
+(defn count-criteria
+  [validation-results missing-tests]
+  (let [criteria-with-result (filter #(not (nil? (:passes %))) validation-results)
+        criteria-met         (filter :passes criteria-with-result)
+        criteria-unmet       (remove :passes criteria-with-result)]
+    { "Count_CriteriaMet"        (str (count criteria-met))
+      "Count_CriteriaUnmet"      (str (count criteria-unmet))
+      "Count_CriteriaNotChecked" (str (+ (count missing-tests) (- (count validation-results) (count criteria-with-result)))) }))
+
 (defn validate-and-write-report
   "Validates the given source and binaries, using the Neo4J server available at the given URL,
   writing the report to the specified Word document."
@@ -237,7 +246,8 @@
          validation-results         (validate         indexes status-fn)
          results-as-bookmarks       (into {} (map result-to-bookmark validation-results))
          missing-tests-as-bookmarks (into {} (map missing-test-to-bookmark missing-tests))
-         all-bookmarks              (merge loc-bookmarks global-bookmarks results-as-bookmarks missing-tests-as-bookmarks)]
+         criteria-count-bookmarks   (count-criteria validation-results missing-tests)
+         all-bookmarks              (merge criteria-count-bookmarks loc-bookmarks global-bookmarks results-as-bookmarks missing-tests-as-bookmarks)]
      (if status-fn (status-fn "\nGenerating report... "))
      (bw/populate-bookmarks! (io/input-stream report-template) report-filename all-bookmarks)
      nil)))
