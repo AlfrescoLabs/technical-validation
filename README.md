@@ -102,13 +102,6 @@ alfresco-technical-validation.core/validate
 ([source binaries neo4j-url] [source binaries neo4j-url status-fn] [indexes status-fn])
   Validates the given source and binaries.
 nil
-user=> (doc atv/validate-and-write-report)
--------------------------
-alfresco-technical-validation.core/validate-and-write-report
-([source binaries neo4j-url report-filename] [source binaries neo4j-url report-filename status-fn] [indexes report-filename status-fn])
-  Validates the given source and binaries, using the Neo4J server available at the given URL,
-  writing the report to the specified Word document.
-nil
 ```
 
 As of v0.4.0, preliminary Java access has been added to the tool - please see
