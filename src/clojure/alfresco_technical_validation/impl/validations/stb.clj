@@ -123,6 +123,8 @@
                            AND NOT(n.package =~ 'org.gradle.*')
                            AND NOT(n.package =~ 'proguard.*')
                            AND HAS(m.name)
+                           AND (NOT HAS(n.type)
+                                OR n.type = 'class')
                            AND m.name IN [
                                            'org.alfresco.service.cmr.search.ResultSet',
                                            'java.io.Closeable',
