@@ -16,18 +16,16 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.impl.validations.ux
-  (:require [clojure.string                          :as s]
-            [clojure.tools.logging                   :as log]
-            [clojurewerkz.neocons.rest               :as nr]
-            [clojurewerkz.neocons.rest.cypher        :as cy]
-            [alfresco-technical-validation.impl.util :refer :all]))
+(ns alfresco-technical-validation.writers.json
+  (:require [clojure.string        :as s]
+            [clojure.tools.logging :as log]
+            [clojure.java.io       :as io]
+            [clojure.data.json     :as json]))
 
-
-(def tests
-  "List of UX validation functions."
-  [])
-
-(def missing-tests
-  "List of UX tests that aren't yet implemented."
-  ["UX01"])
+(defn write
+  ([validation-results json-filename] (write validation-results json-filename nil))
+  ([validation-results json-filename status-fn]
+   (if status-fn (status-fn "\nGenerating JSON document... "))
+   (with-open [w (io/writer (io/file json-filename))]
+     (json/write validation-results w :escape-unicode false))
+   nil))

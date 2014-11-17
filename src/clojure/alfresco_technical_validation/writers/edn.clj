@@ -16,18 +16,16 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(ns alfresco-technical-validation.impl.validations.ux
-  (:require [clojure.string                          :as s]
-            [clojure.tools.logging                   :as log]
-            [clojurewerkz.neocons.rest               :as nr]
-            [clojurewerkz.neocons.rest.cypher        :as cy]
-            [alfresco-technical-validation.impl.util :refer :all]))
+(ns alfresco-technical-validation.writers.edn
+  (:require [clojure.string        :as s]
+            [clojure.tools.logging :as log]
+            [clojure.java.io       :as io]
+            [clojure.pprint        :as pp]))
 
-
-(def tests
-  "List of UX validation functions."
-  [])
-
-(def missing-tests
-  "List of UX tests that aren't yet implemented."
-  ["UX01"])
+(defn write
+  ([validation-results edn-filename] (write validation-results edn-filename nil))
+  ([validation-results edn-filename status-fn]
+   (if status-fn (status-fn "\nGenerating EDN document... "))
+   (with-open [w (io/writer (io/file edn-filename))]
+     (pp/pprint validation-results w))
+   nil))
