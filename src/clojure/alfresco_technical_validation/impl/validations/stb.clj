@@ -160,7 +160,8 @@
                                 "STB08"
                                 "Uses of synchronized"
                                 false
-                                "The technology does not synchronize.")))
+                                "The technology does not synchronize."
+                                #(when (empty? %) true))))
 
 (defn- stb09
   [indexes]
