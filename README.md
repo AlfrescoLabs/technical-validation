@@ -91,7 +91,7 @@ If you wish to use the tool as a library, it's available as a Maven artifact fro
 [![version](https://clojars.org/org.alfrescolabs.alfresco-technical-validation/latest-version.svg)](https://clojars.org/org.alfrescolabs.alfresco-technical-validation)
 
 The library's functionality is provided in the `alfresco-technical-validation.core` namespace, specifically
-these functions:
+this function:
 
 ```clojure
 user=> (require '[alfresco-technical-validation.core :as atv])
@@ -100,9 +100,12 @@ user=> (doc atv/validate)
 -------------------------
 alfresco-technical-validation.core/validate
 ([source binaries neo4j-url] [source binaries neo4j-url status-fn] [indexes status-fn])
-  Validates the given source and binaries.
+  Validates the given source and binaries, using the neo4j database as a working area.
+  The result is a list of maps, with each map representing the result of validating a single criteria.
 nil
 ```
+Please note that during the beta period the data structure returned by this function is subject to change from version
+to version.
 
 As of v0.4.0, preliminary Java access has been added to the tool - please see
 [this worked example](https://github.com/AlfrescoLabs/technical-validation-java-example) for details.

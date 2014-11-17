@@ -67,7 +67,8 @@
    (doall (assoc (idx/indexes neo4j-url binaries source status-fn) :binaries binaries :source source))))
 
 (defn validate
-  "Validates the given source and binaries."
+  "Validates the given source and binaries, using the neo4j database as a working area.
+  The result is a list of maps, with each map representing the result of validating a single criteria."
   ([source binaries neo4j-url]           (validate source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn] (validate (index-extension source binaries neo4j-url status-fn) status-fn))
   ([indexes status-fn]
