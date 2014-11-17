@@ -16,7 +16,7 @@
 ; This file is part of an unsupported extension to Alfresco.
 ;
 
-(defproject org.alfrescolabs.alfresco-technical-validation "0.6.0-SNAPSHOT"
+(defproject org.alfrescolabs.alfresco-technical-validation "0.6.0"
   :description      "Performs technical validation of an Alfresco extension."
   :url              "https://github.com/pmonks/depends"
   :license          {:name "Apache License, Version 2.0"
@@ -35,7 +35,7 @@
                   [org.clojars.pmonks/depends         "0.3.0"]
                   [org.clojars.pmonks/multigrep       "0.2.0"]
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
-                  [org.clojars.pmonks/spinner         "0.3.0-SNAPSHOT"]
+                  [org.clojars.pmonks/spinner         "0.3.0"]
                 ]
   :profiles {:uberjar {:aot :all}}
   :source-paths      ["src/clojure"]
