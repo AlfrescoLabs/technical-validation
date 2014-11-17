@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=0.6.0-SNAPSHOT
+VERSION=0.6.0
 
 echo "Compiling binary distribution..."
 lein clean && lein check && lein bin
