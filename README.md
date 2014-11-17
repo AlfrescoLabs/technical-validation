@@ -45,15 +45,18 @@ somewhere convenient.
 
 ```shell
 $ ./atv -h
- ------------------------------+-------------------------------+--------------------------------------------------------
-  Parameter                    | Default Value                 | Description
- ------------------------------+-------------------------------+--------------------------------------------------------
-  -s, --source SOURCE                                            Source folder (mandatory)
-  -b, --binaries BINARIES                                        Binary folder or archive (mandatory)
-  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
-  -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
-  -h, --help                                                     This message
- ------------------------------+-------------------------------+--------------------------------------------------------
+ ---------------------------+-------------------------------+--------------------------------------------------------
+  Parameter                 | Default Value                 | Description
+ ---------------------------+-------------------------------+--------------------------------------------------------
+  -s, --source SOURCE                                        Source folder (mandatory)
+  -b, --binaries BINARIES                                    Binary folder or archive (mandatory)
+  -n, --neo4j-url NEO4J_URL  http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
+  -w, --word-file FILE_NAME                                  Produce output as a Word document in the specified file
+  -e, --edn-file FILE_NAME                                   Produce EDN output in the specified file
+  -j, --json-file FILE_NAME                                  Produce JSON output in the specified file
+  -h, --help                                                 This message
+  At least one of -w, -e, or -j must be provided.
+ ---------------------------+-------------------------------+--------------------------------------------------------
 $
 ```
 
@@ -61,15 +64,18 @@ or on Windows:
 
 ```Batchfile
 C:\atv> atv -h
- ------------------------------+-------------------------------+--------------------------------------------------------
-  Parameter                    | Default Value                 | Description
- ------------------------------+-------------------------------+--------------------------------------------------------
-  -s, --source SOURCE                                            Source folder (mandatory)
-  -b, --binaries BINARIES                                        Binary folder or archive (mandatory)
-  -n, --neo4j-url NEO4J_URL      http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
-  -r, --report-file REPORT_FILE                                  The filename of the output report (mandatory)
-  -h, --help                                                     This message
- ------------------------------+-------------------------------+--------------------------------------------------------
+ ---------------------------+-------------------------------+--------------------------------------------------------
+  Parameter                 | Default Value                 | Description
+ ---------------------------+-------------------------------+--------------------------------------------------------
+  -s, --source SOURCE                                        Source folder (mandatory)
+  -b, --binaries BINARIES                                    Binary folder or archive (mandatory)
+  -n, --neo4j-url NEO4J_URL  http://localhost:7474/db/data/  URL of the Neo4J server to use (optional - see default)
+  -w, --word-file FILE_NAME                                  Produce output as a Word document in the specified file
+  -e, --edn-file FILE_NAME                                   Produce EDN output in the specified file
+  -j, --json-file FILE_NAME                                  Produce JSON output in the specified file
+  -h, --help                                                 This message
+  At least one of -w, -e, or -j must be provided.
+ ---------------------------+-------------------------------+--------------------------------------------------------
 C:\atv>
 ```
 
