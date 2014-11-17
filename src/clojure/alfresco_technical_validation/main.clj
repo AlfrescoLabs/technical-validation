@@ -68,7 +68,7 @@
           summary       (:summary   parsed-args)
           errors        (:errors    parsed-args)]
       (if errors
-        (println errors)
+        (doall (map println errors))
         (if (or help (nil? binaries) (nil? source) (and (nil? word-filename) (nil? edn-filename) (nil? json-filename)))
           (println (str " ------------------------------+-------------------------------+--------------------------------------------------------\n"
                         "  Parameter                    | Default Value                 | Description\n"
