@@ -21,7 +21,7 @@
             [clojure.tools.logging :as log]))
 
 
-(def ^:private ^String api-page-url       "http://docs.alfresco.com/4.2/concepts/java-public-api-list.html")
+(def ^:private ^String api-page-url       "http://docs.alfresco.com/5.0/concepts/java-public-api-list.html")
 (def ^:private ^String api-list-open-tag  "<pre class=\"pre codeblock\">")
 (def ^:private ^String api-list-close-tag "</pre>")
 
