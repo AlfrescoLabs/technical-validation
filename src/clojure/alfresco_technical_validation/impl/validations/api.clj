@@ -95,7 +95,7 @@
                                 "API05"
                                 "Bean injections other than ServiceRegistry"
                                 true
-                                "The technology does not perform bean injection."
+                                "The technology does not inject any beans other than the ServiceRegistry."
                                 #(when (empty? %) true))))
 
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
