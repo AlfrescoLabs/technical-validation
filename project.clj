@@ -31,7 +31,7 @@
                   [ch.qos.logback/logback-classic     "1.1.2"]
                   [me.raynes/conch                    "0.7.0"]
                   [jansi-clj                          "0.1.0"]
-                  [io.aviso/pretty                    "0.1.13"]
+                  [io.aviso/pretty                    "0.1.14"]
                   [org.clojars.pmonks/depends         "0.3.0"]
                   [org.clojars.pmonks/multigrep       "0.2.0"]
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
