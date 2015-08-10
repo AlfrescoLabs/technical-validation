@@ -125,7 +125,7 @@ As of v0.4.0, preliminary Java access has been added to the tool - please see
 
 ## License
 
-Copyright © 2013,2014 Peter Monks (pmonks@gmail.com)
+Copyright © 2013,2014,2015 Peter Monks (pmonks@gmail.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
