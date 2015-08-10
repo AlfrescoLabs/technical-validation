@@ -36,6 +36,11 @@ node_auto_indexing=true
 node_keys_indexable=name,package,typename
 ```
 
+As of Neo4J v2.2, you also need to disable security for the server.  This is also specified in the neo4j.properties file, as follows:
+```INI
+dbms.security.auth_enabled=false
+```
+
 ## Installation
 
 Download the [latest release](https://github.com/AlfrescoLabs/technical-validation/releases) and unzip the zip file
