@@ -30,13 +30,13 @@ Notes:
 ## Configuration
 
 Ensure "auto indexing" is enabled in Neo4J for the properties "name", "package" and "typename".  These are set in
-the neo4j.properties file, as follows:
+the ```neo4j.properties``` file, as follows:
 ```INI
 node_auto_indexing=true
 node_keys_indexable=name,package,typename
 ```
 
-As of Neo4J v2.2, you also need to disable security for the server.  This is also specified in the neo4j.properties file, as follows:
+As of Neo4J v2.2, you also need to disable security for the server.  This is specified in the ```neo4j-server.properties``` file, as follows:
 ```INI
 dbms.security.auth_enabled=false
 ```
