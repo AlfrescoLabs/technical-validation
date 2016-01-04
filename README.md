@@ -117,6 +117,12 @@ As of v0.4.0, preliminary Java access has been added to the tool - please see
 
 ## Developer Information
 
+### Architecture
+* Most checks of Java code are done by using ASM to analyze the object files.
+* The ASM output is loaded in to a Neo4J database. (See pmonks/depends)
+* The checks of JavaScript need to be done on source code.
+* Source code checks are done with regular expressions in memory. (See source_indexes.clj)
+
 [GitHub project](https://github.com/AlfrescoLabs/technical-validation)
 
 [Bug Tracker](https://github.com/AlfrescoLabs/technical-validation/issues)
