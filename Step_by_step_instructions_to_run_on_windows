@@ -1,5 +1,26 @@
 Steps by step instruction on how to configure and run ATV in windows
 
+Instructions to compile Clojure on windows:
+-------------------------------------------
+1) Download the lein.bat file from this URL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat. Make sure that the path where lein.bat is downloaded is in the PATH env variable. 
+
+2) You might have to set a JAVA_CMD variable to the path of JDK java command (ex:JAVA_CMD="C:\Program Files\Java\jdk1.8.0_60\bin\java.exe")
+
+3) In windows powershell run "lein self-install" command. This command should create a jar file in $USER_HOME\.lein\self-installs dir($USER_HOME is your home directory on windows)
+
+4) In the $USER_HOME\.lein create a profiles.clj file and add this in the file {:user {:plugins [[lein-bin "0.3.4"]]}} If you already have this file add  lein-bin "0.3.4" as a plugin. 
+
+ex: {:user {:plugins [[lein-difftest "1.3.8"]
+                     [lein-bin "0.3.4"] ]}}
+
+ This  plugin helps to make the jar file an executable one.
+
+5) While in the powershell go to the location where you have downloaded the technical-validation project and run "lein bin" (project.clj file should be present in the path). This should create a atv file in the target directory
+
+6) On windows copy this file to the same location where you have atv.cmd file and execute atv from the command line. 
+
+Configuring and running ATV in Windows:
+--------------------------------------
 1) Make sure you have Java running on your system and JAVA_HOME set correctly
 
 2) Create 4 folders C:\neo4j, C:\neo4j_source, C:\neo4j_amps and C:\atv
@@ -61,23 +82,3 @@ Give it a minute to run depending on the size of code and amps
 8) Once the command works, you will see alfresco-technical-validation_connexas.docx created in folder C:\ATV\atv-0.6.0
 
 Note: In Windows the word doc will not have line count since ohcount runs only on Linux.
-
-Instructions to compile Clojure on windows 
-
-1) Download the lein.bat file from this URL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat. Make sure that the path where lein.bat is downloaded is in the PATH env variable. 
-
-2) You might have to set a JAVA_CMD variable to the path of JDK java command (ex:JAVA_CMD="C:\Program Files\Java\jdk1.8.0_60\bin\java.exe")
-
-3) In windows powershell run "lein self-install" command. This command should create a jar file in $USER_HOME\.lein\self-installs dir($USER_HOME is your home directory on windows)
-
-4) In the $USER_HOME\.lein create a profiles.clj file and add this in the file {:user {:plugins [[lein-bin "0.3.4"]]}} If you already have this file add  lein-bin "0.3.4" as a plugin. 
-
-ex: {:user {:plugins [[lein-difftest "1.3.8"]
-                     [lein-bin "0.3.4"] ]}}
-
-
- This  plugin helps to make the jar file an executable one.
-
-5) While in the powershell go to the location where you have downloaded the technical-validation project and run "lein bin" (project.clj file should be present in the path). This should create a atv file in the target directory
-
-6) On windows copy this file to the same location where you have atv.cmd file and execute atv from the command line. 
