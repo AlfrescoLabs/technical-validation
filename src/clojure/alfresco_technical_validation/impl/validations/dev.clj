@@ -23,6 +23,19 @@
             [clojurewerkz.neocons.rest.cypher        :as cy]
             [alfresco-technical-validation.impl.util :refer :all]))
 
+(defn- dev01
+  [indexes]
+  (let [source             (:source       indexes)
+        source-index       (:source-index indexes)
+        content-index      (:source-content-index source-index)
+        matches            (distinct (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %))) (filter #(= :dev01 (:regex-id %)) content-index)))
+        parent-artifact    (s/join "," matches)]
+    (declare-result "DEV01"
+                    (not (empty? matches))
+                    (if (empty? matches)
+                      "The technology does not have alfresco-sdk-parent as parent artifact id in its pom.xml file(s)."
+                      (str "parent-artifact: " parent-artifact)))))
+
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- dev02
   [indexes]
@@ -62,8 +75,8 @@
 
 (def tests
   "List of DEV validation functions."
-  [dev02])
+  [dev01 dev02])
 
 (def missing-tests
   "List of DEV tests that aren't yet implemented."
-  ["DEV01"])
+  [])

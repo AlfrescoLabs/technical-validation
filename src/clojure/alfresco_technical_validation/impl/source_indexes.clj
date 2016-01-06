@@ -81,4 +81,7 @@
     :ant {
         :ivy            #"antlib:org\.apache\.ivy\.ant"
       }
+    :maven {
+        :dev01          #"<artifactId>\s*alfresco-sdk-parent\s*</artifactId>"
+      }
   })
