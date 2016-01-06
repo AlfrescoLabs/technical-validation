@@ -73,12 +73,12 @@ Open windows command prompt. Go to folder C:\ATV\atv-0.6.0
 Here you will see atv.cmd file
 
 Next give this atv:
-C:\ATV\atv-0.6.0>atv  -s C:\neo_source  -b C:\neo_amps/  -w alfresco-technical-validation_connexas.docx
+C:\ATV\atv-0.6.0>atv  -s C:\neo_source  -b C:\neo_amps/  -w alfresco-technical-validation_report.docx
 Indexing binaries...
 Indexing source... \
 
 Give it a minute to run depending on the size of code and amps
 
-8) Once the command works, you will see alfresco-technical-validation_connexas.docx created in folder C:\ATV\atv-0.6.0
+8) Once the command works, you will see alfresco-technical-validation_report.docx created in folder C:\ATV\atv-0.6.0
 
 Note: In Windows the word doc will not have line count since ohcount runs only on Linux.
