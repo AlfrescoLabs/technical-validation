@@ -44,8 +44,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name = 'org.alfresco.repo.security.authentication.AuthenticationUtil$RunAsWork'
                         RETURN n.name AS ClassName
                          ORDER BY n.name
@@ -75,9 +75,9 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')

@@ -29,8 +29,8 @@
         res (cy/tquery con
                        "
                          START n=NODE(*)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'java.*')
                            AND NOT(n.package =~ 'sun.*')
                            AND NOT(n.package =~ 'com.sun.*')
@@ -87,8 +87,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name IN [
                                            'org.alfresco.repo.action.executer.ActionExecuter',
                                            'org.alfresco.repo.action.executer.ActionExecuterAbstractBase'
@@ -104,8 +104,8 @@
         res (cy/tquery con
                        "
                          START n=NODE(*)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'java.*')
                            AND NOT(n.package =~ 'sun.*')
                            AND NOT(n.package =~ 'com.sun.*')
@@ -128,7 +128,7 @@
                            AND NOT(n.package =~ 'groovy.*')
                            AND NOT(n.package =~ 'org.gradle.*')
                            AND NOT(n.package =~ 'proguard.*')
-                           AND HAS(n.`class-version`)
+                           AND EXISTS(n.`class-version`)
                            AND n.`class-version` < 50
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
@@ -163,8 +163,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name = 'org.alfresco.service.cmr.search.SearchService'
                         RETURN DISTINCT n.name AS ClassName
                          ORDER BY n.name
@@ -197,8 +197,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name = 'org.alfresco.service.cmr.attributes.AttributeService'
                         RETURN DISTINCT n.name AS ClassName
                          ORDER BY n.name

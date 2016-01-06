@@ -63,9 +63,9 @@
         cypher-query             (populate-in-clause "
                                                        START n=NODE(*)
                                                        MATCH (n)-->(m)
-                                                       WHERE HAS(n.name)
-                                                         AND HAS(m.name)
-                                                         AND HAS(m.package)
+                                                       WHERE EXISTS(n.name)
+                                                         AND EXISTS(m.name)
+                                                         AND EXISTS(m.package)
                                                          AND m.package =~ 'org.alfresco..*'
                                                          AND NOT(m.package =~ 'org.alfresco.extension..*')
                                                          AND NOT(m.name IN [
@@ -106,12 +106,12 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
-                           AND HAS(m.name)
+                           AND EXISTS(m.name)
                            AND m.name IN [
                                            'org.springframework.context.ApplicationContextAware',
                                            'org.springframework.context.ApplicationContext'

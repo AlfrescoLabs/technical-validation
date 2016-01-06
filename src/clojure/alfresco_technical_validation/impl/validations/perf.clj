@@ -31,12 +31,12 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
-                           AND HAS(m.name)
+                           AND EXISTS(m.name)
                            AND m.name IN [
                                            'org.alfresco.repo.policy.Behaviour'
                                          ]

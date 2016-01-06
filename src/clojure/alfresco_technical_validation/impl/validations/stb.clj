@@ -31,13 +31,13 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
                            AND NOT(n.package =~ 'com.sun..*')
-                           AND HAS(m.package)
+                           AND EXISTS(m.package)
                            AND m.name IN [
                                            'javax.servlet.Servlet',
                                            'javax.servlet.GenericServlet',
@@ -56,14 +56,14 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
                            AND NOT(n.package =~ 'com.sun..*')
-                           AND HAS(m.name)
-                           AND HAS(m.package)
+                           AND EXISTS(m.name)
+                           AND EXISTS(m.package)
                            AND m.package IN [
                                               'java.sql',
                                               'javax.sql',
@@ -83,8 +83,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name = 'org.alfresco.service.transaction.TransactionService'
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
@@ -98,8 +98,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'java.*')
                            AND NOT(n.package =~ 'sun.*')
                            AND NOT(n.package =~ 'com.sun.*')
@@ -122,8 +122,8 @@
                            AND NOT(n.package =~ 'groovy.*')
                            AND NOT(n.package =~ 'org.gradle.*')
                            AND NOT(n.package =~ 'proguard.*')
-                           AND HAS(m.name)
-                           AND (NOT HAS(n.type)
+                           AND EXISTS(m.name)
+                           AND (NOT EXISTS(n.type)
                                 OR n.type = 'class')
                            AND m.name IN [
                                            'org.alfresco.service.cmr.search.ResultSet',
@@ -185,18 +185,18 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
-                           AND (   (    HAS(m.name)
+                           AND (   (    EXISTS(m.name)
                                     AND m.name IN [
                                                     'java.lang.Thread',
                                                     'java.lang.ThreadGroup',
                                                     'java.lang.Runnable'
                                                   ])
-                                OR (    HAS(m.package)
+                                OR (    EXISTS(m.package)
                                     AND m.package  = 'java.util.concurrent'))
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
@@ -229,8 +229,8 @@
                                  "
                                    START n=NODE(*)
                                    MATCH (n)-->(m)
-                                   WHERE HAS(n.name)
-                                     AND HAS(n.package)
+                                   WHERE EXISTS(n.name)
+                                     AND EXISTS(n.package)
                                      AND NOT(n.package =~ 'java.*')
                                      AND NOT(n.package =~ 'sun.*')
                                      AND NOT(n.package =~ 'com.sun.*')
@@ -253,7 +253,7 @@
                                      AND NOT(n.package =~ 'groovy.*')
                                      AND NOT(n.package =~ 'org.gradle.*')
                                      AND NOT(n.package =~ 'proguard.*')
-                                     AND HAS(m.name)
+                                     AND EXISTS(m.name)
                                      AND m.name IN [
 //                                                     'java.lang.Throwable',   // Every class has this dependency
                                                      'java.lang.Error'
@@ -281,13 +281,13 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
                            AND NOT(n.package =~ 'org.apache..*')
                            AND NOT(n.package =~ 'com.google..*')
                            AND NOT(n.package =~ 'com.sap..*')
                            AND NOT(n.package =~ 'com.sun..*')
-                           AND HAS(m.name)
+                           AND EXISTS(m.name)
                            AND m.name IN [
                                            'java.net.HttpURLConnection',
                                            'org.apache.commons.httpclient.HttpClient',
@@ -310,8 +310,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name = 'org.alfresco.service.cmr.search.SearchService'
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
@@ -341,8 +341,8 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(m.name)
                            AND m.name IN [
                                           'org.alfresco.repo.transaction.RetryingTransactionHelper',
                                           'org.alfresco.service.transaction.TransactionService'
@@ -389,9 +389,9 @@
                        "
                          START n=NODE(*)
                          MATCH (n)-->(m)
-                         WHERE HAS(n.name)
-                           AND HAS(n.package)
-                           AND HAS(m.name)
+                         WHERE EXISTS(n.name)
+                           AND EXISTS(n.package)
+                           AND EXISTS(m.name)
                            AND m.name = 'java.lang.ThreadLocal'
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name
