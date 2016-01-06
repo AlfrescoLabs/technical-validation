@@ -117,6 +117,25 @@ As of v0.4.0, preliminary Java access has been added to the tool - please see
 
 ## Developer Information
 
+### Build Instructions ###
+[Leinengen](http://leiningen.org/) is a build tool for Clojure that makes it
+easy to set up a development environment. It can output Maven POMs.
+
+The [lein-bin](https://github.com/Raynes/lein-bin/blob/master/src/leiningen/bin.clj) plugin for leinengen makes it easy to build an executable that contains all dependencies. If you do not install the module, you can still build uberjars that (./lein uberjar) only need Java to run.
+
+On Linux:
+* git clone https://github.com/AlfrescoLabs/technical-validation
+* cd technical-validation
+* wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+* chmod u+x lein
+* ./lein
+* ./lein plugin install lein-bin
+* echo "{:user {:plugins [[lein-bin \"0.3.4\"]]}}" >> ~/.lein/profiles.clj
+* ./lein bin
+
+Instructions for installing and building on Windows are in the file
+"Step_by_step_instructions_to_run_on_windows".
+
 ### Architecture
 * Most checks of Java code are done by using ASM to analyze the object files.
 * The ASM output is loaded in to a Neo4J database. (See pmonks/depends)
