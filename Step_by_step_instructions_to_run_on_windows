@@ -1,31 +1,10 @@
 Steps by step instruction on how to configure and run ATV in windows
 
-Instructions to compile Clojure on windows:
--------------------------------------------
-1) Download the lein.bat file from this URL https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat. Make sure that the path where lein.bat is downloaded is in the PATH env variable. 
+* Make sure you have Java running on your system and JAVA_HOME set correctly
 
-2) You might have to set a JAVA_CMD variable to the path of JDK java command (ex:JAVA_CMD="C:\Program Files\Java\jdk1.8.0_60\bin\java.exe")
+* Create 4 folders C:\neo4j, C:\neo4j_source, C:\neo4j_amps and C:\atv
 
-3) In windows powershell run "lein self-install" command. This command should create a jar file in $USER_HOME\.lein\self-installs dir($USER_HOME is your home directory on windows)
-
-4) In the $USER_HOME\.lein create a profiles.clj file and add this in the file {:user {:plugins [[lein-bin "0.3.4"]]}} If you already have this file add  lein-bin "0.3.4" as a plugin. 
-
-ex: {:user {:plugins [[lein-difftest "1.3.8"]
-                     [lein-bin "0.3.4"] ]}}
-
- This  plugin helps to make the jar file an executable one.
-
-5) While in the powershell go to the location where you have downloaded the technical-validation project and run "lein bin" (project.clj file should be present in the path). This should create a atv file in the target directory
-
-6) On windows copy this file to the same location where you have atv.cmd file and execute atv from the command line. 
-
-Configuring and running ATV in Windows:
---------------------------------------
-1) Make sure you have Java running on your system and JAVA_HOME set correctly
-
-2) Create 4 folders C:\neo4j, C:\neo4j_source, C:\neo4j_amps and C:\atv
-
-3) Dowloading neo4j:
+* Dowloading neo4j:
 Download the 2.2.7 windows 32 bit zip file from neo4j site
 You need to get the windows zip archive. Do not download the installer as it requires complex setup and configuration.
 Get the community edition of the zip archive.
@@ -33,7 +12,7 @@ Once downloaded, unzip it to C:\neo4j folder
 
 Add an environment variable called NEO4J_HOME and set it to C:\neo4j (it is not mentioned anywhere but I added it)
 
-4) Configuring neo4j:
+* Configuring neo4j:
 Open C:\neo4j\conf\neo4j.properties file and then add these 2 lines at the end:
 node_auto_indexing=true
 node_keys_indexable=name,package,typename
@@ -45,7 +24,7 @@ dbms.security.auth_enabled=false
 
 Save this file as well.
 
-5) Running neo4j:
+* Running neo4j:
 You must run neo4j before giving the atv command
 
 Open a command prompt
@@ -57,12 +36,12 @@ C:\neo4j\bin>
 
 At this point neo4j will be running. You will see a java app console open.
 
-6) Verifying that neo4j running
+* Verifying that neo4j running
 Open browser and go to http://localhost:7474 
 
 You should directly see the page. If it asks for password, then you forgot to turn off the security for DBMS
 
-7) Running ATV:
+* Running ATV:
 Before you run ATV, make sure things are in place
 You must have all of the source code in folder C:\neo4j_source
 You must have all the amps in folder C:\neo4j_amps
@@ -79,6 +58,6 @@ Indexing source... \
 
 Give it a minute to run depending on the size of code and amps
 
-8) Once the command works, you will see alfresco-technical-validation_report.docx created in folder C:\ATV\atv-0.6.0
+* Once the command works, you will see alfresco-technical-validation_report.docx created in folder C:\ATV\atv-0.6.0
 
 Note: In Windows the word doc will not have line count since ohcount runs only on Linux.
