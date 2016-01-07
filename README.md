@@ -138,16 +138,16 @@ On Windows:
 * Add the path where lein.bat is downloaded to the end of PATH env variable. 
 * Set JAVA_CMD env variable to the path of your JDK java executable (e.g. JAVA_CMD="C:\Program Files\Java\jdk1.8.0_60\bin\java.exe")
 * Open Windows Power Shell and run "lein self-install" command. This command should create a jar file in $USER_HOME\.lein\self-installs dir($USER_HOME is your home directory on windows)
-* 4) In the $USER_HOME\.lein create a profiles.clj file and add {:user {:plugins [[lein-bin "0.3.4"]]}} in the file. If you already have this file add  lein-bin "0.3.4" as a plugin. This  plugin helps to make the jar file an executable one.
+* In the $USER_HOME\\.lein create a profiles.clj file and add {:user {:plugins [[lein-bin "0.3.4"]]}} in the file. If you already have this file add  lein-bin "0.3.4" as a plugin. This  plugin helps to make the jar file an executable one.
 
        ex: {:user {:plugins [[lein-difftest "1.3.8"]
                      [lein-bin "0.3.4"] ]}}
 
-* In powershell go to the dir where you have downloaded the technical-validation project and run "lein bin" (project.clj file should be present in the path). This should create a atv file in the target directory.
+* In powershell, go to the dir where you have downloaded the technical-validation project and run "lein bin" (project.clj file should be present in the path). This should create a atv file in the target directory.
 
 * Copy the resulting atv file to the same location where you have atv.cmd file and execute atv from the command line. 
 
-Instructions for installing and building on Windows are in the file
+Step by step instructions to set up, configure and running ATV on Windows is in the file:
 "Step_by_step_instructions_to_run_on_windows".
 
 ### Architecture
