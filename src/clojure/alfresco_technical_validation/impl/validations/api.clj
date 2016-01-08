@@ -68,7 +68,7 @@
                                                          AND EXISTS(m.package)
                                                          AND m.package =~ 'org.alfresco..*'
                                                          AND NOT(m.package =~ 'org.alfresco.extension..*')
-                                                         AND NOT(m.name IN [
+                                                         AND NOT(REPLACE(m.name,'$','.') IN [
                                                                              {in-clause-values}
                                                                            ])
                                                       RETURN DISTINCT m.name AS PrivateAPIs

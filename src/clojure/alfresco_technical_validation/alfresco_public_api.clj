@@ -21,9 +21,9 @@
             [clojure.tools.logging :as log]))
 
 
-(def ^:private ^String api-page-url       "http://docs.alfresco.com/5.0/concepts/java-public-api-list.html")
-(def ^:private ^String api-list-open-tag  "<pre class=\"pre codeblock\">")
-(def ^:private ^String api-list-close-tag "</pre>")
+(def ^:private ^String api-page-url       "http://dev.alfresco.com/resource/AlfrescoOne/5.0/PublicAPI/all-classes-frame.html")
+(def ^:private ^String api-list-open-tag  "All Classes</A> (281)</SPAN></DIV>")
+(def ^:private ^String api-list-close-tag "</BODY>")
 
 (defn public-java-api
   ([] (public-java-api api-page-url))
@@ -32,6 +32,7 @@
    (let [api-page-html ^String (slurp url)
          api-list-text ^String (.substring api-page-html (+ (.indexOf api-page-html api-list-open-tag) (.length api-list-open-tag))
                                                          (.indexOf api-page-html api-list-close-tag))
-         api-list              (map #(s/replace % #"\s" "") (s/split-lines api-list-text))   ; Strip whitespace chars *within* API names, due to https://issues.alfresco.com/jira/browse/MNT-10346
+         api-list-text-trimed ^String (s/replace api-list-text #"\"\s*TARGET=\"detail\">" ".")
+		 api-list              (map #(s/replace % #"\s" "") (s/split api-list-text-trimed #"</A></SPAN></DIV><DIV\s*CLASS=\"p5\"><SPAN\s*CLASS=\"(f10|f15)\"><A\s*HREF=\"org/alfresco/[A-Za-z0-9\./]*\.html\"\s*title=\"(class\s*in\s*|interface\s*in\s*|enum\s*in\s*|annotation\s*in\s*)"))
          sorted-api-list       (sort (set api-list))]
      sorted-api-list)))
