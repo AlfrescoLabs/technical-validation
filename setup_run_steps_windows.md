@@ -7,7 +7,7 @@ Once you have the source code, amps in the right location, running ATV will prod
 * Create 4 folders C:\neo4j, C:\neo4j_source, C:\neo4j_amps and C:\atv
 
 * Dowloading neo4j:
-Download the 2.2.7 windows 32 bit zip file from neo4j site
+Download the the target version of neo4j for windows (32 bit zip) file from neo4j site
 You need to get the windows zip archive. Do not download the installer as it requires complex setup and configuration.
 Get the community edition of the zip archive.
 Once downloaded, unzip it to C:\neo4j folder
