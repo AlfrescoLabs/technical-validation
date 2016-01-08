@@ -41,14 +41,14 @@ C:\neo4j\bin>
 * Verifying that neo4j running
 Open browser and go to http://localhost:7474 
 
-You should directly see the page. If it asks for password, then you forgot to turn off the security for DBMS
+   You should directly see the page. If it asks for password, then you forgot to turn off the security for DBMS
 
 * Running ATV:
 Before you run ATV, make sure things are in place
 You must have all of the source code in folder C:\neo4j_source
 You must have all the amps in folder C:\neo4j_amps
 
-You have downloaded ATV and unzipped in folder C:\ATV
+   You have downloaded ATV and unzipped in folder C:\ATV
 
    Open windows command prompt. Go to folder C:\ATV\atv-0.6.0
    Here you will see atv.cmd file
@@ -58,7 +58,7 @@ You have downloaded ATV and unzipped in folder C:\ATV
    Indexing binaries...
    Indexing source... \
 
-Give it a minute to run depending on the size of code and amps
+   Give it a minute to run depending on the size of code and amps
 
 * Once the command works, you will see alfresco-technical-validation_report.docx created in folder C:\ATV\atv-0.6.0
 
