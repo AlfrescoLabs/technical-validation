@@ -35,6 +35,7 @@ You must run neo4j before giving the atv command
    C:\neo4j\bin>Neo4j.bat
    
    WARNING! This batch script has been deprecated. Please use the provided PowerShell scripts instead:     http://neo4j.com/docs/stable/powershell.html
+   
    C:\neo4j\bin>
 
    At this point neo4j will be running. You will see a java app console open.
