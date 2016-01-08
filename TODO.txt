@@ -1,6 +1,8 @@
 # This is a list of suggested TODO's for the tool, please update it if you see any of it can also be done by the tool.
 
-API01: The tool is checking against http://docs.alfresco.com/5.0/concepts/java-public-api-list.html for a list of class names of the public API, this list is no longer available in the 5.1 document and hence the tool is out dated. A Jira has been raised: https://issues.alfresco.com/jira/browse/BDE-507.
+API01: The tool is checking against http://docs.alfresco.com/5.0/concepts/java-public-api-list.html for a list of class names 
+of the public API, this list is no longer available in the 5.1 document and hence the tool is out dated. 
+A Jira has been raised: https://issues.alfresco.com/jira/browse/BDE-507.
 
 API03: Cannot be checked by tool easily, so OK to leave out.
 API04: Cannot be checked by tool easily, so OK to leave out.
@@ -11,9 +13,12 @@ CM01: This is an easy manual check so tools are not required.
 
 DEV01: This needs to be added to the tool to grep for <artifactId>alfresco-sdk-parent</artifactId> on pom.xml (Done)
 DEV02: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
-DEV03: This appears similar to API04. Not sure if it is worthwhile adding to the tool a grep for ì<module>î on *.xml, which will give you results on any Share extensibility modules used, maybe this belongs to a new criteria?
+DEV03: This appears similar to API04. Not sure if it is worthwhile adding to the tool a grep for ‚Äú<module>‚Äù on *.xml, 
+which will give you results on any Share extensibility modules used, maybe this belongs to a new criteria?
 
-COM01: I wonder whether we need to ensure method names don't collide with those in Alfresco. If so, we should grep for 'org.alfresco.*'.
+COM01: I wonder whether we need to ensure method names don't collide with those in Alfresco. 
+If so, we should grep for 'org.alfresco.*'.
+
 COM02: I wonder whether we need to ensure method names don't collide with those in Alfresco. 
 COM04: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
 COM06: The code is checking for 1.6 or greater. This should be changed to check for 1.8 or greater.
@@ -30,7 +35,8 @@ PERF03: OK
 SEC01: OK
 SEC02: OK
 SEC03: OK
-SEC04: OK, should we also grep on "Runtime.exec(" in *.java and "RuntimeExec" in *.xml, because these are the Alfresco way to run processes. 
+SEC04: OK, should we also grep on "Runtime.exec(" in *.java and "RuntimeExec" in *.xml, because these are the 
+Alfresco way to run processes. 
 SEC05: OK
 
 STB01: Cannot be checked by tool easily, so OK to leave out.
@@ -49,7 +55,8 @@ STB13: OK
 STB14: OK
 STB15: OK
 STB16: Cannot be checked by tool easily, so OK to leave out.
-STB17: This is missing in the tool, would you like to grep for "<alfresco.version>" in pom.xml? This is to assume that they are using Maven.
+STB17: This is missing in the tool, would you like to grep for "<alfresco.version>" in pom.xml? This is to assume that 
+they are using Maven.
 STB18: OK
 STB19: OK
 STB20: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
