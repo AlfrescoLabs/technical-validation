@@ -147,7 +147,7 @@ On Windows:
 
 * Copy the resulting atv file to the same location where you have atv.cmd file and execute atv from the command line. 
 
-Step by step instructions to set up, configure and running ATV on Windows [is here] (https://github.com/AlfrescoLabs/technical-validation/blob/master/Step_by_step_instructions_to_run_on_windows)
+Step by step instructions on how to set up, configure and runn ATV on Windows [is here] (https://github.com/AlfrescoLabs/technical-validation/blob/master/setup_run_steps_windows.md)
 
 ### Architecture
 * Most checks of Java code are done by using ASM to analyze the object files.
