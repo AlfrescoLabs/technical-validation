@@ -36,7 +36,9 @@
                   [org.clojars.pmonks/multigrep       "0.2.0"]
                   [org.clojars.pmonks/bookmark-writer "0.1.0"]
                   [org.clojars.pmonks/spinner         "0.3.0"]
+                  [enlive                             "1.1.6"]
                 ]
+  :plugins [[lein2-eclipse "2.0.0"]]
   :profiles {:uberjar {:aot :all}}
   :source-paths      ["src/clojure"]
   :java-source-paths ["src/java"]

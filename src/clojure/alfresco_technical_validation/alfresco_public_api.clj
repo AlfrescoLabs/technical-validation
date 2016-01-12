@@ -18,21 +18,19 @@
 
 (ns alfresco-technical-validation.alfresco-public-api
   (:require [clojure.string        :as s]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [net.cgrand.enlive-html :as html]))
 
 
 (def ^:private ^String api-page-url       "http://dev.alfresco.com/resource/AlfrescoOne/5.0/PublicAPI/all-classes-frame.html")
-(def ^:private ^String api-list-open-tag  "All Classes</A> (281)</SPAN></DIV>")
-(def ^:private ^String api-list-close-tag "</BODY>")
+(defn fetch-url [url]
+  (html/html-resource (java.net.URL. url)))
 
 (defn public-java-api
   ([] (public-java-api api-page-url))
   ([url]
    (log/debug "Retrieving Alfresco Public Java API list from" url "...")
-   (let [api-page-html ^String (slurp url)
-         api-list-text ^String (.substring api-page-html (+ (.indexOf api-page-html api-list-open-tag) (.length api-list-open-tag))
-                                                         (.indexOf api-page-html api-list-close-tag))
-         api-list-text-trimed ^String (s/replace api-list-text #"\"\s*TARGET=\"detail\">" ".")
-		 api-list              (map #(s/replace % #"\s" "") (s/split api-list-text-trimed #"</A></SPAN></DIV><DIV\s*CLASS=\"p5\"><SPAN\s*CLASS=\"(f10|f15)\"><A\s*HREF=\"org/alfresco/[A-Za-z0-9\./]*\.html\"\s*title=\"(class\s*in\s*|interface\s*in\s*|enum\s*in\s*|annotation\s*in\s*)"))
+    (let [api-page-href (mapcat #(html/attr-values % :href) (html/select (fetch-url url) [[:span #{:.f10 :.f15}] [:a  (html/attr? :href)]]))
+          api-list    (map #(s/replace % #"\/|\.html|\s" {"/" "." ".html" "" "s" ""}) api-page-href)
          sorted-api-list       (sort (set api-list))]
      sorted-api-list)))
