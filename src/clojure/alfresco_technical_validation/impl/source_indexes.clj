@@ -57,6 +57,7 @@
         :stb11          #"(?:^|\s)catch(?:\s|$)"
         :stb12-1        #"System\.(out|err)\.print"
         :stb12-2        #"printStackTrace"
+		:com01          #"package\s*[A-Za-z0-9\.]*;"
       }
     :javascript {
         :sec05          #"(?:^|\s)eval\s*\("

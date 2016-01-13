@@ -25,9 +25,14 @@
 
 (defn- com01
   [indexes]
-  (let [con (:binary-index indexes)
-        res (cy/tquery con
-                       "
+  (let [source        (:source       indexes)
+        source-index  (:source-index indexes)
+        content-index (:source-content-index source-index)
+        matches       (distinct (map #(str (s/trim (:line %))) (filter #(= :com01 (:regex-id %)) content-index)))
+		comma-delimited-string-quoted-in-values (s/replace (s/replace (s/join "," (map #(str "'" % "'") matches)) #"package\s*" "") #";" "")
+        con           (:binary-index indexes)
+        res           (cy/tquery con
+                       (s/replace "
                          START n=NODE(*)
                          WHERE EXISTS(n.name)
                            AND EXISTS(n.package)
@@ -36,7 +41,6 @@
                            AND NOT(n.package =~ 'com.sun.*')
                            AND NOT(n.package =~ 'org.w3c.*')
                            AND NOT(n.package =~ 'org.apache.*')
-                           AND NOT(n.package =~ 'org.alfresco.*')
                            AND NOT(n.package =~ 'org.json.*')
                            AND NOT(n.package =~ 'org.xml.*')
                            AND NOT(n.package =~ 'org.springframework.*')
@@ -53,9 +57,10 @@
                            AND NOT(n.package =~ 'groovy.*')
                            AND NOT(n.package =~ 'org.gradle.*')
                            AND NOT(n.package =~ 'proguard.*')
+						   AND n.package IN [{in-clause-values}]
                         RETURN DISTINCT n.package AS PackageName
                          ORDER BY PackageName
-                       ")
+                       " "{in-clause-values}" comma-delimited-string-quoted-in-values))
         res-as-string (str "The following Java packages are used:\n"
                         (s/join "\n" (map #(str (get % "PackageName")) res)))
         message       (if (empty? res)
