@@ -18,7 +18,7 @@ COM01: 1. Refine the query to return only packages found in *.java files that ha
        2. Include "package org.alfresco...;" to be returned to capture any class that adopts org.alfresco as the package so code collision manual check can be carried out. (Done)
 COM02: I wonder whether we need to ensure method names don't collide with those in Alfresco. 
 COM04: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
-COM06: The code is checking for 1.6 or greater. This should be changed to check for 1.8 or greater.
+COM06: The code is checking for 1.6 or greater. This should be changed to check for 1.8 or greater. (Done)
 COM07: Cannot be checked by tool easily, so OK to leave out.
 COM08: OK
 COM09: OK

@@ -134,7 +134,7 @@
                            AND NOT(n.package =~ 'org.gradle.*')
                            AND NOT(n.package =~ 'proguard.*')
                            AND EXISTS(n.`class-version`)
-                           AND n.`class-version` < 50
+                           AND n.`class-version` < 52
                         RETURN n.name AS ClassName, n.`class-version-str` AS ClassVersion
                          ORDER BY n.name
                        ")
@@ -145,7 +145,7 @@
                              res))]
     (declare-result "COM06"
                     (empty? res)
-                    (if (empty? res) "The code has been compiled for JVM 1.6 or greater." message))))
+                    (if (empty? res) "The code has been compiled for JVM 1.8 or greater." "The code has not been compiled for JVM 1.8 or greater"))))
 
 (defn- com08
   [indexes]
