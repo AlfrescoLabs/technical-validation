@@ -23,14 +23,16 @@
 
 
 (def ^:private ^String api-page-url       "http://dev.alfresco.com/resource/AlfrescoOne/5.0/PublicAPI/all-classes-frame.html")
+
+
 (defn fetch-url [url]
   (html/html-resource (java.net.URL. url)))
 
 (defn public-java-api
   ([] (public-java-api api-page-url))
   ([url]
-   (log/debug "Retrieving Alfresco Public Java API list from" url "...")
+    (log/debug "Retrieving Alfresco Public Java API list from" url "...")
     (let [api-page-href (mapcat #(html/attr-values % :href) (html/select (fetch-url url) [[:span #{:.f10 :.f15}] [:a  (html/attr? :href)]]))
           api-list    (map #(s/replace % #"\/|\.html|\s" {"/" "." ".html" "" "s" ""}) api-page-href)
-         sorted-api-list       (sort (set api-list))]
-     sorted-api-list)))
+          sorted-api-list (sort (set api-list))]
+      sorted-api-list)))

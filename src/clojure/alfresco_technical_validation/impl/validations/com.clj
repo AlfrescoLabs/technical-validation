@@ -1,4 +1,4 @@
-;
+/;
 ; Copyright © 2013,2014 Peter Monks (pmonks@gmail.com)
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
             [clojure.tools.logging                   :as log]
             [clojurewerkz.neocons.rest               :as nr]
             [clojurewerkz.neocons.rest.cypher        :as cy]
+            [alfresco-technical-validation.strict    :as atvst]
             [alfresco-technical-validation.impl.util :refer :all]))
 
 (defn- com01
@@ -82,6 +83,7 @@
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- com04
   [indexes]
+  (println "strict value" (atvst/strict-arg))
   (let [con (:binary-index indexes)
         res (cy/tquery con
                        "
@@ -212,7 +214,8 @@
 
 (def tests
   "List of COM validation functions."
-  [com01 com03 com04 com06 com08 com09 com10 com11])
+ (if(atvst/strict-arg) [com01 com03 com04 com06 com08 com09 com10 com11] [com01 com03 com06 com08 com09 com10 com11]))
+
 
 (def missing-tests
   "List of COM tests that aren't yet implemented."
