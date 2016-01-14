@@ -78,13 +78,16 @@
                          WHERE EXISTS(n.name)
                            AND EXISTS(m.name)
                            AND EXISTS(n.package)
-                           AND NOT(n.package =~ 'org.apache..*')
-                           AND NOT(n.package =~ 'com.google..*')
-                           AND NOT(n.package =~ 'com.sap..*')
-                           AND NOT(n.package =~ 'com.sun..*')
+                           AND NOT(n.package =~ 'org.apache.*')
+                           AND NOT(n.package =~ 'com.google.*')
+                           AND NOT(n.package =~ 'com.sap.*')
+                           AND NOT(n.package =~ 'com.sun.*')
+                           AND NOT(n.package =~ 'com.jcabi.*')
+						   AND NOT(n.package =~ 'com.license4j.*')
                            AND m.name IN [
                                            'java.lang.Process',
-                                           'java.lang.ProcessBuilder'
+                                           'java.lang.ProcessBuilder',
+										   'org.alfresco.util.exec.RuntimeExec'
                                          ]
                         RETURN n.name AS ClassName, COLLECT(DISTINCT m.name) AS APIs
                          ORDER BY n.name

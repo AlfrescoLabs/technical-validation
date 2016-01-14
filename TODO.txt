@@ -13,15 +13,12 @@ CM01: This is an easy manual check so tools are not required.
 
 DEV01: This needs to be added to the tool to grep for <artifactId>alfresco-sdk-parent</artifactId> on pom.xml (Done)
 DEV02: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
-DEV03: This appears similar to API04. Not sure if it is worthwhile adding to the tool a grep for “<module>” on *.xml, 
-which will give you results on any Share extensibility modules used, maybe this belongs to a new criteria?
 
-COM01: I wonder whether we need to ensure method names don't collide with those in Alfresco. 
-If so, we should grep for 'org.alfresco.*'.
-
+COM01: 1. Refine the query to return only packages found in *.java files that has the format of "package ...;" and not "import ...;". (Done)
+       2. Include "package org.alfresco...;" to be returned to capture any class that adopts org.alfresco as the package so code collision manual check can be carried out. (Done)
 COM02: I wonder whether we need to ensure method names don't collide with those in Alfresco. 
 COM04: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.
-COM06: The code is checking for 1.6 or greater. This should be changed to check for 1.8 or greater.
+COM06: The code is checking for 1.6 or greater. This should be changed to check for 1.8 or greater. (Done)
 COM07: Cannot be checked by tool easily, so OK to leave out.
 COM08: OK
 COM09: OK
@@ -35,8 +32,7 @@ PERF03: OK
 SEC01: OK
 SEC02: OK
 SEC03: OK
-SEC04: OK, should we also grep on "Runtime.exec(" in *.java and "RuntimeExec" in *.xml, because these are the 
-Alfresco way to run processes. 
+SEC04: OK, should we also grep on 'org.alfresco.util.exec.RuntimeExec' in *.java packages because these are the Alfresco way to run Alfresco processes. (Done)
 SEC05: OK
 
 STB01: Cannot be checked by tool easily, so OK to leave out.
