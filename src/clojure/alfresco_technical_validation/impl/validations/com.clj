@@ -88,7 +88,6 @@
 ; Would be preferable to do a deeper search here, but Neo4J is super slow at those
 (defn- com04
   [indexes]
-  (println "strict value" (atvst/strict-arg))
   (let [con (:binary-index indexes)
         res (cy/tquery con
                        "
@@ -217,9 +216,9 @@
       (declare-result "COM11" true "The technology does not use the AttributeService.")
       (declare-result "COM11" message))))
 
-(def tests
+(defn tests []
   "List of COM validation functions."
- (if(atvst/strict-arg) [com01 com03 com04 com06 com08 com09 com10 com11] [com01 com03 com06 com08 com09 com10 com11]))
+ (if (atvst/strict-arg)  [com01 com03 com04 com06 com08 com09 com10 com11] [com01 com03 com06 com08 com09 com10 com11]))
 
 
 (def missing-tests

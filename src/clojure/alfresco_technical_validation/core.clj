@@ -38,16 +38,7 @@
 
 (def ^:private report-template (io/resource "alfresco-technical-validation-template.docx"))
 
-(def ^:private validation-fns (concat val-api/tests
-                                      val-cm/tests
-                                      val-dev/tests
-                                      val-com/tests
-                                      val-perf/tests
-                                      val-sec/tests
-                                      val-stb/tests
-                                      val-ux/tests
-                                      val-up/tests
-                                      val-lgl/tests))
+
 
 (def missing-tests (concat val-api/missing-tests
                            val-cm/missing-tests
@@ -59,6 +50,20 @@
                            val-ux/missing-tests
                            val-up/missing-tests
                            val-lgl/missing-tests))
+
+(defn- validation-fns []  
+                         (concat val-api/tests
+                                      val-cm/tests
+                                      val-dev/tests
+                                     (val-com/tests)
+                                      val-perf/tests
+                                      val-sec/tests
+                                      val-stb/tests
+                                      val-ux/tests
+                                      val-up/tests
+                                      val-lgl/tests))
+
+
 
 (defn index-extension
   "Indexes an extension, given its source, binaries, and with a Neo4J server running at neo4j-url."
@@ -72,8 +77,9 @@
   ([source binaries neo4j-url]           (validate source binaries neo4j-url nil))
   ([source binaries neo4j-url status-fn] (validate (index-extension source binaries neo4j-url status-fn) status-fn))
   ([indexes status-fn]
+    
     (if status-fn (status-fn "\nValidating criteria... "))
-    (doall (map #(% indexes) validation-fns))))
+    (doall (map #(% indexes) (validation-fns)))))
 
 (defn- java-ify-result
   "Converts a single validation result into something Java can digest.  Specifically it replaces keyword keys with string keys."
