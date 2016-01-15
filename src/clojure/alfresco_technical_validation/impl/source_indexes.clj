@@ -84,5 +84,6 @@
       }
     :maven {
         :dev01          #"<artifactId>\s*alfresco-sdk-parent\s*</artifactId>"
+		:stb17          #"<alfresco\.version>5\.1\.?[0-9]*</alfresco\.version>"
       }
   })
