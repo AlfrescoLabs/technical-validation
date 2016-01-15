@@ -51,8 +51,7 @@ STB13: OK
 STB14: OK
 STB15: OK
 STB16: Cannot be checked by tool easily, so OK to leave out.
-STB17: This is missing in the tool, would you like to grep for "<alfresco.version>" in pom.xml? This is to assume that 
-they are using Maven.
+STB17: This is missing in the tool, would you like to grep for "<alfresco.version>" in pom.xml? This is to assume that they are using Maven. (Done)
 STB18: OK
 STB19: OK
 STB20: This needs to be removed or marked as "not strict" from the tool since it's removed in the document template.

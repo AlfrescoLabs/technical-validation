@@ -334,6 +334,19 @@
                         "#### Manual followup required - content models (if any) are not loaded via bootstrap."
                         message))))
 
+  (defn- stb17
+  [indexes]
+  (let [source             (:source       indexes)
+        source-index       (:source-index indexes)
+        content-index      (:source-content-index source-index)
+        matches            (distinct (map #(str (subs (str (:file %)) (.length ^String source)) " line " (:line-number %) ": " (s/trim (:line %))) (filter #(= :stb17 (:regex-id %)) content-index)))
+        alfresco-version   (s/join "\n" matches)]
+    (declare-result "STB17"
+                    (not (empty? matches))
+                    (if (empty? matches)
+                      "#### Manual followup required - the technology doesn't seem to be built against the latest version of Alfresco Enterprise as it doesn't have <alfresco.version>x.x.x</alfresco.version> with Alfresco latest version in the pom.xml files."
+                      (str alfresco-version)))))
+					  
 (defn- stb18
   [indexes]
   (let [con (:binary-index indexes)
@@ -401,9 +414,9 @@
 
 (def tests
   "List of STB validation functions."
-  [stb03 stb04 stb06 stb07 stb08 stb09 stb10 stb11 stb12 stb13 stb14 stb15 stb18 stb19 stb20 stb22])
+  [stb03 stb04 stb06 stb07 stb08 stb09 stb10 stb11 stb12 stb13 stb14 stb15 stb17 stb18 stb19 stb20 stb22])
 
 (def missing-tests
   "List of STB tests that aren't yet implemented."
-  ["STB01" "STB02" "STB05" "STB16" "STB17" "STB21"])
+  ["STB01" "STB02" "STB05" "STB16" "STB21"])
 
