@@ -22,7 +22,7 @@
             [net.cgrand.enlive-html :as html]))
 
 
-(def ^:private ^String api-page-url       "http://dev.alfresco.com/resource/AlfrescoOne/5.0/PublicAPI/all-classes-frame.html")
+(def ^:private ^String api-page-url       "http://dev.alfresco.com/resource/AlfrescoOne/5.1/PublicAPI/all-classes-frame.html")
 
 
 (defn fetch-url [url]

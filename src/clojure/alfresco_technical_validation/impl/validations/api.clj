@@ -81,8 +81,7 @@
         message                  (if (empty? res)
                                    "The technology only uses Alfresco's Public Java APIs."
                                    res-as-string)]
-    (println "query :" res-as-string)
-    (declare-result "API01"
+        (declare-result "API01"
                     (empty? res)
                     message)))
 
