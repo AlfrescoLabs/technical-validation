@@ -60,6 +60,7 @@
   [indexes]
   (let [con                      (:binary-index indexes)
         alfresco-public-java-api (cypher-escaped-alfresco-api)
+        
         cypher-query             (populate-in-clause "
                                                        START n=NODE(*)
                                                        MATCH (n)-->(m)
@@ -71,15 +72,16 @@
                                                          AND NOT(REPLACE(m.name,'$','.') IN [
                                                                              {in-clause-values}
                                                                            ])
-                                                      RETURN DISTINCT m.name AS PrivateAPIs
+                                                      RETURN DISTINCT m.name AS PrivateAPIs , n.name AS UsedInClass
                                                        ORDER BY m.name
                                                      ", alfresco-public-java-api)
         res                      (cy/tquery con cypher-query)
         res-as-string            (str "The following private Java APIs are used:\n"
-                                   (s/join "\n" (map #(str (get % "PrivateAPIs")) res)))
+                                   (s/join "\n" (map #(str (get % "PrivateAPIs") " used in " (get % "UsedInClass")) res)))
         message                  (if (empty? res)
                                    "The technology only uses Alfresco's Public Java APIs."
                                    res-as-string)]
+    (println "query :" res-as-string)
     (declare-result "API01"
                     (empty? res)
                     message)))
