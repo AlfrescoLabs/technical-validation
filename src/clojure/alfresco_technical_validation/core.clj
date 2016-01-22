@@ -51,11 +51,11 @@
                            val-up/missing-tests
                            val-lgl/missing-tests))
 
-(defn- validation-fns []  
+(def ^:private validation-fns
                          (concat val-api/tests
                                       val-cm/tests
                                       val-dev/tests
-                                     (val-com/tests)
+                                      val-com/tests
                                       val-perf/tests
                                       val-sec/tests
                                       val-stb/tests
@@ -79,7 +79,7 @@
   ([indexes status-fn]
     
     (if status-fn (status-fn "\nValidating criteria... "))
-    (doall (map #(% indexes) (validation-fns)))))
+    (doall (map #(% indexes) validation-fns))))
 
 (defn- java-ify-result
   "Converts a single validation result into something Java can digest.  Specifically it replaces keyword keys with string keys."

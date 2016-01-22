@@ -21,7 +21,6 @@
             [clojure.tools.logging                   :as log]
             [clojurewerkz.neocons.rest               :as nr]
             [clojurewerkz.neocons.rest.cypher        :as cy]
-            [alfresco-technical-validation.strict    :as atvst]
             [alfresco-technical-validation.impl.util :refer :all]))
 
 (defn- com01
@@ -216,9 +215,9 @@
       (declare-result "COM11" true "The technology does not use the AttributeService.")
       (declare-result "COM11" message))))
 
-(defn tests []
+(def tests
   "List of COM validation functions."
- (if (atvst/strict-arg)  [com01 com03 com04 com06 com08 com09 com10 com11] [com01 com03 com06 com08 com09 com10 com11]))
+  [com01 com03 com04 com06 com08 com09 com10 com11] )
 
 
 (def missing-tests

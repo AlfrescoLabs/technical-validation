@@ -23,7 +23,6 @@
             [jansi-clj.core                             :as jansi]
             [io.aviso.exception                         :as ave]
             [alfresco-technical-validation.core         :as atv]
-            [alfresco-technical-validation.strict       :as atvst]
             [alfresco-technical-validation.writers.word :as atvww]
             [alfresco-technical-validation.writers.edn  :as atvwe]
             [alfresco-technical-validation.writers.json :as atvwj]
@@ -41,8 +40,6 @@
    ["-n" "--neo4j-url NEO4J_URL" "URL of the Neo4J server to use (optional - see default)"
      :default "http://localhost:7474/db/data/"
      :validate [#(not (or (nil? %) (zero? (.length ^String %)))) "URL must be provided"]]
-   ["-S" nil "Check on additional criteria"
-   :id :strict]
    ["-w" "--word-file FILE_NAME" "Produce output as a Word document in the specified file"
      :validate [#(not (.exists (clojure.java.io/file %))) "Word document must not exist"]]
    ["-e" "--edn-file FILE_NAME" "Produce EDN output in the specified file"
@@ -64,7 +61,6 @@
           source        (:source    options)
           binaries      (:binaries  options)
           neo4j-url     (:neo4j-url options)
-          strict        (:strict    options)
           word-filename (:word-file options)
           edn-filename  (:edn-file  options)
           json-filename (:json-file options)
@@ -84,8 +80,6 @@
           (do
             (jansi/install!)
             (log/debug "Starting...")  ; We do this primarily to force slf4j to initialise itself - it's rather whiny on startup
-            (atvst/strict-arg strict)
-            
             (spin/spin!
               #(let [indexes            (atv/index-extension source binaries neo4j-url spin/print)
                      validation-results (atv/validate indexes spin/print)]
